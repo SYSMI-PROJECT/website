@@ -1,10 +1,8 @@
 <?php
-$servername = "89.213.140.89";
-$username = "u53_cMs3kOJctv";
-$password = "Zd1QC.O.vGFHc.4.1gXF+d0i";
-$dbname = "s53_utilisateur";
-$encryptionKey = "8gthkl77335628TvK21030ggvnbc";
-
+$servername = "host";
+$username = "username";
+$password = "password";
+$dbname = "db_name";
 
 if (!function_exists('executeQuery')) {
     function executeQuery($sql, $params = []) {
