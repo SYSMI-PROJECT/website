@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/jpg" href="./PNG/SYSMI connect.jpg">
+    <link rel="icon" type="image/png" href="../Import/icons/Logo.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connexion</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientAnimation 10s ease infinite;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Roboto', sans-serif;
+            color: #fff;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-box {
+            background-color: rgba(0, 0, 0, 0.6); /* Légèrement sombre pour le contraste */
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .user-box {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .user-box input {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            border: none;
+            border-bottom: 2px solid #ffcc00; /* Bordure jaune */
+            outline: none;
+            font-size: 18px;
+            background: transparent;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .user-box input:focus {
+            border-bottom: 2px solid #ffd700; /* Changement de couleur au focus */
+        }
+
+        .user-box label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 18px;
+            color: #ddd;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .user-box input:focus ~ label,
+        .user-box input:valid ~ label {
+            top: -20px;
+            left: 0;
+            font-size: 14px;
+            color: #ffcc00; /* Changement de couleur des labels */
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff8c00, #ff4500); /* Dégradé vibrant d'orange à rouge */
+            color: white;
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #ff7f50, #ff6347); /* Changement de couleur au survol */
+            transform: translateY(-3px);
+        }
+
+        .message {
+            text-align: center;
+            color: #ffcc00; /* Message en couleur jaune */
+            font-family: sans-serif;
+            margin-bottom: 60px;
+        }
+
+        .forgot-password {
+            margin-top: 30px;
+        }
+
+        .forgot-password a {
+            color: #00aaff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        
+        }
+
+        .forgot-password a:hover {
+            color: #00c300; 
+        }
+
+        .error-message {
+            color: #ff0000; /* Couleur rouge pour les messages d'erreur */
+            margin-top: 10px;
+            font-size: 14px;
+            display: none; /* Caché par défaut */
+        }
+    </style>
+</head>
+<body>
+<div class="login-box">
+    <p class="message">Vous serez bloqué après 3 tentatives infructueuses.</p>
+
+    <!-- Formulaire de connexion -->
+    <form id="loginForm" action="../traitements/Formulaires/login.php" method="post">
+        <div class="user-box">
+            <input type="email" name="email" id="email" required>
+            <label>Adresse mail</label>
+            <div class="error-message" id="emailError">Veuillez entrer une adresse email valide.</div>
+        </div>
+        <div class="user-box">
+            <input type="password" name="password" id="password" required>
+            <label>Mot de passe</label>
+            <div class="error-message" id="passwordError">Veuillez entrer votre mot de passe.</div>
+        </div>
+        <div>
+            <button type="submit">Se Connecter</button>
+        </div>
+    </form>
+
+    <!-- Lien pour mot de passe oublié -->
+    <div class="forgot-password">
+        <a href="password.html">Mot de passe oublié ?</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+        let valid = true;
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const emailError = document.getElementById("emailError");
+        const passwordError = document.getElementById("passwordError");
+
+        // Réinitialiser les messages d'erreur
+        emailError.style.display = "none";
+        passwordError.style.display = "none";
+
+        // Validation de l'email
+        if (!emailInput.value.includes("@") || !emailInput.value.includes(".")) {
+            emailError.style.display = "block";
+            valid = false;
+        }
+
+        // Validation du mot de passe
+        if (passwordInput.value.trim() === "") {
+            passwordError.style.display = "block";
+            valid = false;
+        }
+
+        // Empêche la soumission si les champs ne sont pas valides
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+</script>
+</body>
+</html>

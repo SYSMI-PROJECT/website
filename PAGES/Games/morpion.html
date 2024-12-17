@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../../Import/icons/Logo.png" type="image/png">
+    <title>morpion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle, #021265, #003105);
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 400px;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: solid 1px #e1ff00;
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-gap: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .cell {
+            width: 80px;
+            height: 80px;
+            background-color: #ddd;
+            border: 2px solid #fff;
+            font-size: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .cell.x {
+            color: #2962ff;
+        }
+
+        .cell.o {
+            color: #ff1744;
+        }
+        
+        .cell:hover {
+            background-color: #ccc;
+        }
+
+        #restart-button, .redirect {
+            background-color: #ff1744;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+
+        #restart-button:hover, .redirect:hover {
+            background-color: #d50000;
+        }
+
+        h1 {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Morpion vs Bot</h1>
+        <div id="board" class="board">
+            <!-- Les cases du jeu seront ajoutées dynamiquement ici -->
+        </div>
+        <p id="status-message"></p>
+        <button id="restart-button">Recommencer</button>
+        <button class="redirect">Menu</button>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const statusMessage = document.getElementById('status-message');
+        const restartButton = document.getElementById('restart-button');
+
+        const X_CLASS = 'x';
+        const O_CLASS = 'o';
+        const HUMAN_PLAYER = X_CLASS;
+        const BOT_PLAYER = O_CLASS;
+        let currentPlayerClass = HUMAN_PLAYER;
+        const winningCombination = [
+            [0, 1, 2],    // Première ligne
+            [3, 4, 5],    // Deuxième ligne
+            [6, 7, 8],   // Troisième ligne
+            [0, 3, 6], // Première colonne
+            [1, 4, 7], // Deuxième colonne
+            [2, 5, 8], // Troisième colonne
+            [0, 4, 8], // Diagonale descendante
+            [2, 4, 6]  // Diagonale ascendante
+        ];
+
+        let gameActive = true;
+        const cellElements = [];
+
+        startGame();
+
+        restartButton.addEventListener('click', startGame);
+
+        function startGame() {
+            gameActive = true;
+            currentPlayerClass = HUMAN_PLAYER;
+            board.innerHTML = '';
+            cellElements.length = 0; // Réinitialiser le tableau des cellules
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.cellIndex = i;
+                cell.addEventListener('click', handleClick);
+                board.appendChild(cell);
+                cellElements.push(cell);
+            }
+            setBoardHoverClass();
+            statusMessage.innerText = '';
+            if (currentPlayerClass === BOT_PLAYER) {
+                botTurn(); // Le bot commence la partie si nécessaire
+            }
+        }
+
+        function handleClick(event) {
+            const cell = event.target;
+            if (!gameActive || cell.classList.contains(X_CLASS) || cell.classList.contains(O_CLASS)) {
+                return; // Si le jeu est inactif ou la cellule est déjà occupée, ne rien faire
+            }
+            const currentClass = currentPlayerClass;
+            placeMark(cell, currentClass);
+            if (checkWin(currentClass)) {
+                endGame(false);
+                if (currentClass === HUMAN_PLAYER) {
+                    statusMessage.innerText = "Vous avez gagné!";
+                    window.location.href = 'Super étoile.php'; // Redirection vers le script PHP en cas de victoire du joueur
+                } else {
+                    statusMessage.innerText = "Le Bot a gagné!";
+                }
+            } else if (isDraw()) {
+                endGame(true);
+                statusMessage.innerText = "Match nul!";
+            } else {
+                currentPlayerClass = currentPlayerClass === HUMAN_PLAYER ? BOT_PLAYER : HUMAN_PLAYER; // Changer de joueur
+                if (currentPlayerClass === BOT_PLAYER) {
+                    setTimeout(botTurn, 500); // Laisser le bot jouer immédiatement après le joueur humain
+                }
+                setBoardHoverClass();
+            }
+        }
+
+        function endGame(draw) {
+            gameActive = false;
+        }
+
+        function isDraw() {
+            return [...cellElements].every(cell => {
+                return cell.classList.contains(X_CLASS) || cell.classList.contains(O_CLASS);
+            });
+        }
+
+        function placeMark(cell, currentClass) {
+            cell.classList.add(currentClass);
+            cell.innerText = currentClass.toUpperCase(); // Ajouter le symbole (X ou O) comme contenu texte
+        }
+
+        function setBoardHoverClass() {
+            board.classList.remove(X_CLASS);
+            board.classList.remove(O_CLASS);
+            if (currentPlayerClass === HUMAN_PLAYER) {
+                board.classList.add(X_CLASS);
+            } else {
+                board.classList.add(O_CLASS);
+            }
+        }
+
+        function checkWin(currentClass) {
+            return winningCombination.some(combination => {
+                return combination.every(index => {
+                    return cellElements[index].classList.contains(currentClass);
+                });
+            });
+        }
+
+        function botTurn() {
+            let emptyCells = cellElements.filter(cell => !cell.classList.contains(X_CLASS) && !cell.classList.contains(O_CLASS));
+            if (emptyCells.length === 0) return; // Si aucune case vide n'est disponible, retourner
+            const botIndex = findBestMove();
+            const cell = cellElements[botIndex];
+            if (!cell) return; // Vérifier si la cellule est valide
+            placeMark(cell, BOT_PLAYER);
+            if (checkWin(BOT_PLAYER)) {
+                endGame(false);
+                statusMessage.innerText = "Le Bot a gagné!";
+            } else if (isDraw()) {
+                endGame(true);
+                statusMessage.innerText = "Match nul!";
+            } else {
+                currentPlayerClass = HUMAN_PLAYER;
+                setBoardHoverClass();
+            }
+        }
+
+        function findBestMove() {
+            // Pour le moment, le bot va juste bloquer si le joueur a deux symboles alignés
+            // Sinon, il va juste choisir une case aléatoire
+            for (let i = 0; i < winningCombination.length; i++) {
+                const [a, b, c] = winningCombination[i];
+                if (
+                    cellElements[a].classList.contains(HUMAN_PLAYER) &&
+                    cellElements[b].classList.contains(HUMAN_PLAYER) &&
+                    !cellElements[c].classList.contains(X_CLASS) &&
+                    !cellElements[c].classList.contains(O_CLASS)
+                ) {
+                    return c;
+                } else if (
+                    cellElements[a].classList.contains(HUMAN_PLAYER) &&
+                    cellElements[c].classList.contains(HUMAN_PLAYER) &&
+                    !cellElements[b].classList.contains(X_CLASS) &&
+                    !cellElements[b].classList.contains(O_CLASS)
+                ) {
+                    return b;
+                } else if (
+                    cellElements[b].classList.contains(HUMAN_PLAYER) &&
+                    cellElements[c].classList.contains(HUMAN_PLAYER) &&
+                    !cellElements[a].classList.contains(X_CLASS) &&
+                    !cellElements[a].classList.contains(O_CLASS)
+                ) {
+                    return a;
+                }
+            }
+            // Si aucune case ne permet de bloquer, le bot choisit une case aléatoire
+            const randomIndex = Math.floor(Math.random() * cellElements.length);
+            return randomIndex;
+        }
+
+        document.querySelector('.redirect').addEventListener('click', function() {
+            window.location.href = 'home-menu.php';
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Chat Amélioré</title>
+    <style>
+        /* Style général pour l'arrière-plan */
+        body, html {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column; /* Alignement vertical */
+            background: radial-gradient(circle, #1a1a1a, #000000); /* Dégradé radial */
+            font-family: 'Arial', sans-serif; /* Changement de police */
+            color: #fff;
+            transition: background-color 0.3s, color 0.3s; /* Transition pour le changement de thème */
+        }
+
+        /* Menu de navigation */
+        nav {
+            position: fixed; /* Fixe la barre en haut */
+            top: 0;
+            left: 0;
+            width: 100%; /* Largeur de 100% */
+            background: rgba(255, 215, 0, 0.8); /* Fond doré semi-transparent */
+            padding: 10px 0; /* Espace autour des liens */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            z-index: 10; /* Assure que la navbar soit toujours au-dessus */
+        }
+
+        nav img {
+            height: 50px;
+            width: auto;
+        }
+
+        nav ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            justify-content: flex-start; /* Aligner à gauche */
+            align-items: center; /* Aligner verticalement les éléments */
+            padding-left: 20px; /* Ajouter un padding pour éloigner légèrement du bord gauche */
+        }
+
+        nav ul li {
+            margin-right: 20px; /* Espacement entre les éléments de la navbar */
+        }
+
+        nav a {
+            color: #000; /* Texte noir pour contraste */
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 16px;
+            padding: 5px 10px;
+            transition: color 0.3s, background-color 0.3s; /* Effet de transition */
+        }
+
+        nav a:hover {
+            color: #fff; /* Change la couleur du texte au survol */
+            background-color: rgba(0, 0, 0, 0.7); /* Fond noir semi-transparent au survol */
+            border-radius: 5px;
+        }
+
+        /* Style pour la zone de chat */
+        .chat-container {
+            flex: 1; /* Prend tout l'espace restant */
+            display: flex;
+            flex-direction: column; /* Alignement vertical */
+            justify-content: flex-end; /* Aligne les messages en bas */
+            padding: 20px;
+            overflow-y: auto; /* Permet le défilement */
+            background-color: #222; /* Fond du chat */
+            border-top: 2px solid rgba(255, 215, 0, 0.6); /* Bordure dorée */
+            transition: background-color 0.3s; /* Transition pour le changement de thème */
+        }
+
+        /* Messages */
+        .message {
+            background-color: rgba(255, 215, 0, 0.2); /* Fond des messages */
+            color: #000; /* Texte noir */
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            max-width: 80%; /* Limiter la largeur des messages */
+            transition: opacity 0.5s; /* Animation pour l'apparition */
+            opacity: 0; /* Commence invisible */
+            position: relative; /* Pour le positionnement de la citation */
+        }
+
+        .message.show {
+            opacity: 1; /* Devenir visible avec animation */
+        }
+
+        .message.user {
+            background-color: rgba(0, 255, 0, 0.2); /* Fond des messages de l'utilisateur */
+            align-self: flex-end; /* Aligner à droite */
+        }
+
+        .quote {
+            font-style: italic; /* Style italique pour la citation */
+            color: rgba(255, 255, 255, 0.7); /* Couleur plus claire */
+            font-size: 12px; /* Taille de police plus petite */
+            position: absolute; /* Positionner la citation */
+            top: 5px; /* Marge en haut */
+            left: 5px; /* Marge à gauche */
+        }
+
+        /* Zone de saisie */
+        .input-container {
+            display: flex; /* Flexbox pour le champ de texte et le bouton */
+            padding: 10px;
+            background-color: #333; /* Fond de la zone de saisie */
+        }
+
+        .input-container input {
+            flex: 1; /* Prend tout l'espace disponible */
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .input-container button {
+            background-color: rgba(255, 215, 0, 0.8); /* Fond doré */
+            color: #000; /* Texte noir */
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase; /* Texte en majuscules */
+            transition: background 0.3s; /* Effet de transition pour le hover */
+        }
+
+        .input-container button:hover {
+            background-color: rgba(255, 215, 0, 1); /* Éclaircir au survol */
+        }
+
+        /* Bouton pour effacer le chat */
+        .clear-button {
+            margin-left: 10px;
+            background-color: red; /* Fond rouge pour le bouton d'effacement */
+            color: white; /* Texte blanc */
+        }
+
+        /* Indicateur de rédaction */
+        .typing-indicator {
+            color: rgba(255, 215, 0, 0.6); /* Couleur pour l'indicateur de rédaction */
+            margin-bottom: 10px;
+            display: none; /* Cacher par défaut */
+        }
+
+        /* Pied de page */
+        footer {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menu de navigation avec un logo -->
+    <nav>
+        <ul>
+            <li><img src="logo.png" alt="Logo VIP">
+            </li> <!-- Logo dans la navbar -->
+            <li><a href="#services">Services</a></li>
+            <li><a href="#about">À propos</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Conteneur de chat -->
+    <div class="chat-container" id="chat-container">
+        <div class="typing-indicator" id="typingIndicator">L'utilisateur est en train de rédiger...</div>
+        <!-- Les messages seront ajoutés ici dynamiquement -->
+    </div>
+
+    <!-- Zone de saisie -->
+    <div class="input-container">
+        <input type="text" id="messageInput" placeholder="Entrez votre message...">
+        <button id="sendButton">Envoyer</button>
+        <button class="clear-button" id="clearButton">Effacer</button> <!-- Bouton pour effacer le chat -->
+    </div>
+
+    <script>
+        // Fonction pour ajouter un message au chat
+        function addMessage(isUser = true, quoteText = '') {
+            const input = document.getElementById('messageInput');
+            const messageText = input.value;
+
+            if (messageText.trim() !== '') { // Vérifie si le champ n'est pas vide
+                const messageContainer = document.createElement('div');
+                messageContainer.className = 'message' + (isUser ? ' user' : '');
+                messageContainer.textContent = messageText;
+
+                // Si une citation est fournie, l'ajouter
+                if (quoteText) {
+                    const quote = document.createElement('div');
+                    quote.className = 'quote';
+                    quote.textContent = `Réponse à : "${quoteText}"`;
+                    messageContainer.appendChild(quote);
+                }
+
+                document.getElementById('chat-container').appendChild(messageContainer);
+                input.value = ''; // Réinitialiser le champ de saisie
+                setTimeout(() => {
+                    messageContainer.classList.add('show'); // Ajouter la classe pour l'animation
+                }, 10); // Laisser le temps à l'élément d'être ajouté avant d'appliquer l'animation
+
+                // Faire défiler vers le bas
+                document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight; 
+            }
+        }
+
+        // Fonction pour effacer le chat
+        function clearChat() {
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.innerHTML = ''; // Supprime tous les messages
+            document.getElementById('typingIndicator').style.display = 'none'; // Masquer l'indicateur de rédaction
+        }
+
+        // Événement pour le bouton d'envoi
+        document.getElementById('sendButton').addEventListener('click', function() {
+            addMessage(true); // Ajouter le message de l'utilisateur
+        });
+
+        // Événement pour le bouton d'effacement
+        document.getElementById('clearButton').addEventListener('click', clearChat);
+
+        // Indicateur de rédaction
+        const input = document.getElementById('messageInput');
+        input.addEventListener('input', function() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            typingIndicator.style.display = 'block'; // Afficher l'indicateur de rédaction
+            clearTimeout(typingIndicator.timeout); // Réinitialiser le timeout
+            typingIndicator.timeout = setTimeout(() => {
+                typingIndicator.style.display = 'none'; // Cacher après 1 seconde d'inactivité
+            }, 1000);
+        });
+
+        // Événement pour la touche "Entrée"
+        input.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addMessage(true); // Ajouter le message de l'utilisateur
+            }
+        });
+    </script>
+
+</body>
+</html>

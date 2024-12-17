@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game Ultimate</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            transition: background 0.5s ease;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        #score-board {
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+        #game-board {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px auto;
+            max-width: 320px;
+        }
+        .color-button {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+        .color-button.active {
+            border: 5px solid #fff;
+            box-shadow: 0 0 15px #fff;
+            filter: brightness(1.5);
+        }
+        .color-button.success {
+            background-color: green;
+            border: 5px solid lime;
+        }
+        .color-button:hover {
+            transform: scale(1.1);
+        }
+        #progress-bar-container {
+            margin: 20px auto;
+            width: 80%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #ff9800;
+            transition: width 0.3s ease;
+        }
+        #message {
+            font-size: 1.2rem;
+            margin: 10px;
+        }
+        #controls {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            margin: 5px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message-highlight {
+            font-size: 1.5rem;
+            color: #ff9800;
+            font-weight: bold;
+        }
+        #reset-button {
+            background-color: #f44336;
+        }
+        #reset-button:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+    <h1>Memory Game Ultimate</h1>
+    <div id="score-board">
+        Score : <span id="score">0</span> | Meilleur Score : <span id="high-score">0</span>
+    </div>
+    <div id="progress-bar-container">
+        <div id="progress-bar"></div>
+    </div>
+    <div id="game-board">
+        <button class="color-button" id="red" style="background: red;"></button>
+        <button class="color-button" id="green" style="background: green;"></button>
+        <button class="color-button" id="blue" style="background: blue;"></button>
+        <button class="color-button" id="yellow" style="background: yellow;"></button>
+    </div>
+    <p id="message">Cliquez sur "Commencer" pour jouer !</p>
+    <div id="controls">
+        <button id="start-button">Commencer</button>
+        <button id="reset-button">Réinitialiser</button>
+    </div>
+
+    <script>
+        const colors = ["red", "green", "blue", "yellow"];
+        const sounds = {
+            red: new Audio("https://freesound.org/data/previews/405/405764_5121236-lq.mp3"),
+            green: new Audio("https://freesound.org/data/previews/405/405767_5121236-lq.mp3"),
+            blue: new Audio("https://freesound.org/data/previews/405/405763_5121236-lq.mp3"),
+            yellow: new Audio("https://freesound.org/data/previews/405/405765_5121236-lq.mp3"),
+        };
+
+        let sequence = [];
+        let playerSequence = [];
+        let level = 0;
+        let score = 0;
+        let highScore = localStorage.getItem("highScore") || 0;
+        let strictMode = true;  // Mode strict activé par défaut
+
+        const messageDisplay = document.getElementById("message");
+        const scoreDisplay = document.getElementById("score");
+        const highScoreDisplay = document.getElementById("high-score");
+        const progressBar = document.getElementById("progress-bar");
+        const startButton = document.getElementById("start-button");
+        const resetButton = document.getElementById("reset-button");
+        const colorButtons = document.querySelectorAll(".color-button");
+
+        highScoreDisplay.textContent = highScore;
+
+        function playSound(color) {
+            sounds[color].currentTime = 0;
+            sounds[color].play();
+        }
+
+        function animateButton(color) {
+            const button = document.getElementById(color);
+            button.classList.add("active");
+            setTimeout(() => button.classList.remove("active"), 300);
+        }
+
+        function showMessage(msg, className) {
+            messageDisplay.textContent = msg;
+            messageDisplay.classList.add(className);
+            setTimeout(() => {
+                messageDisplay.classList.remove(className);
+            }, 1000);
+        }
+
+        function playSequence() {
+            let i = 0;
+            messageDisplay.textContent = `Niveau ${level}`;
+            progressBar.style.width = "0%";
+            const interval = setInterval(() => {
+                const color = sequence[i];
+                playSound(color);
+                animateButton(color);
+                i++;
+                if (i >= sequence.length) {
+                    clearInterval(interval);
+                }
+            }, 800);
+        }
+
+        function nextLevel() {
+            level++;
+            score++;
+            playerSequence = [];
+            sequence.push(colors[Math.floor(Math.random() * colors.length)]);
+            scoreDisplay.textContent = score;
+            progressBar.style.width = `${(level / (level + 5)) * 100}%`;
+            playSequence();
+        }
+
+        function resetGame() {
+            showMessage("Vous avez perdu ! Cliquez sur 'Commencer' pour rejouer.", "message-highlight");
+            if (score > highScore) {
+                highScore = score;
+                highScoreDisplay.textContent = highScore;
+                localStorage.setItem("highScore", highScore);
+            }
+            sequence = [];
+            level = 0;
+            score = 0;
+            scoreDisplay.textContent = score;
+            progressBar.style.width = "0%";
+        }
+
+        function checkPlayerSequence() {
+            if (playerSequence[playerSequence.length - 1] !== sequence[playerSequence.length - 1]) {
+                if (strictMode) {
+                    resetGame();
+                } else {
+                    showMessage("Mauvais choix ! Essayez encore.", "message-highlight");
+                    playerSequence = [];
+                    playSequence();
+                }
+                return false;
+            }
+            return true;
+        }
+
+        colorButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const color = button.id;
+                playSound(color);
+                animateButton(color);
+                playerSequence.push(color);
+
+                if (checkPlayerSequence()) {
+                    if (playerSequence.length === sequence.length) {
+                        setTimeout(nextLevel, 1000);
+                    }
+                }
+            });
+        });
+
+        startButton.addEventListener("click", () => {
+            showMessage("Regardez attentivement la séquence.", "message-highlight");
+            score = 0;
+            scoreDisplay.textContent = score;
+            sequence = [];
+            progressBar.style.width = "0%";
+            nextLevel();
+        });
+
+        resetButton.addEventListener("click", () => {
+            resetGame();
+        });
+    </script>
+</body>
+</html>

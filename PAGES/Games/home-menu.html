@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../Import/css/navbar.css?v=0.1">
+    <link rel="icon" href="../../Import/icons/Logo.png" type="image/png">
+    <title>Mini-Jeux - La SYSMI PROJECT</title>
+    <style>
+        /* Animations générales */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Styles généraux */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            overflow-x: hidden;
+            background: radial-gradient(circle, #021265, #003105);
+        }
+
+        /* En-tête avec animation */
+        header {
+            background: linear-gradient(135deg, #333, #444);
+            color: #fff;
+            padding: 30px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            animation: slideIn 1s ease-out;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0;
+            letter-spacing: 3px;
+        }
+
+        header p {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: #ffcc00;
+        }
+
+        /* Conteneur principal */
+        .main-container {
+            margin: 100px auto;
+            padding: 20px;
+            background: #ffffff00;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgb(0 0 0);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            color: goldenrod;
+            animation: fadeIn 2s ease;
+        }
+
+        /* Grille des jeux */
+        .games-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        /* Cartes des jeux */
+        .game-box {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgb(2 0 0);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 5px;
+            background: radial-gradient(circle, #c55200, #04009b);
+        }
+
+        .game-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-box:hover .game-overlay {
+            opacity: 1;
+        }
+
+        /* Image du jeu */
+        .game-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        /* Contenu des jeux */
+        .game-content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .game-description {
+            font-size: 1rem;
+            color: #f9f9f9;
+            margin-bottom: 20px;
+        }
+
+        /* Bouton de jeu */
+        .game-button {
+            position: relative; /* Ajout de positionnement relatif */
+            padding: 12px 30px;
+            background: #fff;
+            color: #ff5722;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 2; /* Assure que le bouton soit au-dessus de l'overlay */
+        }
+
+        .game-button:hover {
+            background: #ff5722;
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .game-button:active {
+            transform: scale(0.98);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Overlay sur hover */
+        .game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 1; /* L'overlay reste en dessous du bouton */
+        }
+
+        .game-overlay h3 {
+            color: #ffcc00;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .game-overlay p {
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        /* Pied de page */
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            background-color: #333;
+            color: #fff;
+            margin-top: 50px;
+            font-size: 0.9rem;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        .category-title {
+            color: #ff4081;
+            font-size: 26px;
+            text-decoration: none;
+            margin: 40px;
+            transition: color 0.3s;
+            padding: 10px 20px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .category-container {
+            margin-bottom: 50px;
+            padding: 0 20px;
+            animation: fadeIn 1s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="navbar-logo">
+        <a href="../../index.php" target="_self">
+            <img src="../../Import/icons/Logo.png" alt="Logo La SYSMI PROJECT" class="logo">
+        </a>
+    </div>
+    <div class="navbar-icons">
+        <a href="https://discord.gg/6RPQn4NKuT" target="_blank">
+            <i class="fab fa-discord navbar-icon" title="Discord" style="color: #0070ff;"></i>
+        </a>
+        <div class="profile-container">
+            <a href="../../PAGES/user/profile.php?id=<?php echo $user_id; ?>" target="_self">
+                <?php if (!empty($image_content)): ?>
+                    <img src="data:image/jpeg;base64,<?php echo base64_encode($image_content); ?>" alt="Profile Picture" class="profile-picture">
+                <?php else: ?>
+                    <img src="https://p7.hiclipart.com/preview/782/114/405/5bbc3519d674c.jpg" alt="Profile Picture" class="profile-picture">
+                <?php endif; ?>
+            </a>
+        </div>
+    </div>
+</div>
+
+    <main class="main-container">
+        <h2 class="section-title">Explorez nos jeux interactifs</h2>
+        <div class="category-container">
+    <h2 class="category-title">Général</h2> 
+        <div class="games-container">
+        <div class="game-box">
+                <div class="game-image" style="background-image: url('https://res.cloudinary.com/practicaldev/image/fetch/s--Vi54pU-X--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_800/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/env8ay83t00ceipg2sa5.png');"></div>
+                <div class="game-overlay">
+                    <h3>Snake</h3>
+                    <p>Qui remportera la bataille ?</p>
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">Snake</h3>
+                    <button class="game-button" onclick="window.location.href='snake.html';">Jouer</button>
+                </div>
+            </div>
+            <div class="game-box">
+                <div class="game-image" style="background-image: url('https://th.bing.com/th/id/R.6830ca7eb0011248350863b07b1e4b71?rik=HyXzBQSem6AP6A&riu=http%3a%2f%2fimga999.5054399.com%2fupload_pic%2f2010%2f12%2f24%2f4399_11513417196.jpg&ehk=lw3zDrN7iWT1TlcrG6yf5ha3TcOu3pZt%2fj9FCM5a9LI%3d&risl=&pid=ImgRaw&r=0');"></div>
+                <div class="game-overlay">
+                    <h3>Tic Tac Toe</h3>
+                    <p>Testez vos stratégies contre vos amis !</p>
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">Tic Tac Toe</h3>
+                    <button class="game-button" onclick="window.location.href='morpion.html';">Jouer</button>
+                </div>
+            </div>
+            <div class="game-box">
+                <div class="game-image" style="background-image: url('https://th.bing.com/th/id/OIP.-XEdApHpWH726xALAnLoEAHaGW?rs=1&pid=ImgDetMain');"></div>
+                <div class="game-overlay">
+                    <h3>Puissance 4</h3>
+                    <p>Trouvez le mot avant la fin !</p>
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">Puissance 4</h3>
+                    <button class="game-button" onclick="window.location.href='puissance4.html';">Jouer</button>
+                </div>
+            </div>
+            <div class="game-box">
+                <div class="game-image" style="background-image: url('https://is4-ssl.mzstatic.com/image/thumb/Purple126/v4/c0/37/06/c0370653-7aa6-5e9f-615b-ed25e7bfaeb0/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/1200x630wa.png');"></div>
+                <div class="game-overlay">
+                    <h3>Pendu</h3>
+                    <p>Trouvez le mot avant la fin !</p>
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">Pendu</h3>
+                    <button class="game-button" onclick="window.location.href='pendu.html';">Jouer</button>
+                </div>
+            </div>
+            <div class="game-box">
+                <div class="game-image" style="background-image: url('https://tse3.mm.bing.net/th?id=OIP.ueR86X9V4fPzokF_nykInwHaHa&pid=Api&P=0&h=180');"></div>
+                <div class="game-overlay">
+                    <h3>Pfc</h3>
+                    <p>Trouvez le mot avant la fin !</p>
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">Pierre Feuille Ciseaux</h3>
+                    <button class="game-button" onclick="window.location.href='pfc.html';">Jouer</button>
+                </div>
+            </div>
+            <div class="game-box">
+                <div class="game-image" style="background-image: url('https://www.vernondowns.com/wp-content/uploads/promos/racing/guess-the-number-small.jpg');"></div>
+                <div class="game-overlay">
+                    <h3>Guess the number</h3>
+                    <p>Devinez un nombre entre 1 et 100 !</p>
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">Guess the number</h3>
+                    <button class="game-button" onclick="window.location.href='numberTest.html';">Jouer</button>
+                </div>
+            </div>
+            <div class="game-box">
+                <div class="game-image" style="background-image: url('https://th.bing.com/th/id/OIP.KwxeAhU2u2UDbslfyzRMXAHaEK?rs=1&pid=ImgDetMain');"></div>
+                <div class="game-overlay">
+                    <h3>Pacman</h3>
+                    <p>Devinez un nombre entre 1 et 100 !</p>
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">Pacman</h3>
+                    <button class="game-button" onclick="window.location.href='pacman.html';">Jouer</button>
+                </div>
+            </div>
+            <div class="game-box">
+                <div class="game-image" style="background-image: url('https://th.bing.com/th/id/OIP.yqgu7VW-08-_NVsP9eHDBQHaHa?rs=1&pid=ImgDetMain');"></div>
+                <div class="game-overlay">
+                    <h3>calcucle mental</h3>
+                    <p>Devinez un nombre entre 1 et 100 !</p>
+                </div>
+                <div class="game-content">
+                    <h3 class="game-title">calcucle mental</h3>
+                    <button class="game-button" onclick="window.location.href='calcule.html';">Jouer</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Import/icons/Logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>La SYSMI PROJECT</title>
+    <style>
+        /* Styles globaux */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background: #f4f4f9 url('Import/icons/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            overflow-x: hidden;
+            height: 100vh;
+            text-align: center;
+        }
+
+        header {
+            background: linear-gradient(to right, #ffcc00, #ff9900);
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        header a img {
+            max-width: 90px;
+            height: auto;
+            display: block;
+            margin: 0 auto 15px auto;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        header a img:hover {
+            transform: rotate(360deg) scale(1.1);
+            cursor: pointer;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 3em;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            animation: fadeInHeader 2s ease-in-out;
+        }
+
+        header p {
+            font-size: 1.5em;
+            margin-top: 15px;
+            font-style: italic;
+            animation: fadeIn 1.5s ease-in-out;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            color: #000000;
+        }
+
+        main {
+            padding: 50px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            z-index: 0;
+        }
+
+        section {
+            margin-bottom: 50px;
+            text-align: center;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        section h2 {
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            color: #ff6600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        section h2:after {
+            content: '';
+            width: 50px;
+            height: 4px;
+            background: #ff6600;
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        section p {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin: 20px auto;
+            max-width: 800px;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+
+        ul {
+            list-style: none;
+            margin: 30px auto;
+            max-width: 800px;
+            padding: 0;
+            animation: fadeIn 1.4s ease-in-out;
+        }
+
+        ul li {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        ul li i {
+            font-size: 20px;
+            color: #ff6600;
+        }
+
+        .highlight {
+            color: #ff6600;
+            font-weight: bold;
+        }
+
+        .cta {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .cta a {
+            display: inline-block;
+            background: linear-gradient(to right, #ff6600, #ff9900);
+            color: #fff;
+            padding: 15px 50px;
+            font-size: 1.4em;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        }
+
+        .cta a:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #ff9900, #ffcc00);
+        }
+
+        footer {
+            background: #ffcc00;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%);
+        }
+
+        footer p {
+            font-size: 0.9em;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5em;
+            }
+            header p {
+                font-size: 1.2em;
+            }
+            section h2 {
+                font-size: 1.8em;
+            }
+            .cta a {
+                font-size: 1.2em;
+                padding: 12px 40px;
+            }
+        }
+
+        /* Back-to-top button */
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ff6600;
+            color: white;
+            border-radius: 50%;
+            padding: 15px 24px;
+            font-size: 1.5em;
+            border: none;
+            cursor: pointer;
+            display: none;
+            transition: transform 0.3s ease;
+        }
+
+        #back-to-top:hover {
+            transform: scale(1.1);
+            background: #ff9900;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="menu.php"><img src="Import/icons/Logo.png" alt="La SYSMI PROJECT Logo"></a>
+        <h1>Bienvenue sur La SYSMI PROJECT</h1>
+        <p>Un réseau social moderne, connecté et plein d’innovations.</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>Qu'est-ce que La SYSMI PROJECT ?</h2>
+            <p>
+                 Ce projet vise à créer une plateforme social qui permet non seulement de vous divertir, mais aussi à connecter les communautés à travers divers serveurs Discord <span class="highlight">(grâce à un bot spécifique)</span>, tout en vous offrant une expérience unique, dynamique et immersive. L'objectif est de créer un <span class="highlight">écosystème social indépendant</span>, où les utilisateurs peuvent interagir de manière sécurisée, jouer à des jeux, organiser des événements et bien plus encore.
+            </p>
+            <p>
+                Que vous soyez un joueur passionné, un créateur de contenu ou un organisateur d'événements, La SYSMI PROJECT vous offre des fonctionnalités adaptées pour renforcer vos liens avec d'autres membres et faire grandir votre communauté.
+            </p>
+            <img src="Import/icons/SYSMI_PROJECT.png" alt="Illustration de la SYSMI PROJECT" style="max-width: 100%; height: auto; border-radius: 20px;">
+        </section>        
+
+        <section>
+            <h2>Nos Objectifs</h2>
+            <ul>
+                <li><i class="fas fa-globe"></i> Créer un réseau social indépendant, interconnecté avec Discord.</li>
+                <li><i class="fas fa-search"></i> Faciliter la recherche de serveur discord en fonction du numéro attrubué.</li>
+                <li><i class="fas fa-users"></i> Favoriser des interactions respectueuses et sécurisées entre les membres.</li>
+                <li><i class="fas fa-gamepad"></i> Offrir des jeux interactifs pour favoriser la compétition et la convivialité.</li>
+                <li><i class="fas fa-gift"></i> Proposer un système de récompenses pour les utilisateurs les plus actifs.</li>
+                <li><i class="fas fa-user-shield"></i> Faciliter la recherche de staff ou de recrutement pour des services.</li>
+                <li><i class="fas fa-cogs"></i> Faciliter la gestion des serveurs pour un contrôle simplifié et efficace.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Nos Fonctionnalités</h2>
+            <ul>
+                <li><i class="fas fa-users"></i> Publier des serveurs Discord</li>
+                <li><i class="fas fa-gamepad"></i> Jeux communautaires et compétitions</li>
+                <li><i class="fas fa-gift"></i> Gagner des points et récompenses</li>
+                <li><i class="fas fa-cogs"></i> Gestion du compte utilisateur</li>
+                <li><i class="fas fa-plus"></i> D'autre fonctionnalités arriverons au fur et à mesure...</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Rejoignez-nous</h2>
+            <p>Créez un compte pour accéder à toutes les fonctionnalités et commencer à interagir avec les autres utilisateurs.</p>
+            <div class="cta">
+                <a href="formulaires/Signup.html">Commencez maintenant</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 La SYSMI PROJECT | Tous droits réservés.</p>
+    </footer>
+
+    <!-- Back-to-top button -->
+    <button id="back-to-top" onclick="scrollToTop()">↑</button>
+
+    <script>
+        // Scroll to top functionality
+        window.onscroll = function () {
+            var btn = document.getElementById('back-to-top');
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        };
+
+        function scrollToTop() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+    </script>
+
+</body>
+</html>

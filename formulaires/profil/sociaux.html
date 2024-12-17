@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../Logo.png">
+    <title>Ajouter des Réseaux Sociaux</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #socialForm {
+            background-color: #fff;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .social-inputs {
+            margin-bottom: 20px;
+            position: relative;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .social-inputs label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .social-inputs select, .social-inputs input[type="text"] {
+            width: calc(50% - 6px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .social-inputs select:focus, .social-inputs input[type="text"]:focus {
+            border-color: #007bff;
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="submit"] {
+            padding: 12px 24px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        .add-social-button {
+            display: block;
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .add-social-button button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add-social-button button:hover {
+            background-color: #218838;
+        }
+
+        .add-social-button button:active {
+            transform: translateY(1px);
+        }
+
+        .social-inputs button.remove-social-button {
+            position: absolute;
+            top: 10px;
+            right: 0;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            opacity: 0.7;
+            display: none;
+        }
+
+        .social-inputs:hover button.remove-social-button {
+            display: block;
+        }
+
+        .social-inputs button.remove-social-button:hover {
+            background-color: #c82333;
+            opacity: 1;
+        }
+
+        .social-inputs button.remove-social-button:focus {
+            outline: none;
+        }
+
+        .social-inputs.added {
+            animation: slideIn 0.5s ease;
+        }
+
+        .social-inputs.removed {
+            animation: slideOut 0.5s ease;
+        }
+
+        .selected-socials {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .selected-socials img {
+            width: 30px;
+            height: 30px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<form id="socialForm" action="../../traitements/Formulaires/réseaux.php" method="post" onsubmit="return validateForm()">
+    <div id="socialInputs" aria-live="polite">
+        <div class="social-inputs">
+            <label for="social">Réseau social :</label>
+            <select name="social" required onchange="updateSelectedSocials()">
+                <option value="">Choisir un réseau social</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Snapchat">Snapchat</option>
+                <option value="Instagram">Instagram</option>
+                <option value="YouTube">YouTube</option>
+                <option value="Discord">Discord</option>
+                <option value="Twitch">Twitch</option>
+            </select>
+            <input type="text" name="link" placeholder="Veuillez entrer le lien" required pattern="https?://.+">
+            <input type="hidden" name="user_id" value="1">
+            <button type="button" class="remove-social-button" aria-label="Supprimer ce réseau social" onclick="removeSocialInput(this)">X</button>
+        </div>
+    </div>
+    <div class="add-social-button">
+        <button id="addSocialButton" type="button" onclick="addSocialInput()">Ajouter un autre réseau social</button>
+    </div>
+    <input type="submit" value="Soumettre">
+    <div id="selectedSocialsContainer" class="selected-socials" aria-live="polite">
+        <!-- Les icônes des réseaux sociaux ajoutés seront affichées ici -->
+    </div>
+</form>
+
+<script>
+    const socialIcons = {
+        TikTok: 'https://static.vecteezy.com/system/resources/previews/016/716/450/original/tiktok-icon-free-png.png',
+        Snapchat: 'https://www.theproacademy.com/wp-content/uploads/2023/03/Snap.png',
+        Instagram: 'https://freelogopng.com/images/all_img/1658587303instagram-png.png',
+        YouTube: 'https://www.pinclipart.com/picdir/big/232-2328226_youtube-icon-circle-clipart-youtube-computer-icons-png.png',
+        Discord: 'https://www.freepnglogos.com/uploads/discord-logo-png/discord-logo-logodownload-download-logotipos-1.png',
+        Twitch: 'https://static-00.iconduck.com/assets.00/twitch-icon-1024x1024-rqcv3iwu.png'
+    };
+
+    function addSocialInput() {
+        var socialInputs = document.querySelectorAll('.social-inputs select[name="social"]');
+        var selectedSocials = Array.from(socialInputs).map(select => select.value);
+        var availableOptions = ['TikTok', 'Snapchat', 'Instagram', 'YouTube', 'Discord', 'Twitch'];
+
+        var remainingOptions = availableOptions.filter(option => !selectedSocials.includes(option));
+
+        if (remainingOptions.length === 0) {
+            document.getElementById('addSocialButton').disabled = true;
+            return;
+        }
+
+        var newSocialInput = document.createElement('div');
+        newSocialInput.classList.add('social-inputs', 'added');
+        newSocialInput.innerHTML = `
+            <label for="social">Réseau social :</label>
+            <select name="social" required onchange="updateSelectedSocials()">
+                <option value="">Choisir un réseau social</option>
+                ${remainingOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
+            </select>
+            <input type="text" name="link" placeholder="Veuillez entrer le lien" required pattern="https?://.+">
+            <button type="button" class="remove-social-button" aria-label="Supprimer ce réseau social" onclick="removeSocialInput(this)">X</button>
+        `;
+        document.getElementById('socialInputs').appendChild(newSocialInput);
+        updateSelectedSocials();
+    }
+
+    function removeSocialInput(button) {
+        var socialInput = button.parentElement;
+        socialInput.classList.add('removed');
+        setTimeout(() => {
+            socialInput.remove();
+            updateSelectedSocials();
+            document.getElementById('addSocialButton').disabled = false;
+        }, 500);
+    }
+
+    function updateSelectedSocials() {
+        var socialInputs = document.querySelectorAll('.social-inputs select[name="social"]');
+        var selectedSocialsContainer = document.getElementById('selectedSocialsContainer');
+        selectedSocialsContainer.innerHTML = '';
+
+        socialInputs.forEach(select => {
+            var social = select.value;
+            if (social) {
+                var img = document.createElement('img');
+                img.src = socialIcons[social];
+                img.alt = social;
+                selectedSocialsContainer.appendChild(img);
+            }
+        });
+    }
+
+    function validateForm() {
+        var inputs = document.querySelectorAll('#socialInputs select[name="social"], #socialInputs input[name="link"]');
+        for (var i = 0; i < inputs.length; i++) {
+            if (!inputs[i].value) {
+                alert("Veuillez remplir tous les champs.");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateSelectedSocials();
+    });
+</script>
+</body>
+</html>

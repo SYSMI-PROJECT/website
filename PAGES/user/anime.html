@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../../Import/icons/Logo.png" type="image/png">
+  <title>Tableau de Collection d'Animés</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle, #021265, #691430);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #FFD700;
+      text-align: center;
+      padding: 15px 0;
+      font-size: 24px;
+      color: white;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 35px;
+      padding: 20px;
+    }
+    .collection-item {
+      width: 150px;
+      height: 200px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .collection-item:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .collection-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .collection-item .name {
+      position: absolute;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      width: 100%;
+      padding: 5px 0;
+      font-size: 14px;
+    }
+    .add-button {
+      display: block;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #FFD700;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .add-button:hover {
+      background-color: #FFC300;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    Tableau de Collection d'Animés
+  </header>
+
+  <div class="container">
+    <!-- Personnage 1 -->
+    <div class="collection-item">
+      <img src="https://i.pinimg.com/736x/18/dd/85/18dd85e5187e00e1aaa951ad15214ec9--bow-dresses-anime-neko.jpg" alt="Personnage 1">
+      <div class="name">Personnage 1</div>
+      <button class="add-button" onclick="ajouterAColection('Personnage 1')">Ajouter à la collection</button>
+    </div>
+
+    <!-- Personnage 2 -->
+    <div class="collection-item">
+      <img src="https://via.placeholder.com/150" alt="Personnage 2">
+      <div class="name">Personnage 2</div>
+      <button class="add-button" onclick="ajouterAColection('Personnage 2')">Ajouter à la collection</button>
+    </div>
+
+    <!-- Personnage 3 -->
+    <div class="collection-item">
+      <img src="https://via.placeholder.com/150" alt="Personnage 3">
+      <div class="name">Personnage 3</div>
+      <button class="add-button" onclick="ajouterAColection('Personnage 3')">Ajouter à la collection</button>
+    </div>
+
+    <!-- Personnage 4 -->
+    <div class="collection-item">
+      <img src="https://via.placeholder.com/150" alt="Personnage 4">
+      <div class="name">Personnage 4</div>
+      <button class="add-button" onclick="ajouterAColection('Personnage 4')">Ajouter à la collection</button>
+    </div>
+  </div>
+
+  <script>
+    // Fonction pour simuler l'ajout à la collection
+    function ajouterAColection(personnage) {
+      alert(personnage + " a été ajouté à votre collection !");
+      // Ici, tu peux ajouter du code pour réellement gérer la collection de l'utilisateur, comme l'ajout à une base de données
+    }
+  </script>
+
+</body>
+</html>

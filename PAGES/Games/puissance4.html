@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../../Import/icons/Logo.png" type="image/png">
+    <title>puissance 4</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(circle, #021265, #003105);
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #gameBoard {
+            display: grid;
+            grid-template-columns: repeat(7, 60px);
+            gap: 5px;
+            border: 2px solid #000;
+            padding: 5px;
+            background-color: #3f51b5;
+            border-radius: 20px;
+        }
+        .cell {
+            width: 60px;
+            height: 60px;
+            background-color: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .red { background-color: #f44336; }
+        .yellow { background-color: #ffeb3b; }
+    </style>
+</head>
+<body>
+    <div id="gameBoard"></div>
+
+    <script>
+        const ROWS = 6;
+        const COLS = 7;
+        const board = [];
+        let currentPlayer = 'red';
+        let gameWon = false;
+
+        // Créer la grille de jeu
+        function createBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+
+            for (let row = 0; row < ROWS; row++) {
+                board[row] = [];
+                for (let col = 0; col < COLS; col++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.addEventListener('click', () => dropPiece(col));
+                    gameBoard.appendChild(cell);
+                    board[row][col] = null;
+                }
+            }
+        }
+
+        // Fonction pour déposer un jeton dans la colonne choisie
+        function dropPiece(col) {
+            if (gameWon) return;
+
+            let row = ROWS - 1;
+            while (row >= 0 && board[row][col] !== null) {
+                row--;
+            }
+
+            if (row >= 0) {
+                const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                const colorClass = currentPlayer === 'red' ? 'red' : 'yellow';
+                cell.classList.add(colorClass);
+                board[row][col] = currentPlayer;
+
+                if (checkWin(row, col)) {
+                    gameWon = true;
+                    alert(`Le joueur ${currentPlayer} a gagné !`);
+                } else {
+                    currentPlayer = currentPlayer === 'red' ? 'yellow' : 'red';
+                    if (currentPlayer === 'yellow') {
+                        // Bot joue après le joueur humain
+                        setTimeout(() => {
+                            const move = minimax(board, 4, true); // Profondeur de recherche optimale
+                            dropPiece(move.col);
+                        }, 500);
+                    }
+                }
+            }
+        }
+
+        // Algorithme Minimax avec élagage alpha-beta
+        function minimax(board, depth, maximizingPlayer, alpha = -Infinity, beta = Infinity) {
+            const availableMoves = getAvailableMoves(board);
+            const isTerminalNode = depth === 0 || availableMoves.length === 0 || isGameOver(board);
+
+            if (isTerminalNode) {
+                return evaluateBoard(board);
+            }
+
+            if (maximizingPlayer) {
+                let maxEval = -Infinity;
+                let bestMove = null;
+
+                for (let move of availableMoves) {
+                    const newBoard = simulateMove(board, move.col, 'yellow');
+                    const eval = minimax(newBoard, depth - 1, false, alpha, beta);
+
+                    if (eval > maxEval) {
+                        maxEval = eval;
+                        bestMove = move;
+                    }
+                    alpha = Math.max(alpha, eval);
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+
+                return depth === 4 ? bestMove : maxEval;
+            } else {
+                let minEval = Infinity;
+
+                for (let move of availableMoves) {
+                    const newBoard = simulateMove(board, move.col, 'red');
+                    const eval = minimax(newBoard, depth - 1, true, alpha, beta);
+                    minEval = Math.min(minEval, eval);
+                    beta = Math.min(beta, eval);
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+
+                return minEval;
+            }
+        }
+
+        // Obtenir les mouvements disponibles
+        function getAvailableMoves(board) {
+            const moves = [];
+            for (let col = 0; col < COLS; col++) {
+                if (board[0][col] === null) {
+                    moves.push({ col });
+                }
+            }
+            return moves;
+        }
+
+        // Simuler un mouvement sur le plateau
+        function simulateMove(board, col, color) {
+            const newBoard = board.map(row => row.slice());
+            let row = ROWS - 1;
+            while (row >= 0 && newBoard[row][col] !== null) {
+                row--;
+            }
+            newBoard[row][col] = color;
+            return newBoard;
+        }
+
+        // Vérifier s'il y a un gagnant
+        function checkWin(row, col) {
+            return (
+                checkDirection(row, col, 0, 1) || // Horizontal
+                checkDirection(row, col, 1, 0) || // Vertical
+                checkDirection(row, col, 1, 1) || // Diagonale bas-droite
+                checkDirection(row, col, -1, 1)   // Diagonale bas-gauche
+            );
+        }
+
+        // Vérifier une direction spécifique pour une victoire
+        function checkDirection(row, col, deltaRow, deltaCol) {
+            const color = board[row][col];
+            let count = 1; // Compteur de jetons consécutifs
+
+            // Vers la droite (deltaRow = 0, deltaCol = 1) ou vers le bas (deltaRow = 1, deltaCol = 0)
+            for (let i = 1; i < 4; i++) {
+                const newRow = row + deltaRow * i;
+                const newCol = col + deltaCol * i;
+
+                if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS || board[newRow][newCol] !== color) {
+                    break;
+                }
+
+                count++;
+            }
+
+            // Vers la gauche (deltaRow = 0, deltaCol = -1) ou vers le haut (deltaRow = -1, deltaCol = 0)
+            for (let i = 1; i < 4; i++) {
+                const newRow = row - deltaRow * i;
+                const newCol = col - deltaCol * i;
+
+                if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS || board[newRow][newCol] !== color) {
+                    break;
+                }
+
+                count++;
+            }
+
+            return count >= 4;
+        }
+
+        // Évaluer le plateau de jeu pour le bot
+        function evaluateBoard(board) {
+            let score = 0;
+
+            // Évaluation basique : compter les alignements de 2, 3 et 4 jetons
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    if (board[row][col] === 'yellow') {
+                        score += evaluateDirection(board, row, col, 0, 1); // Horizontal
+                        score += evaluateDirection(board, row, col, 1, 0); // Vertical
+                        score += evaluateDirection(board, row, col, 1, 1); // Diagonale bas-droite
+                        score += evaluateDirection(board, row, col, -1, 1); // Diagonale bas-gauche
+                    } else if (board[row][col] === 'red') {
+                        score -= evaluateDirection(board, row, col, 0, 1); // Horizontal
+                        score -= evaluateDirection(board, row, col, 1, 0); // Vertical
+                        score -= evaluateDirection(board, row, col, 1, 1); // Diagonale bas-droite
+                        score -= evaluateDirection(board, row, col, -1, 1); // Diagonale bas-gauche
+                    }
+                }
+            }
+
+            return score;
+        }
+
+        // Évaluer une direction spécifique pour le bot
+        function evaluateDirection(board, row, col, deltaRow, deltaCol) {
+            let score = 0;
+            const opponent = board[row][col] === 'yellow' ? 'red' : 'yellow';
+            let consecutivePlayerCount = 0;
+            let consecutiveOpponentCount = 0;
+
+            // Vers la droite (deltaRow = 0, deltaCol = 1) ou vers le bas (deltaRow = 1, deltaCol = 0)
+            for (let i = 1; i < 4; i++) {
+                const newRow = row + deltaRow * i;
+                const newCol = col + deltaCol * i;
+
+                if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS) {
+                    break;
+                }
+
+                if (board[newRow][newCol] === board[row][col]) {
+                    consecutivePlayerCount++;
+                } else if (board[newRow][newCol] === opponent) {
+                    consecutiveOpponentCount++;
+                    break;
+                } else {
+                    break;
+                }
+            }
+
+            // Vers la gauche (deltaRow = 0, deltaCol = -1) ou vers le haut (deltaRow = -1, deltaCol = 0)
+            for (let i = 1; i < 4; i++) {
+                const newRow = row - deltaRow * i;
+                const newCol = col - deltaCol * i;
+
+                if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS) {
+                    break;
+                }
+
+                if (board[newRow][newCol] === board[row][col]) {
+                    consecutivePlayerCount++;
+                } else if (board[newRow][newCol] === opponent) {
+                    consecutiveOpponentCount++;
+                    break;
+                } else {
+                    break;
+                }
+            }
+
+            // Évaluer en fonction des jetons consécutifs
+            if (consecutivePlayerCount === 2) {
+                score += 10;
+            } else if (consecutivePlayerCount === 3) {
+                score += 100;
+            } else if (consecutivePlayerCount === 4) {
+                score += 1000;
+            }
+
+            if (consecutiveOpponentCount === 2) {
+                score -= 10;
+            } else if (consecutiveOpponentCount === 3) {
+                score -= 100;
+            } else if (consecutiveOpponentCount === 4) {
+                score -= 1000;
+            }
+
+            return score;
+        }
+
+        // Vérifie si le jeu est terminé (plateau plein)
+        function isGameOver(board) {
+            for (let col = 0; col < COLS; col++) {
+                if (board[0][col] === null) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>

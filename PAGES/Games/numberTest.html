@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../../Import/icons/Logo.png" type="image/png">
+    <title>Guess the Number</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: background-color 0.5s;
+            background: linear-gradient(to bottom, #1d2b64, #f8cdda);
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        #guessButton, #resetButton, #startButton {
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        #guessButton {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #resetButton {
+            background-color: #f44336;
+            color: white;
+            display: none;
+        }
+
+        #startButton {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        #guessButton:hover, #resetButton:hover, #startButton:hover {
+            transform: scale(1.1);
+        }
+
+        #history {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        #timer {
+            font-size: 18px;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .emoji {
+            font-size: 48px;
+            margin-top: 20px;
+        }
+
+        #hint {
+            font-style: italic;
+            color: #555;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Devine le Nombre</h1>
+        <p id="welcome">Entrez votre pseudo pour commencer :</p>
+        <input type="text" id="playerName" placeholder="Votre pseudo">
+        <button id="startButton" onclick="startGame()">Commencer</button>
+        <div id="gameArea" style="display: none;">
+            <p>Devinez un nombre entre 1 et 100.</p>
+            <input type="number" id="guessInput" min="1" max="100" placeholder="1-100">
+            <button id="guessButton" onclick="checkGuess()">Devinez</button>
+            <p id="result"></p>
+            <p id="hint"></p>
+            <p id="attempts"></p>
+            <p id="timer"></p>
+            <div id="history"></div>
+            <p class="emoji" id="emojiDisplay"></p>
+            <button id="resetButton" onclick="resetGame()">Nouvelle Partie</button>
+        </div>
+    </div>
+
+    <script>
+        let secretNumber, attemptsLeft, score, playerName, history, timer;
+        let startTime, endTime;
+        const maxTime = 30; // Temps maximum en secondes
+
+        function startGame() {
+            playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert("Veuillez entrer un pseudo !");
+                return;
+            }
+            document.getElementById('welcome').textContent = `Bienvenue, ${playerName} ! Bonne chance !`;
+            document.getElementById('playerName').style.display = 'none';
+            document.getElementById('startButton').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            resetGame();
+        }
+
+        function resetGame() {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            attemptsLeft = 5;
+            score = 0;
+            history = [];
+            updateAttemptsText();
+            updateTimer();
+            document.getElementById('guessInput').value = '';
+            document.getElementById('result').textContent = '';
+            document.getElementById('hint').textContent = '';
+            document.getElementById('emojiDisplay').textContent = '';
+            document.getElementById('history').innerHTML = '';
+            document.getElementById('resetButton').style.display = 'none';
+            document.getElementById('guessButton').disabled = false;
+            startTime = Date.now();
+        }
+
+        function checkGuess() {
+            const guess = parseInt(document.getElementById('guessInput').value);
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                alert("Veuillez entrer un nombre valide entre 1 et 100 !");
+                return;
+            }
+
+            attemptsLeft--;
+            history.push(guess);
+            updateAttemptsText();
+            updateHistory(guess);
+
+            if (guess < secretNumber) {
+                document.getElementById('result').textContent = "Trop bas ! 😢";
+                document.getElementById('hint').textContent = getRandomHint();
+                showEmoji("😟");
+            } else if (guess > secretNumber) {
+                document.getElementById('result').textContent = "Trop haut ! 😓";
+                document.getElementById('hint').textContent = getRandomHint();
+                showEmoji("😮");
+            } else {
+                document.getElementById('result').textContent = `Bravo ${playerName} ! Le nombre était ${secretNumber}. 🎉`;
+                endTime = Date.now();
+                score = calculateScore();
+                document.getElementById('hint').textContent = `Votre score : ${score}`;
+                disableInput();
+                showEmoji("🎉");
+                return;
+            }
+
+            if (attemptsLeft === 0) {
+                document.getElementById('result').textContent = `Dommage ${playerName} ! Le nombre était ${secretNumber}.`;
+                disableInput();
+                document.getElementById('resetButton').style.display = 'block';
+            }
+        }
+
+        function updateAttemptsText() {
+            document.getElementById('attempts').textContent = `Tentatives restantes : ${attemptsLeft}`;
+        }
+
+        function updateHistory(guess) {
+            const direction = guess < secretNumber ? "⬆️ Trop bas" : "⬇️ Trop haut";
+            const newItem = document.createElement("p");
+            newItem.textContent = `Vous avez deviné : ${guess} (${direction})`;
+            document.getElementById('history').appendChild(newItem);
+        }
+
+        function updateTimer() {
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timer').textContent = `Temps écoulé : ${elapsedTime}s / ${maxTime}s`;
+            if (elapsedTime < maxTime) {
+                requestAnimationFrame(updateTimer);
+            } else {
+                document.getElementById('result').textContent = `Temps écoulé ! Le nombre était ${secretNumber}.`;
+                disableInput();
+            }
+        }
+
+        function calculateScore() {
+            const timeBonus = Math.max(0, maxTime - Math.floor((endTime - startTime) / 1000));
+            return attemptsLeft * 10 + timeBonus;
+        }
+
+        function disableInput() {
+            document.getElementById('guessInput').disabled = true;
+            document.getElementById('guessButton').disabled = true;
+        }
+
+        function showEmoji(emoji) {
+            document.getElementById('emojiDisplay').textContent = emoji;
+        }
+
+        function getRandomHint() {
+            const hints = ["Tu peux le faire ! 💪", "Essaie encore ! ✨", "Courage, c'est proche ! 🔍"];
+            return hints[Math.floor(Math.random() * hints.length)];
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../../Import/icons/Logo.png" type="image/png">
+    <title>Jeu Jigsaw Anime</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', Arial, sans-serif;
+            background: linear-gradient(to bottom, #021265, #003105);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            position: relative;
+            width: 980px;  /* Nouvelle largeur modifiée */
+            height: 550px; /* Nouvelle hauteur modifiée */
+            border: 8px solid #FFD700; /* Bordure dorée */
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Ombre élégante */
+            background-color: #fff;
+            overflow: hidden; /* Empêche tout débordement */
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .game-container:hover {
+            transform: scale(1.05);
+        }
+
+        iframe {
+            width: 100%;  /* L'iframe prendra toute la largeur de son conteneur */
+            height: 100%; /* L'iframe prendra toute la hauteur du conteneur */
+            border: none;
+        }
+
+        .game-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+            animation: title-glow 1.5s infinite alternate;
+        }
+
+        @keyframes title-glow {
+            from {
+                text-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700;
+            }
+            to {
+                text-shadow: 0 0 20px #FFAA00, 0 0 30px #FFAA00, 0 0 40px #FFAA00;
+            }
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #fff;
+            font-style: italic;
+            background-color: #FFD700;
+            padding: 5px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .footer:hover {
+            background-color: #FFAA00;
+            color: #fff;
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .footer:active {
+            background-color: #FF8800;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-title">🧩 Jigsaw Anime 🧩</div>
+        <iframe src="https://funhtml5games.com?embed=jigsawanime" frameborder="0" scrolling="no"></iframe>
+        <div class="footer" onclick="window.location.reload()">Rejouer</div>
+    </div>
+</body>
+</html>
