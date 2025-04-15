@@ -1,8 +1,8 @@
 <?php
 $servername = "hostname";
-$username = "u15_bDGoggNmMe";
-$password = "M8@z!n6^i0P@DUNI3d.5Pfxn";
-$dbname = "s15_user";
+$username = "username";
+$password = "password";
+$dbname = "dbname";
 $encryptionKey = "8gthkl77335628TvK21030ggvnbc";
 
 if (!function_exists('executeQuery')) {
