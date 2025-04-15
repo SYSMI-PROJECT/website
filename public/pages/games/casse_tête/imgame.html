@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/Import/icons/Logo.png" type="image/png">
+  <title>Puzzle slider</title>
+  <style>
+    /* Styles de base et responsive */
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #c7c7c7;
+      background-image: url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23404040' fill-opacity='0.4'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1zM0 23h20v20H0V23zm22 0h20v20H22V23z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      font-family: Arial, sans-serif;
+    }
+    #container {
+      width: 840px;
+      margin: 20px auto;
+      position: relative;
+    }
+    /* En-tête du jeu avec titre, timer et meilleur score */
+    #header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    #header h1 {
+      margin: 5px;
+      font-size: 2em;
+      color: #333;
+    }
+    #bestScore, #liveTimer {
+      font-size: 1.1em;
+      color: #555;
+      margin: 5px;
+    }
+    /* Boutons */
+    .button {
+      margin: 10px;
+      padding: 12px 30px;
+      border-radius: 10px;
+      font-size: 1.1em;
+      color: #FFF;
+      text-decoration: none;
+      background-color: #E74C3C;
+      border-bottom: 5px solid #BD3E31;
+      text-shadow: 0 -2px #BD3E31;
+      cursor: pointer;
+      transition: all 0.1s;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+      display: inline-block;
+    }
+    .button:active {
+      border-bottom-width: 1px;
+    }
+    /* Zone de jeu */
+    .box {
+      width: 800px;
+      height: 400px;
+      margin: 0 auto;
+      position: relative;
+      border: 2px solid #333;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .me {
+      position: relative;
+      background-size: 800px 400px;
+      background-repeat: no-repeat;
+      border-radius: 10px;
+      transition: 0.2s;
+    }
+    .full {
+      height: 400px;
+      width: 800px;
+      border-radius: 15px;
+    }
+    /* Grille de tuiles (6 colonnes x 3 lignes = 18 pièces) */
+    .tile {
+      height: 133.33px;
+      width: 133.33px;
+      float: left;
+    }
+    /* Positionnement de chaque tuile (pré-calculé) */
+    .me_0  { background-position: 0px 0px; }
+    .me_1  { background-position: -133.33px 0px; }
+    .me_2  { background-position: -266.66px 0px; }
+    .me_3  { background-position: -399.99px 0px; }
+    .me_4  { background-position: -533.32px 0px; }
+    .me_5  { background-position: -666.65px 0px; }
+    .me_6  { background-position: 0px -133.33px; }
+    .me_7  { background-position: -133.33px -133.33px; }
+    .me_8  { background-position: -266.66px -133.33px; }
+    .me_9  { background-position: -399.99px -133.33px; }
+    .me_10 { background-position: -533.32px -133.33px; }
+    .me_11 { background-position: -666.65px -133.33px; }
+    .me_12 { background-position: 0px -266.66px; }
+    .me_13 { background-position: -133.33px -266.66px; }
+    .me_14 { background-position: -266.66px -266.66px; }
+    .me_15 { background-position: -399.99px -266.66px; }
+    .me_16 { background-position: -533.32px -266.66px; }
+    .me_17 { background-position: -666.65px -266.66px; }
+    .prevent_click {
+      pointer-events: none;
+    }
+    .correct {
+      animation: correctAnim 0.5s ease;
+    }
+    @keyframes correctAnim {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+      }
+      50% {
+        transform: scale(1.25);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.25);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: none;
+      }
+    }
+    /* Zone de sélection des images */
+    .pre_img {
+      margin: 10px auto;
+      width: 800px;
+      text-align: center;
+    }
+    .pre_img ul {
+      padding: 0;
+      margin: 0;
+    }
+    .pre_img li {
+      display: inline-block;
+      list-style: none;
+      margin: 0 5px;
+    }
+    .pre_img li img {
+      width: 150px;
+      height: 75px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border 0.2s;
+    }
+    .pre_img li img:hover {
+      border: 2px solid #E74C3C;
+    }
+    /* Popup score affiché devant l'image (placé dans .box) */
+    .cover {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: rgba(0,0,0,0.38);
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .score {
+      background: #fff;
+      border: 1px solid #666;
+      width: 300px;
+      padding: 20px;
+      box-shadow: 0 0 50px rgba(0,0,0,0.8);
+      text-align: center;
+    }
+    .score p {
+      margin: 10px 0;
+    }
+    .i {
+      font-weight: bold;
+      color: #3c3c3c;
+    }
+    /* Indice : affichage temporaire de l'image complète */
+    .hint-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 800px;
+      height: 400px;
+      background-size: 800px 400px;
+      border-radius: 15px;
+      opacity: 0.8;
+      z-index: 500;
+    }
+    /* Adaptation sur mobile */
+    @media (max-width: 850px) {
+      #container, .box, .pre_img ul {
+        width: 100%;
+      }
+      .box {
+        height: auto;
+      }
+      .me, .full, .hint-overlay {
+        width: 100%;
+        height: auto;
+      }
+      .tile {
+        width: 16.66%;
+        height: auto;
+      }
+    }
+  </style>
+  <!-- Inclusion de jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+  <div id="container">
+    <!-- En-tête avec titre, timer en direct et meilleur score -->
+    <div id="header">
+      <h1>Puzzle Amélioré</h1>
+      <div id="bestScore">Meilleur score : Temps : <span id="bestTime">--:--</span>, Coups : <span id="bestMoves">--</span></div>
+      <div id="liveTimer">Temps : <span id="liveMin">00</span>:<span id="liveSec">00</span></div>
+      <div>
+        <span class="button" id="hintButton">Indice</span>
+      </div>
+    </div>
+    <!-- Bouton démarrer -->
+    <a href="#" class="button start">Démarrer</a>
+    <!-- Zone de jeu -->
+    <div class="box">
+      <div class="me full"></div>
+      <!-- Overlay indice pour afficher brièvement l'image complète -->
+      <div class="hint-overlay"></div>
+      <!-- Overlay score : s'affiche au milieu de l'image une fois le jeu fini -->
+      <div class="cover">
+        <div class="score">
+          <p id="scr_head">&#9875; Puzzle Résolu &#9875;</p>
+          <p id="scr_time">Temps : <span id="min">00</span> min <span id="sec">00</span> sec</p>
+          <p id="scr_moves">Coups : <span id="moves"></span></p>
+          <p class="i">Développé par zac_Xgamer</p>
+          <div class="button OK">OK</div>
+        </div>
+      </div>
+    </div>
+    <!-- Sélection des images -->
+    <div class="pre_img">
+      <ul>
+        <li data-bid="0"><img src="https://preview.ibb.co/kMdsfm/kfp.png" alt="Image 1"></li>
+        <li data-bid="1"><img src="https://preview.ibb.co/kWOEt6/minion.png" alt="Image 2"></li>
+        <li data-bid="2"><img src="https://preview.ibb.co/e0Rv0m/ab.jpg" alt="Image 3"></li>
+        <li data-bid="3" id="upfile1"><img src="https://image.ibb.co/cXSomR/upload1.png" alt="Upload"></li>
+      </ul>
+      <input type="file" name="image" id="file1" style="display: none">
+    </div>
+    <!-- Bouton réinitialiser -->
+    <div align="center">
+      <a href="#" class="button reset">Réinitialiser</a>
+    </div>
+  </div>
+
+  <!-- Sons (vous pouvez changer les sources par vos propres fichiers) -->
+  <audio id="moveSound">
+    <source src="https://www.myinstants.com/media/sounds/click.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="winSound">
+    <source src="https://www.myinstants.com/media/sounds/success-fanfare-trumpets.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    $(document).ready(function() {
+      // Variables globales
+      var box       = $(".box"),
+          orginal   = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+          temp      = orginal.slice(),
+          x         = [],
+          moves     = 0,
+          date1, date2,
+          timerInterval,
+          liveSec   = 0,
+          liveMin   = 0,
+          upIMG,
+          images    = [
+                        "https://preview.ibb.co/kMdsfm/kfp.png",
+                        "https://preview.ibb.co/kWOEt6/minion.png",
+                        "https://preview.ibb.co/e0Rv0m/ab.jpg"
+                      ],
+          img       = 0,
+          gameStarted = false;
+      
+      // Sons
+      var moveSound = document.getElementById("moveSound"),
+          winSound  = document.getElementById("winSound");
+      
+      // Affichage initial de l'image de fond et de l'indice (overlay)
+      $('.me').css({"background-image": "url(" + images[0] + ")"});
+      $('.hint-overlay').css({"background-image": "url(" + images[0] + ")"});
+      
+      // Chargement des meilleurs scores depuis localStorage
+      function loadBestScore() {
+        var bestTime = localStorage.getItem("bestTime"),
+            bestMoves = localStorage.getItem("bestMoves");
+        if(bestTime && bestMoves) {
+          $("#bestTime").text(bestTime);
+          $("#bestMoves").text(bestMoves);
+        }
+      }
+      loadBestScore();
+      
+      // Mise à jour du timer en direct
+      function updateLiveTimer() {
+        liveSec++;
+        if(liveSec === 60) {
+          liveSec = 0;
+          liveMin++;
+        }
+        $("#liveMin").text(liveMin < 10 ? "0"+liveMin : liveMin);
+        $("#liveSec").text(liveSec < 10 ? "0"+liveSec : liveSec);
+      }
+      
+      // Démarrer le timer en direct
+      function startLiveTimer() {
+        liveSec = liveMin = 0;
+        $("#liveMin, #liveSec").text("00");
+        timerInterval = setInterval(updateLiveTimer, 1000);
+      }
+      
+      // Arrêter le timer en direct
+      function stopLiveTimer() {
+        clearInterval(timerInterval);
+      }
+      
+      // Démarrage de la partie
+      $(".start").click(function() {
+        if(gameStarted) return false;
+        gameStarted = true;
+        $(this).addClass('prevent_click').delay(100).slideUp(500);
+        $(".full").hide();
+        $(".pre_img").addClass("prevent_click");
+        date1 = new Date();
+        startLiveTimer();
+        startGame();
+        return false;
+      });
+      
+      // Fonction principale de démarrage
+      function startGame() {
+        randomTile();
+        changeBG(img);
+        // Gestion du clic sur chaque tuile
+        var count = 0, a, b;
+        $(".me").click(function() {
+          count++;
+          if(count === 1) {
+            a = $(this).attr("data-bid");
+            $('.me_' + a).css({"opacity": ".65"});
+          } else {
+            b = $(this).attr("data-bid");
+            $('.me_' + a).css({"opacity": "1"});
+            if(a !== b) {
+              // Échange des classes entre tuiles
+              $(".me_" + a)
+                .addClass("me_" + b)
+                .removeClass("me_" + a);
+              $(this)
+                .addClass("me_" + a)
+                .removeClass("me_" + b);
+              $(".me_" + a).attr("data-bid", a);
+              $(".me_" + b).attr("data-bid", b);
+              // Joue le son de déplacement
+              moveSound.play();
+            }
+            moves++;
+            swapping(a, b);
+            checkCorrect(a);
+            checkCorrect(b);
+            count = 0;
+          }
+          if(arraysEqual(x)) {
+            date2 = new Date();
+            stopLiveTimer();
+            timeDifference();
+            showScore();
+            // Joue le son de victoire
+            winSound.play();
+            updateBestScore();
+            return false;
+          }
+        });
+        return false;
+      }
+      
+      // Fonction de mélange aléatoire des tuiles
+      function randomTile() {
+        var i;
+        for(i = orginal.length - 1; i >= 0; i--) {
+          var flag = getRandom(0, i);
+          x[i] = temp[flag];
+          temp[flag] = temp[i];
+          temp[i] = x[i];
+        }
+        for(i = 0; i < orginal.length; i++) {
+          box.append(
+            '<div class="me me_' + x[i] + ' tile" data-bid="' + x[i] + '"></div>'
+          );
+          if((i+1) % 6 === 0) box.append("<br>");
+        }
+        return;
+      }
+      
+      // Vérifie si le tableau x est dans l'ordre
+      function arraysEqual(arr) {
+        for(var i = orginal.length - 1; i >= 0; i--) {
+          if(arr[i] != i) return false;
+        }
+        return true;
+      }
+      
+      // Marque la tuile correcte
+      function checkCorrect(N1) {
+        var pos = x.indexOf(parseInt(N1, 10));
+        if(pos !== N1) return;
+        $(".me_" + N1).addClass("correct prevent_click");
+      }
+      
+      // Échange les positions dans le tableau x
+      function swapping(N1, N2) {
+        var first  = x.indexOf(parseInt(N1, 10)),
+            second = x.indexOf(parseInt(N2, 10));
+        x[first]  = parseInt(N2, 10);
+        x[second] = parseInt(N1, 10);
+      }
+      
+      // Fonction utilitaire pour obtenir un nombre aléatoire
+      function getRandom(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      
+      // Calcule la différence de temps (pour le popup final)
+      function timeDifference() {
+        var diff = date2 - date1;
+        var msec = diff;
+        var hh = Math.floor(msec / 1000 / 60 / 60);
+        msec -= hh * 1000 * 60 * 60;
+        var mmFinal = Math.floor(msec / 1000 / 60);
+        msec -= mmFinal * 1000 * 60;
+        var ssFinal = Math.floor(msec / 1000);
+        $("#min").text(mmFinal < 10 ? "0"+mmFinal : mmFinal);
+        $("#sec").text(ssFinal < 10 ? "0"+ssFinal : ssFinal);
+      }
+      
+      // Change l'image de fond en fonction de la sélection
+      function changeBG(img) {
+        if(img != 3)
+          $('.me').css({"background-image": "url(" + images[img] + ")"});
+        else
+          $('.me').css({"background-image": "url(" + upIMG + ")"});
+        // Met à jour également l'overlay indice
+        $('.hint-overlay').css({"background-image": "url(" + (img != 3 ? images[img] : upIMG) + ")"});
+      }
+      
+      // Passage de la souris sur les images de sélection
+      $('.pre_img li').hover(function(){
+        img = $(this).attr("data-bid");
+        changeBG(img);
+      });
+      
+      // Affiche le popup score au milieu de l'image
+      function showScore() {
+        $('#moves').text(moves);
+        setTimeout(function(){
+          $('.cover').fadeIn(350);
+        },1050);
+      }
+      
+      // Ferme le popup score
+      $('.OK').click(function(){
+        $('.cover').fadeOut(350);
+      });
+      
+      // Réinitialiser la partie
+      $('.reset').click(function(){
+        $(".tile").remove();
+        $("br").remove();
+        $(".full").show();
+        $(".start").show();
+        $(".pre_img, .start").removeClass("prevent_click");
+        temp = orginal.slice();
+        x = [];
+        moves = liveSec = liveMin = 0;
+        stopLiveTimer();
+        $("#liveMin, #liveSec").text("00");
+        gameStarted = false;
+        return false;
+      });
+      
+      // Gestion de l'upload d'image
+      $("#upfile1").click(function () {
+        $("#file1").trigger('click');
+      });
+      $("#file1").change(function(){
+        readURL(this);
+      });
+      function readURL(input) {
+        if(input.files && input.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            upIMG = e.target.result;
+            img = 3;
+            changeBG(3);
+          }
+          reader.readAsDataURL(input.files[0]);
+        }
+      }
+      
+      // Bouton Indice : Affiche l'image complète pendant 2 secondes
+      $("#hintButton").click(function(){
+        $(".hint-overlay").fadeIn(200, function(){
+          setTimeout(function(){
+            $(".hint-overlay").fadeOut(200);
+          }, 2000);
+        });
+      });
+      
+      // Met à jour le meilleur score en comparant le temps et le nombre de coups
+      function updateBestScore() {
+        // Calcul du temps total en secondes
+        var totalTime = liveMin * 60 + liveSec;
+        var prevBestTime = localStorage.getItem("bestTimeSec");
+        // Si aucun score précédent ou si le score actuel est meilleur
+        if(!prevBestTime || totalTime < prevBestTime) {
+          localStorage.setItem("bestTimeSec", totalTime);
+          localStorage.setItem("bestTime", ($("#liveMin").text() + ":" + $("#liveSec").text()));
+          localStorage.setItem("bestMoves", moves);
+          $("#bestTime").text($("#liveMin").text() + ":" + $("#liveSec").text());
+          $("#bestMoves").text(moves);
+        }
+      }
+      
+    });
+  </script>
+</body>
+</html>

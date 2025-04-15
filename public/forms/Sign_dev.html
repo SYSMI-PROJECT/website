@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../Import/icons/Logo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>Connexion et Inscription</title>
+  <style>
+    /* Importation de la police et définition des variables */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+    :root {
+      --primary-color: #ffcc00;
+      --secondary-color: #ffd700;
+      --accent-color: #ff6f61;
+      --accent-color2: #de5d8c;
+      --error-color: #ff4d4d;
+      --bg-dark: rgba(0, 0, 0, 0.8);
+      --input-bg: rgba(255, 255, 255, 0.1);
+      --border-radius: 8px;
+      --transition: 0.3s;
+      --font-base: 'Roboto', sans-serif;
+      --spacing: 16px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: var(--font-base);
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-color2));
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #fff;
+      padding: var(--spacing);
+    }
+    
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .container {
+      background: var(--bg-dark);
+      padding: calc(var(--spacing) * 2);
+      border-radius: var(--border-radius);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      max-width: 500px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .container::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.05), transparent);
+      animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing);
+      margin-bottom: var(--spacing);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .tab {
+      padding: calc(var(--spacing) / 2) var(--spacing);
+      cursor: pointer;
+      border-radius: 50px;
+      border: 2px solid var(--primary-color);
+      background: transparent;
+      transition: background var(--transition), transform var(--transition);
+    }
+    
+    .tab.active, .tab:hover {
+      background: var(--primary-color);
+      color: #000;
+      transform: translateY(-3px);
+    }
+    
+    .form-container {
+      display: none;
+      text-align: left;
+      position: relative;
+      z-index: 1;
+      animation: fadeIn var(--transition) ease;
+    }
+    
+    .form-container.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    h2 {
+      color: var(--primary-color);
+      margin-bottom: calc(var(--spacing) * 1.5);
+      text-align: center;
+    }
+    
+    .user-box {
+      margin-bottom: var(--spacing);
+      position: relative;
+    }
+    
+    label {
+      display: block;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--primary-color);
+      border-radius: var(--border-radius);
+      background: var(--input-bg);
+      color: #fff;
+      font-size: 1rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+    }
+    
+    button {
+      background: linear-gradient(135deg, #ff8c00, #ff4500);
+      border: none;
+      border-radius: 50px;
+      padding: 0.75rem;
+      font-size: 1.125rem;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      transition: background var(--transition), transform var(--transition);
+      margin-top: calc(var(--spacing) / 2);
+    }
+    
+    button:hover {
+      background: linear-gradient(135deg, #ff7f50, #ff6347);
+      transform: translateY(-3px);
+    }
+    
+    .password-container {
+      position: relative;
+    }
+    
+    /* Ajustement pour laisser la place à l’icône */
+    #motDePasse, #loginPassword {
+      padding-right: 50px;
+    }
+    
+    .toggle-password {
+      position: absolute;
+      top: 59%;
+      right: 15px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 1.25rem;
+      transition: color var(--transition);
+     color: black;
+    }
+    
+    .toggle-password:hover {
+      color: var(--secondary-color);
+    }
+    
+    .strength-bar {
+      width: 100%;
+      height: 5px;
+      background: #ddd;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    
+    .strength-bar div {
+      height: 100%;
+      transition: width var(--transition);
+    }
+    
+    .error-message-container {
+      margin-bottom: var(--spacing);
+      animation: fadeIn var(--transition) ease;
+    }
+    
+    .error-message {
+      color: var(--error-color);
+      background: rgba(255, 77, 77, 0.1);
+      border: 1px solid var(--error-color);
+      border-radius: var(--border-radius);
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
+    
+    .message {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: calc(var(--spacing) * 1.5);
+      font-size: 1rem;
+    }
+    
+    .forgot-password {
+      margin-top: calc(var(--spacing) * 1.5);
+      text-align: center;
+    }
+    
+    .forgot-password a {
+      color: #00aaff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color var(--transition);
+    }
+    
+    .forgot-password a:hover {
+      color: #00c300;
+    }
+    
+    /* Style personnalisé pour la checkbox */
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .checkbox-container input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--primary-color);
+      border-radius: var(--border-radius);
+      position: relative;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    
+    .checkbox-container input[type="checkbox"]:checked {
+      background: var(--primary-color);
+    }
+    
+    .checkbox-container input[type="checkbox"]:checked::after {
+      content: "\f00c";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      color: #000;
+      position: absolute;
+      top: 4px;
+      left: 5px;
+      font-size: 1rem;
+    }
+    
+    .checkbox-container label {
+      cursor: pointer;
+      font-size: 1rem;
+	  margin-bottom: 0;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 600px) {
+      .container {
+        padding: var(--spacing);
+      }
+      .tab {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" data-tab="login">Connexion</div>
+      <div class="tab" data-tab="signup">Inscription</div>
+    </div>
+    
+    <!-- Formulaire de connexion -->
+    <div class="form-container active" id="loginFormContainer" aria-labelledby="loginForm">
+      <p class="message">Vous serez bloqué après 3 tentatives infructueuses.</p>
+      <form id="loginForm" action="../traitements/Formulaires/login.php" method="post" novalidate>
+        <div class="user-box">
+          <label for="loginEmail">Adresse mail</label>
+          <input type="email" name="email" id="loginEmail" required aria-required="true">
+          <div class="error-message" id="loginEmailError" style="display:none;">Veuillez entrer une adresse email valide.</div>
+        </div>
+        <div class="user-box password-container">
+          <label for="loginPassword">Mot de passe</label>
+          <input type="password" name="password" id="loginPassword" required aria-required="true">
+          <i class="fas fa-eye toggle-password" id="loginEyeIcon" aria-hidden="true"></i>
+          <div class="error-message" id="loginPasswordError" style="display:none;">Veuillez entrer votre mot de passe.</div>
+        </div>
+        <div class="user-box checkbox-container">
+          <input type="checkbox" id="stayConnected" name="stayConnected">
+          <label for="stayConnected">Rester connecté</label>
+        </div>
+        <button type="submit">Se Connecter</button>
+      </form>
+      <div class="forgot-password">
+        <a href="password.html">Mot de passe oublié ?</a>
+      </div>
+    </div>
+    
+    <!-- Formulaire d'inscription -->
+    <div class="form-container" id="signupFormContainer" aria-labelledby="signupForm">
+      <h2>Formulaire d'Inscription</h2>
+      <form id="inscriptionForm" action="../traitements/Formulaires/signup.php" method="post" novalidate>
+        <div class="error-message-container" id="signupErrorMessage"></div>
+        <div class="user-box">
+          <label for="prenom">Prénom</label>
+          <input type="text" id="prenom" name="prenom" required>
+        </div>
+        <div class="user-box">
+          <label for="nom">Nom</label>
+          <input type="text" id="nom" name="nom" required>
+        </div>
+        <div class="user-box">
+          <label for="date_naissance">Date de naissance</label>
+          <input type="text" id="date_naissance" name="date_naissance" maxlength="10" placeholder="JJ/MM/AAAA" required>
+        </div>
+        <div class="user-box">
+          <label for="signupEmail">Adresse mail</label>
+          <input type="email" id="signupEmail" name="email" required>
+        </div>
+        <div class="user-box password-container">
+          <label for="motDePasse">Mot de passe</label>
+          <input type="password" id="motDePasse" name="motDePasse" required>
+          <i class="fas fa-eye toggle-password" id="signupEyeIcon" onclick="togglePassword('motDePasse', 'signupEyeIcon')" aria-hidden="true"></i>
+          <div class="strength-bar"><div id="strengthIndicator"></div></div>
+        </div>
+        <div class="user-box">
+          <label for="confirmMotDePasse">Confirmer le mot de passe</label>
+          <input type="password" id="confirmMotDePasse" name="confirmMotDePasse" required>
+        </div>
+        <div class="user-box">
+          <label for="pays">Votre pays</label>
+          <select id="pays" name="pays" required>
+            <option value="">Sélectionnez votre pays</option>
+            <option value="france">France</option>
+            <option value="canada">Canada</option>
+            <option value="belgique">Belgique</option>
+          </select>
+        </div>
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+        <button type="submit">S'inscrire</button>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    // Navigation entre les onglets
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.form-container').forEach(fc => fc.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById(this.getAttribute('data-tab') + 'FormContainer').classList.add('active');
+      });
+    });
+    
+    // Basculement de la visibilité des mots de passe
+    document.getElementById('loginEyeIcon').addEventListener('click', function() {
+      togglePassword('loginPassword', 'loginEyeIcon');
+    });
+    
+    function togglePassword(inputId, iconId) {
+      var passwordInput = document.getElementById(inputId);
+      var icon = document.getElementById(iconId);
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      } else {
+        passwordInput.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      }
+    }
+    
+    // Indicateur de force du mot de passe dans le formulaire d'inscription
+    document.getElementById("motDePasse").addEventListener('input', function() {
+      var strengthBar = document.getElementById('strengthIndicator');
+      var password = this.value;
+      var strength = 0;
+    
+      if (password.length >= 10) strength++;
+      if (/[A-Z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+      switch (strength) {
+        case 1:
+          strengthBar.style.width = '25%';
+          strengthBar.style.background = 'red';
+          break;
+        case 2:
+          strengthBar.style.width = '50%';
+          strengthBar.style.background = 'orange';
+          break;
+        case 3:
+          strengthBar.style.width = '75%';
+          strengthBar.style.background = 'yellow';
+          break;
+        case 4:
+          strengthBar.style.width = '100%';
+          strengthBar.style.background = 'green';
+          break;
+        default:
+          strengthBar.style.width = '0';
+      }
+    });
+    
+    // Formatage de la date de naissance en JJ/MM/AAAA
+    document.getElementById('date_naissance').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 8) {
+        value = value.slice(0, 8);
+      }
+      let formattedValue = "";
+      if (value.length > 4) {
+        formattedValue = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4);
+      } else if (value.length > 2) {
+        formattedValue = value.slice(0, 2) + '/' + value.slice(2);
+      } else {
+        formattedValue = value;
+      }
+      e.target.value = formattedValue;
+    });
+    
+    // Validation du formulaire de connexion
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      let valid = true;
+      const emailInput = document.getElementById("loginEmail");
+      const passwordInput = document.getElementById("loginPassword");
+      const emailError = document.getElementById("loginEmailError");
+      const passwordError = document.getElementById("loginPasswordError");
+    
+      emailError.style.display = "none";
+      passwordError.style.display = "none";
+    
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailInput.value)) {
+        emailError.style.display = "block";
+        valid = false;
+      }
+      if (passwordInput.value.trim() === "") {
+        passwordError.style.display = "block";
+        valid = false;
+      }
+      if (!valid) {
+        event.preventDefault();
+      }
+    });
+    
+    // Validation du formulaire d'inscription
+    document.getElementById("inscriptionForm").addEventListener("submit", function(event) {
+      var errorMessageContainer = document.getElementById("signupErrorMessage");
+      errorMessageContainer.innerHTML = "";
+      var errors = [];
+      var prenom = document.getElementById("prenom").value.trim();
+      var nom = document.getElementById("nom").value.trim();
+      var dateNaissance = document.getElementById("date_naissance").value.trim();
+      var email = document.getElementById("signupEmail").value.trim();
+      var password = document.getElementById("motDePasse").value;
+      var confirmPassword = document.getElementById("confirmMotDePasse").value;
+      var pays = document.getElementById("pays").value;
+    
+      var motsInterdits = ["bite", "pénis", "sucemoi", "cul", "chatte", "seins", "boobs", "pussy", "chibre", "fils", "fille", "con", "connard", "pute", "putain", "salope", "nique", "niquer","merde; caca, pipi, sucemoi, suce moi"];
+      var regexInterdit = new RegExp(motsInterdits.join("|"), "i");
+    
+      if (regexInterdit.test(prenom) || regexInterdit.test(nom)) {
+        errors.push("Votre nom ou prénom contient des mots inappropriés.");
+      }
+    
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        errors.push("Veuillez entrer une adresse email valide.");
+      }
+    
+      const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/;
+      if (!dateRegex.test(dateNaissance)) {
+        errors.push("Veuillez entrer une date de naissance valide au format JJ/MM/AAAA.");
+      }
+    
+      if (password !== confirmPassword) {
+        errors.push("Les mots de passe ne correspondent pas.");
+      }
+      if (password.length < 10) {
+        errors.push("Le mot de passe doit contenir au moins 10 caractères.");
+      }
+    
+      if (pays === "") {
+        errors.push("Veuillez sélectionner votre pays.");
+      }
+    
+      if (errors.length > 0) {
+        event.preventDefault();
+        errors.forEach(function(err) {
+          var errorDiv = document.createElement("div");
+          errorDiv.className = "error-message";
+          errorDiv.textContent = err;
+          errorMessageContainer.appendChild(errorDiv);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

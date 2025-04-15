@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/jpg" href="./PNG/SYSMI connect.jpg">
+    <link rel="icon" type="image/png" href="/public/img/icon/Logo.png">
+    <link rel="stylesheet" href="/public/import/css/forms/login.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connexion</title>
+</head>
+<body>
+    <div class="login-box">
+        <p class="message">Vous serez bloqué après 3 tentatives infructueuses.</p>
+
+        <form id="loginForm" action="/public/import/php/script/forms/login.php" method="post">
+            <div class="user-box">
+                <input type="email" name="email" id="email" required>
+                <label>Adresse mail</label>
+                <div class="error-message" id="emailError">Veuillez entrer une adresse email valide.</div>
+            </div>
+            <div class="user-box">
+                <input type="password" name="password" id="password" required>
+                <label>Mot de passe</label>
+                <div class="error-message" id="passwordError">Veuillez entrer votre mot de passe.</div>
+            </div>
+            
+            <!-- Nouvelle case à cocher -->
+            <div class="stay-connected">
+                <input type="checkbox" id="stayConnected" name="stayConnected">
+                <label for="stayConnected">Rester connecté</label>
+            </div>
+
+            <div>
+                <button type="submit">Se Connecter</button>
+            </div>
+        </form>
+
+        <!-- Lien pour mot de passe oublié -->
+        <div class="forgot-password">
+            <a href="forgot.html">Mot de passe oublié ?</a>
+        </div>
+    </div>
+
+<script src="/public/import/js/login.js"></script>
+</body>
+</html>

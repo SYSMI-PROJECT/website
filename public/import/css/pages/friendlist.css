@@ -1,0 +1,141 @@
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.request {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.3s ease;
+}
+
+.request:hover {
+    background-color: #f9f9f9;
+}
+
+.info {
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+    background-color: #ddd;
+    background-size: cover;
+    background-position: center;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.user-name a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.user-name a:hover {
+    color: #4CAF50;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.button {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(100, 150, 255, 0.5);
+}
+
+.accept {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.accept:hover {
+    background-color: #45a049;
+}
+
+.decline {
+    background-color: #f44336;
+    color: white;
+}
+
+.decline:hover {
+    background-color: #e41e1e;
+}
+
+.no-requests {
+    text-align: center;
+    margin-top: 20px;
+    color: #888;
+}
+
+.contraineur {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.contraineur a {
+    display: inline-block;
+    background-color: #0c9b0c;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.contraineur a:hover {
+    background-color: #0a860a;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 15px;
+    }
+
+    .request {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px;
+    }
+
+    .avatar {
+        margin-bottom: 10px;
+    }
+
+    .buttons {
+        gap: 10px;
+        margin-left: 65px;
+    }
+
+    .button {
+        width: 100%;
+    }
+}

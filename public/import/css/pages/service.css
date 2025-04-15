@@ -1,0 +1,230 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #0056b3;
+    --success-color: #00bf05;
+    --error-color: #ff0000;
+    --text-color: #333;
+    --background-color: #f4f4f9;
+    --border-color: #ddd;
+    --box-shadow: rgba(0, 0, 0, 0.1);
+    --hover-shadow: rgba(0, 0, 0, 0.2);
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+header {
+    background-color: var(--primary-color);
+    color: #fff;
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 6rem auto 2rem; /* Ajout d'une marge supérieure pour le header fixe */
+    padding: 0 1.5rem;
+}
+
+.back-to-home {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: var(--success-color);
+    cursor: pointer;
+    text-align: center;
+    margin-bottom: 2rem;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-to-home:hover {
+    background-color: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+.back-to-home i {
+    margin-right: 0.5rem;
+}
+
+label {
+    font-weight: 600;
+    color: var(--text-color);
+    display: block;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    background-color: #fff;
+    box-shadow: 0 4px 8px var(--box-shadow);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.participation-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: var(--error-color);
+    cursor: pointer;
+    text-align: center;
+    display: block;
+    margin-bottom: 2rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.participation-button:hover {
+    background-color: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+.user-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.user-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px var(--box-shadow);
+    padding: 1.5rem;
+    margin: 1rem 0;
+    width: calc(25% - 1.5rem);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.user-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px var(--hover-shadow);
+}
+
+.user-card .profile-pic {
+    margin-bottom: 1rem;
+}
+
+.user-card .profile-pic img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+    padding: 2px;
+    transition: border-color 0.3s ease;
+}
+
+.user-card .profile-pic img:hover {
+    border-color: var(--secondary-color);
+}
+
+.user-card h3 {
+    margin: 0.5rem 0;
+    color: var(--text-color);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.user-card p {
+    margin: 0.5rem 0;
+    color: #555;
+    font-size: 1rem;
+}
+
+.user-card .user-id {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.user-card .user-bio {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.user-card .view-profile {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.user-card .view-profile:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 1024px) {
+    .user-card {
+        width: calc(33.333% - 1.5rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .user-card {
+        width: calc(50% - 1.5rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .user-card {
+        width: 100%;
+    }
+}

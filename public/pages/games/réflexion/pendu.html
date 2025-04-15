@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../../Import/icons/Logo.png" type="image/png">
+    <title>pendu</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle, #021265, #003105);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 451px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #30d0ff70;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: solid 1px #e1ff00;
+        }
+        h1 {
+            margin: 0 0 20px;
+            font-size: 36px;
+            color: #333;
+            text-align: center;
+        }
+        #game-container {
+            text-align: center;
+        }
+        #word-display {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        #hangman-container {
+            margin-bottom: 20px;
+        }
+        .hangman-part {
+            fill: none;
+            stroke: black;
+            stroke-width: 4;
+            display: none;
+        }
+        #letters-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .letter-button {
+            font-size: 24px;
+            margin: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #dcdcdc;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .letter-button:hover {
+            background-color: #999;
+            color: white;
+        }
+        #message-container {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+        #message-container span {
+            color: #ff0000;
+        }
+        #restart-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #f00;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        #restart-button:hover {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jeu du Pendu</h1>
+        <div id="game-container">
+            <div id="word-display"></div>
+            <svg id="hangman-container" width="200" height="200">
+                <line class="hangman-part" x1="20" y1="180" x2="100" y2="180"/>
+                <line class="hangman-part" x1="60" y1="180" x2="60" y2="20"/>
+                <line class="hangman-part" x1="60" y1="20" x2="140" y2="20"/>
+                <line class="hangman-part" x1="140" y1="20" x2="140" y2="50"/>
+                <circle class="hangman-part" cx="140" cy="70" r="20"/>
+                <line class="hangman-part" x1="140" y1="90" x2="140" y2="130"/>
+                <line class="hangman-part" x1="140" y1="100" x2="120" y2="110"/>
+                <line class="hangman-part" x1="140" y1="100" x2="160" y2="110"/>
+                <line class="hangman-part" x1="140" y1="130" x2="120" y2="150"/>
+                <line class="hangman-part" x1="140" y1="130" x2="160" y2="150"/>
+            </svg>
+            <div id="letters-container"></div>
+            <div id="message-container"></div>
+            <button id="restart-button">Retour au Menu</button>
+        </div>
+    </div>
+
+    <script>
+        // Charger les mots depuis un fichier texte
+// Charger les mots depuis un fichier texte
+function fetchWords(callback) {
+    fetch('mots.txt')
+    .then(response => response.text())
+    .then(text => {
+        const words = text.trim().split('\n').map(word => word.trim()); // Supprimer les espaces avant et après chaque mot
+        callback(words);
+    });
+}
+
+
+        // Sélection aléatoire d'un mot
+        function selectRandomWord(words) {
+            return words[Math.floor(Math.random() * words.length)];
+        }
+
+        // Liste des mots
+        let selectedWord;
+        let guessedWord;
+        let remainingAttempts = 10;
+
+// Récupération des éléments HTML
+const wordDisplay = document.getElementById('word-display');
+const hangmanParts = document.querySelectorAll('.hangman-part');
+const lettersContainer = document.getElementById('letters-container');
+const messageContainer = document.getElementById('message-container');
+const restartButton = document.getElementById('restart-button');
+
+// Ajout d'un gestionnaire d'événements au bouton de redémarrage
+restartButton.addEventListener('click', function() {
+  // Rediriger vers la page souhaitée
+  window.location.href = 'home-menu.php';
+});
+
+
+        // Afficher le mot caché
+        function displayWord() {
+    let displayedWord = guessedWord.join(' ');
+    if (displayedWord.endsWith(' ')) {
+        displayedWord = displayedWord.slice(0, -1); // Retirer le dernier espace s'il existe
+    }
+    wordDisplay.textContent = displayedWord;
+}
+
+
+        // Vérifier si la lettre est présente dans le mot
+        function checkLetter(letter) {
+            let found = false;
+            for (let i = 0; i < selectedWord.length; i++) {
+                if (selectedWord[i] === letter) {
+                    guessedWord[i] = letter;
+                    found = true;
+                }
+            }
+            if (!found) {
+                remainingAttempts--;
+                updateHangman();
+            }
+            displayWord();
+            checkGameStatus();
+        }
+// Vérifier si le joueur a gagné ou perdu
+function checkGameStatus() {
+    if (!guessedWord.includes('_')) {
+        // Rediriger vers le script PHP après avoir gagné
+        window.location.href = 'Super étoile.php?result=win&word=' + encodeURIComponent(selectedWord);
+    } else if (remainingAttempts === 0) {
+        messageContainer.innerHTML = `Désolé, vous avez perdu ! Le mot était : <span>${selectedWord}</span>`;
+        restartButton.style.display = 'block';
+    }
+}
+
+
+        // Mettre à jour l'affichage du pendu
+        function updateHangman() {
+            let index = 9 - remainingAttempts;
+            hangmanParts[index].style.display = 'block';
+        }
+
+        // Créer les boutons des lettres
+        function createLetterButtons() {
+            for (let i = 65; i <= 90; i++) {
+                const letter = String.fromCharCode(i);
+                const button = document.createElement('button');
+                button.textContent = letter;
+                button.classList.add('letter-button');
+                button.addEventListener('click', () => {
+                    button.disabled = true;
+                    checkLetter(letter);
+                });
+                lettersContainer.appendChild(button);
+            }
+        }
+
+        // Initialisation du jeu
+        function initGame() {
+    fetchWords(words => {
+        selectedWord = selectRandomWord(words);
+        // Utilisation de map pour initialiser guessedWord en conservant les espaces
+        guessedWord = selectedWord.split('').map(char => char === ' ' ? ' ' : '_');
+        displayWord();
+        createLetterButtons();
+    });
+}
+
+
+        // Lancer le jeu
+        initGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+body {
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    transition: background-color 0.5s ease;
+    flex-direction: column;
+}
+
+.container {
+    background-color: #fff;
+    padding: 1.5rem; /* Réduction de la taille des espacements */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 12px; /* Réduction du rayon des bords */
+    width: 100%;
+    max-width: 600px; /* Réduction de la largeur maximale */
+    margin-top: 2rem;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Réduction de l'espace entre les éléments */
+    margin-bottom: 1.5rem; /* Réduction de l'espacement entre l'entête et le formulaire */
+}
+
+.back-arrow {
+    font-size: 1.8rem; /* Réduction de la taille de la flèche */
+    text-decoration: none;
+    color: #ff2e63;
+    transition: color 0.3s ease;
+}
+
+.back-arrow:hover {
+    color: #d81b4e;
+}
+
+h2 {
+    font-size: 1.8rem; /* Réduction de la taille du titre */
+    color: #222;
+    font-weight: bold;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.form-section {
+    margin-bottom: 1.5rem; /* Réduction de l'espacement entre les sections */
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+}
+
+.form-section label {
+    font-size: 1.1rem; /* Réduction de la taille des labels */
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.8rem; /* Réduction de l'espacement sous les labels */
+    color: #555;
+    letter-spacing: 0.5px;
+}
+
+.form-section input[type="radio"], 
+.form-section input[type="checkbox"] {
+    margin-right: 8px; /* Réduction de l'espacement à droite des cases */
+    transition: transform 0.2s ease;
+}
+
+.form-section input[type="radio"]:checked,
+.form-section input[type="checkbox"]:checked {
+    transform: scale(1.15); /* Légère réduction du zoom au survol */
+}
+
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Réduction de l'espacement entre les éléments du groupe */
+}
+
+.settings-group div {
+    display: flex;
+    gap: 12px; /* Réduction de l'espacement entre les cases */
+    transition: background-color 0.3s ease;
+}
+
+button {
+    background-color: #ff2e63;
+    color: white;
+    padding: 12px; /* Réduction de l'espacement interne du bouton */
+    font-size: 1.2rem; /* Réduction de la taille du texte dans le bouton */
+    border: none;
+    border-radius: 12px; /* Réduction du rayon des bords du bouton */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #d81b4e;
+    transform: scale(1.03); /* Légère réduction du zoom au survol */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.form-section input[type="radio"],
+.form-section input[type="checkbox"] {
+    appearance: none;
+    width: 18px; /* Réduction de la taille des cases */
+    height: 18px; /* Réduction de la taille des cases */
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    transition: 0.3s;
+    position: relative;
+}
+
+.form-section input[type="radio"]:checked {
+    background-color: #ff2e63;
+    border-color: #ff2e63;
+}
+
+.form-section input[type="checkbox"]:checked {
+    background-color: #ff2e63;
+    border-color: #ff2e63;
+}
+
+.form-section input[type="radio"]:checked::after,
+.form-section input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; /* Réduction de la taille du cercle intérieur */
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+.container:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px); /* Réduction du décalage au survol */
+}
+
+.settings-group input[type="radio"]:checked,
+.settings-group input[type="checkbox"]:checked {
+    background-color: #ff2e63;
+    box-shadow: 0 0 10px rgba(255, 46, 99, 0.8);
+}
+
+.container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}

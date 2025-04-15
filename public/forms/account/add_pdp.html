@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/public/img/icon/Logo.png" type="image/png">
+    <link rel="stylesheet" href="/public/import/css/forms/account/add_pdp.css">
+    <title>Formulaire d'Upload</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Formulaire d'Upload</h1>
+        <form action="/public/import/php/script/forms/account/add_pdp.php" method="post" enctype="multipart/form-data">
+            <label for="photo">Sélectionnez une photo :</label>
+            <input type="file" name="photo" id="photo">
+            <input type="submit" value="Télécharger">
+        </form>
+    </div>
+</body>
+</html>

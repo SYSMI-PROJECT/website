@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier la visibilité des informations</title>
+    <link rel="icon" type="image/png" href="/public/img/icon/Logo.png">
+    <link rel="stylesheet" href="/public/import/css/forms/account/info_visibility.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Modifier la visibilité de vos informations</h2>
+        <form action="/public/import/php/script/forms/account/informations.php" method="POST" class="form">
+            <input type="hidden" name="user_id" value="<?= htmlspecialchars($userID) ?>">
+
+            <div class="form-group">
+                <label for="display_info">Afficher les informations</label>
+                <select name="display_info" id="display_info" required>
+                    <option value="1" <?= $currentDisplayInfo == 1 ? 'selected' : '' ?>>Oui</option>
+                    <option value="0" <?= $currentDisplayInfo == 0 ? 'selected' : '' ?>>Non</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn-submit">Mettre à jour</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

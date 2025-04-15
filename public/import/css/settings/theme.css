@@ -1,0 +1,119 @@
+body {
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+    transition: background-color 0.5s ease;
+}
+
+.container {
+    padding: 2.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    background-color: #00000070;
+}
+
+/* En-tête avec flèche à gauche et texte centré */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 2rem;
+}
+.back-arrow {
+    font-size: 2rem;
+    text-decoration: none;
+    color: #ff2e63;
+    transition: color 0.3s ease;
+}
+.back-arrow:hover {
+    color: #d81b4e;
+}
+
+h2 {
+    font-size: 1.8rem;
+    color: #e6ff00;
+    font-weight: bold;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+}
+
+/* Liste des thèmes façon TikTok */
+.theme-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.theme-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    position: relative;
+}
+
+.theme-item:hover {
+    transform: translateY(-3px);
+}
+
+.theme-item.selected {
+    border-color: #ff2e63;
+    box-shadow: 0 0 12px rgba(255, 46, 99, 0.6);
+}
+
+/* Styles individuels des thèmes */
+.theme-blanc { background: #ffffff; color: #333; }
+.theme-noir { background: #222; color: #fff; }
+.theme-bleu { background: #007bff; color: #fff; }
+.theme-rouge { background: #dc3545; color: #fff; }
+.theme-vert { background: #28a745; color: #fff; }
+
+/* Style du bouton radio personnalisé */
+.theme-item input {
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border: 3px solid white;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    background: white;
+    position: absolute;
+    right: 15px;
+}
+
+.theme-item input:checked {
+    background: #ff2e63;
+    border-color: white;
+    box-shadow: 0 0 10px rgba(255, 46, 99, 0.8);
+}
+
+/* Bouton Enregistrer */
+button {
+    background-color: #ff2e63;
+    color: white;
+    padding: 12px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 25px;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background-color: #d81b4e;
+    transform: scale(1.03);
+}

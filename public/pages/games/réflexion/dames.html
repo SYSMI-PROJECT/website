@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/Import/icons/Logo.png" type="image/png">
+  <title>Jeu de dames 3D - Version Ultime</title>
+  <style>
+    :root {
+      --board-size: 90vmin;
+      --grid-size: 10;
+      --cell-bg-dark-start: #654321;
+      --cell-bg-dark-end: #8B4513;
+      --cell-bg-light-start: #F5DEB3;
+      --cell-bg-light-end: #FFF8DC;
+      --piece-size: 45px;
+      --move-duration: 0.5s;
+    }
+    body {
+      background-color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+    #header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    #turn-indicator {
+      font-size: 1.4em;
+      margin-bottom: 5px;
+    }
+    #reset-btn {
+      padding: 8px 15px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    #move-history {
+      max-height: 150px;
+      width: var(--board-size);
+      overflow-y: auto;
+      background: #eee;
+      border: 1px solid #ccc;
+      padding: 5px;
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+    #board-container {
+      position: relative;
+      width: var(--board-size);
+      height: var(--board-size);
+      perspective: 1000px;
+      transform: rotateX(15deg);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+      transition: transform 0.3s ease;
+    }
+    #board-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-size), 1fr);
+      grid-template-rows: repeat(var(--grid-size), 1fr);
+      width: 100%;
+      height: 100%;
+    }
+    .case {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+    }
+    .case.dark {
+      background: linear-gradient(145deg, var(--cell-bg-dark-start), var(--cell-bg-dark-end));
+    }
+    .case.light {
+      background: linear-gradient(145deg, var(--cell-bg-light-start), var(--cell-bg-light-end));
+    }
+    .case.available {
+      background: red !important;
+      opacity: 0.8;
+      cursor: pointer;
+    }
+    #pieces-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .piece {
+      position: absolute;
+      width: var(--piece-size);
+      height: var(--piece-size);
+      border-radius: 50%;
+      border: 2px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: left var(--move-duration) ease, top var(--move-duration) ease;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    .piece.white {
+      background: white;
+      color: black;
+    }
+    .piece.black {
+      background: black;
+      color: white;
+    }
+    .piece.king {
+      border: 2px solid gold;
+    }
+    .piece.selected {
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 5px 2px yellow; }
+      50% { box-shadow: 0 0 15px 5px yellow; }
+      100% { box-shadow: 0 0 5px 2px yellow; }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    @media (max-width: 600px) {
+      :root {
+        --piece-size: 30px; /* Réduit la taille des pions pour les petits écrans */
+      }
+      #board-container {
+        --board-size: 80vw; /* Ajuste la taille du plateau pour les petits écrans */
+      }
+      #move-history {
+        width: 100%; /* Assure que l'historique des coups prend toute la largeur disponible */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <div id="turn-indicator">Tour : Blanc</div>
+    <button id="reset-btn">Recommencer</button>
+  </div>
+  <div id="board-container">
+    <div id="board-grid"></div>
+    <div id="pieces-container"></div>
+  </div>
+  <div id="move-history"><strong>Historique des coups :</strong><br></div>
+  <script>
+    const GRID_SIZE = 10;
+    const boardContainer = document.getElementById('board-container');
+    let CELL_SIZE = boardContainer.offsetWidth / GRID_SIZE;
+
+    window.addEventListener('resize', () => {
+      CELL_SIZE = boardContainer.offsetWidth / GRID_SIZE;
+      game.updatePieces();
+    });
+
+    let pieceIdCounter = 0;
+    class Pion {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.isKing = false;
+        this.id = pieceIdCounter++;
+      }
+      move(x, y) {
+        this.x = x;
+        this.y = y;
+        if (this.color === 'white' && this.y === 1) this.isKing = true;
+        if (this.color === 'black' && this.y === GRID_SIZE) this.isKing = true;
+      }
+      getValidMoves(damier) {
+        let moves = [];
+        let captures = [];
+        let directions = [];
+        if (this.isKing) {
+          directions = [[-1,-1], [1,-1], [-1,1], [1,1]];
+        } else {
+          let dir = (this.color === 'black') ? 1 : -1;
+          directions = [[-1, dir], [1, dir]];
+        }
+        directions.forEach(d => {
+          const dx = d[0], dy = d[1];
+          const newX = this.x + dx;
+          const newY = this.y + dy;
+          if (isInside(newX, newY) && damier.isCellEmpty(newX, newY)) {
+            moves.push([newX, newY]);
+          }
+          const enemyX = this.x + dx;
+          const enemyY = this.y + dy;
+          const landingX = this.x + 2 * dx;
+          const landingY = this.y + 2 * dy;
+          if (isInside(landingX, landingY) && damier.isCellEmpty(landingX, landingY)) {
+            const enemy = damier.getPionAt(enemyX, enemyY);
+            if (enemy && enemy.color !== this.color) {
+              captures.push({ move: [landingX, landingY], captured: enemy });
+            }
+          }
+        });
+        return { normal: moves, capture: captures };
+      }
+    }
+
+    function isInside(x, y) {
+      return x >= 1 && x <= GRID_SIZE && y >= 1 && y <= GRID_SIZE;
+    }
+
+    class Damier {
+      constructor() {
+        this.grid = [];
+        for (let y = 1; y <= GRID_SIZE; y++) {
+          let row = [];
+          for (let x = 1; x <= GRID_SIZE; x++) {
+            const cellColor = ((x + y) % 2 === 1) ? 'dark' : 'light';
+            row.push({ x, y, color: cellColor });
+          }
+          this.grid.push(row);
+        }
+        this.pions = [];
+        for (let y = 1; y <= 4; y++) {
+          for (let x = 1; x <= GRID_SIZE; x++) {
+            if ((x + y) % 2 === 1) this.pions.push(new Pion(x, y, 'black'));
+          }
+        }
+        for (let y = 7; y <= 10; y++) {
+          for (let x = 1; x <= GRID_SIZE; x++) {
+            if ((x + y) % 2 === 1) this.pions.push(new Pion(x, y, 'white'));
+          }
+        }
+      }
+      isCellEmpty(x, y) {
+        return !this.pions.some(p => p.x === x && p.y === y);
+      }
+      getPionAt(x, y) {
+        return this.pions.find(p => p.x === x && p.y === y);
+      }
+      removePion(pionToRemove) {
+        const el = document.getElementById('piece-' + pionToRemove.id);
+        if (el) {
+          el.style.animation = 'fadeOut 0.5s forwards';
+          setTimeout(() => { el.remove(); }, 500);
+        }
+        this.pions = this.pions.filter(p => p !== pionToRemove);
+      }
+    }
+
+    function playSound(frequency, duration) {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+      oscillator.connect(audioCtx.destination);
+      oscillator.start();
+      setTimeout(() => {
+        oscillator.stop();
+        audioCtx.close();
+      }, duration);
+    }
+
+    class Game {
+      constructor() {
+        this.damier = new Damier();
+        this.currentTurn = 'white';
+        this.selectedPion = null;
+        this.gameOver = false;
+        this.initBoard();
+        this.updatePieces();
+        this.updateTurnIndicator();
+        this.addListeners();
+      }
+      initBoard() {
+        const boardGrid = document.getElementById('board-grid');
+        boardGrid.innerHTML = "";
+        for (let y = 1; y <= GRID_SIZE; y++) {
+          for (let x = 1; x <= GRID_SIZE; x++) {
+            const cell = document.createElement('div');
+            cell.classList.add('case', ((x + y) % 2 === 1) ? 'dark' : 'light', 'x' + x, 'y' + y);
+            cell.dataset.x = x;
+            cell.dataset.y = y;
+            boardGrid.appendChild(cell);
+          }
+        }
+      }
+      updatePieces() {
+        const piecesContainer = document.getElementById('pieces-container');
+        this.damier.pions.forEach(pion => {
+          let pieceEl = document.getElementById('piece-' + pion.id);
+          if (!pieceEl) {
+            pieceEl = document.createElement('div');
+            pieceEl.id = 'piece-' + pion.id;
+            pieceEl.classList.add('piece', pion.color);
+            pieceEl.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if (this.currentTurn === 'white' && pion.color === 'white' && !this.gameOver) {
+                this.selectPiece(pion, pieceEl);
+              }
+            });
+            piecesContainer.appendChild(pieceEl);
+          }
+          const left = (pion.x - 1) * CELL_SIZE + (CELL_SIZE - parseInt(getComputedStyle(document.documentElement).getPropertyValue('--piece-size'))) / 2;
+          const top = (pion.y - 1) * CELL_SIZE + (CELL_SIZE - parseInt(getComputedStyle(document.documentElement).getPropertyValue('--piece-size'))) / 2;
+          pieceEl.style.left = left + 'px';
+          pieceEl.style.top = top + 'px';
+          if (pion.isKing) {
+            pieceEl.classList.add('king');
+            pieceEl.textContent = "D";
+          } else {
+            pieceEl.classList.remove('king');
+            pieceEl.textContent = "";
+          }
+        });
+        document.querySelectorAll('.piece').forEach(el => {
+          const id = parseInt(el.id.replace('piece-', ''));
+          if (!this.damier.pions.some(p => p.id === id)) el.remove();
+        });
+      }
+      updateTurnIndicator() {
+        const indicator = document.getElementById('turn-indicator');
+        if (this.gameOver) {
+          indicator.textContent = "Fin de la partie!";
+        } else {
+          indicator.textContent = "Tour : " + (this.currentTurn === 'white' ? "Blanc" : "Noir (Bot)");
+        }
+      }
+      addListeners() {
+        const boardGrid = document.getElementById('board-grid');
+        boardGrid.addEventListener('click', (e) => {
+          if (this.gameOver) return;
+          const target = e.target;
+          if (target.classList.contains('available') && this.selectedPion) {
+            const newX = parseInt(target.dataset.x);
+            const newY = parseInt(target.dataset.y);
+            if (target.dataset.capture === "true") {
+              const midX = (this.selectedPion.x + newX) / 2;
+              const midY = (this.selectedPion.y + newY) / 2;
+              const captured = this.damier.getPionAt(midX, midY);
+              if (captured) this.damier.removePion(captured);
+              playSound(220, 200);
+              this.appendHistory(`${this.selectedPion.color} capture en (${newX}, ${newY})`);
+            } else {
+              playSound(440, 150);
+              this.appendHistory(`${this.selectedPion.color} se déplace en (${newX}, ${newY})`);
+            }
+            this.selectedPion.move(newX, newY);
+            this.deselectPiece();
+            this.clearHighlights();
+            this.updatePieces();
+            if (target.dataset.capture === "true") {
+              const moves = this.selectedPion.getValidMoves(this.damier);
+              if (moves.capture.length > 0) {
+                this.highlightMoves(this.selectedPion);
+                return;
+              }
+            }
+            this.endTurn();
+          }
+        });
+        document.getElementById('reset-btn').addEventListener('click', () => this.resetGame());
+      }
+      selectPiece(pion, element) {
+        this.deselectPiece();
+        this.selectedPion = pion;
+        element.classList.add('selected');
+        this.highlightMoves(pion);
+      }
+      deselectPiece() {
+        document.querySelectorAll('.piece.selected').forEach(el => el.classList.remove('selected'));
+        this.selectedPion = null;
+      }
+      clearHighlights() {
+        document.querySelectorAll('.case.available').forEach(cell => {
+          cell.classList.remove('available');
+          cell.removeAttribute('data-capture');
+        });
+      }
+      highlightMoves(pion) {
+        this.clearHighlights();
+        const moves = pion.getValidMoves(this.damier);
+        if (moves.capture.length > 0) {
+          moves.capture.forEach(cap => {
+            const cell = this.getCell(cap.move[0], cap.move[1]);
+            if (cell) {
+              cell.classList.add('available');
+              cell.dataset.capture = "true";
+            }
+          });
+        } else {
+          moves.normal.forEach(move => {
+            const cell = this.getCell(move[0], move[1]);
+            if (cell) cell.classList.add('available');
+          });
+        }
+      }
+      getCell(x, y) {
+        return document.querySelector(`.case.x${x}.y${y}`) ||
+               document.querySelector(`.case[data-x="${x}"][data-y="${y}"]`);
+      }
+      endTurn() {
+        this.checkGameOver();
+        if (this.gameOver) {
+          this.updateTurnIndicator();
+          return;
+        }
+        this.currentTurn = (this.currentTurn === 'white') ? 'black' : 'white';
+        this.updateTurnIndicator();
+        this.clearHighlights();
+        if (this.currentTurn === 'black') {
+          setTimeout(() => this.botMove(), 500);
+        }
+      }
+      checkGameOver() {
+        let pieces = this.damier.pions.filter(p => p.color === this.currentTurn);
+        let moveExists = pieces.some(p => {
+          const moves = p.getValidMoves(this.damier);
+          return moves.normal.length > 0 || moves.capture.length > 0;
+        });
+        if (!moveExists) {
+          this.gameOver = true;
+          alert("Fin de la partie! " + (this.currentTurn === 'white' ? "Bot (Noir)" : "Joueur (Blanc)") + " n'a plus de mouvements.");
+        }
+      }
+      botMove() {
+        if (this.gameOver) return;
+        const botPieces = this.damier.pions.filter(p => p.color === 'black');
+        let allCaptures = [];
+        let allNormals = [];
+        botPieces.forEach(pion => {
+          const moves = pion.getValidMoves(this.damier);
+          if (moves.capture.length > 0) {
+            moves.capture.forEach(cap => {
+              allCaptures.push({ pion, move: cap.move, captured: cap.captured });
+            });
+          } else if (moves.normal.length > 0) {
+            moves.normal.forEach(move => { allNormals.push({ pion, move }); });
+          }
+        });
+        if (allCaptures.length > 0) {
+          const choice = allCaptures[Math.floor(Math.random() * allCaptures.length)];
+          const midX = (choice.pion.x + choice.move[0]) / 2;
+          const midY = (choice.pion.y + choice.move[1]) / 2;
+          const captured = this.damier.getPionAt(midX, midY);
+          if (captured) this.damier.removePion(captured);
+          choice.pion.move(choice.move[0], choice.move[1]);
+          this.updatePieces();
+          playSound(220, 200);
+          this.appendHistory(`Bot capture en (${choice.move[0]}, ${choice.move[1]})`);
+          const further = choice.pion.getValidMoves(this.damier);
+          if (further.capture.length > 0) {
+            setTimeout(() => this.botContinueCapture(choice.pion), 500);
+            return;
+          }
+        } else if (allNormals.length > 0) {
+          const choice = allNormals[Math.floor(Math.random() * allNormals.length)];
+          choice.pion.move(choice.move[0], choice.move[1]);
+          this.updatePieces();
+          playSound(440, 150);
+          this.appendHistory(`Bot se déplace en (${choice.move[0]}, ${choice.move[1]})`);
+        } else {
+          alert("Aucun mouvement possible pour le bot. Vous gagnez !");
+          this.gameOver = true;
+        }
+        this.currentTurn = 'white';
+        this.updateTurnIndicator();
+        this.checkGameOver();
+      }
+      botContinueCapture(pion) {
+        const moves = pion.getValidMoves(this.damier);
+        if (moves.capture.length > 0) {
+          const choice = moves.capture[Math.floor(Math.random() * moves.capture.length)];
+          const midX = (pion.x + choice.move[0]) / 2;
+          const midY = (pion.y + choice.move[1]) / 2;
+          const captured = this.damier.getPionAt(midX, midY);
+          if (captured) this.damier.removePion(captured);
+          pion.move(choice.move[0], choice.move[1]);
+          this.updatePieces();
+          playSound(220, 200);
+          setTimeout(() => this.botContinueCapture(pion), 500);
+        } else {
+          this.currentTurn = 'white';
+          this.updateTurnIndicator();
+          this.checkGameOver();
+        }
+      }
+      appendHistory(moveText) {
+        const historyDiv = document.getElementById('move-history');
+        const entry = document.createElement('div');
+        entry.textContent = moveText;
+        historyDiv.appendChild(entry);
+        historyDiv.scrollTop = historyDiv.scrollHeight;
+      }
+      resetGame() {
+        pieceIdCounter = 0;
+        this.damier = new Damier();
+        this.currentTurn = 'white';
+        this.selectedPion = null;
+        this.gameOver = false;
+        this.initBoard();
+        document.getElementById('pieces-container').innerHTML = "";
+        document.getElementById('move-history').innerHTML = "<strong>Historique des coups :</strong><br>";
+        this.updatePieces();
+        this.updateTurnIndicator();
+      }
+    }
+
+    const game = new Game();
+  </script>
+</body>
+</html>

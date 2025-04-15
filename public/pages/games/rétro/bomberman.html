@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bomberman</title>
+  <link rel="icon" href="/Import/icons/Logo.png" type="image/png">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #222;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    #game {
+      display: block;
+      background: #333;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
+      margin: auto;
+    }
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: rgba(0,0,0,0.75);
+      font-size: 48px;
+      text-align: center;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="960" height="832"></canvas>
+  <div id="overlay"></div>
+  <script>
+    // -----------------------------------------
+    // CONFIGURATION & VARIABLES GLOBALES
+    // -----------------------------------------
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const overlay = document.getElementById('overlay');
+
+    const gridSize = 64, numRows = 13, numCols = 15;
+    const GAME_STATE = { MENU: 'menu', PLAYING: 'playing', GAMEOVER: 'gameover', WIN: 'win' };
+    let gameState = GAME_STATE.MENU, levelTransition = false, score = 0, level = 1;
+
+    // Variables pour le secouage d'écran et les particules
+    let shakeTime = 0, shakeIntensity = 0;
+    let particles = [];
+
+    // Grille du niveau : chaque cellule est null ou contient "WALL", "SOFT_WALL" ou "BOMB"
+    let cells = [];
+    let entities = []; // Bombes et explosions
+    let items = [];    // Bonus
+    let enemies = [];  // Ennemis
+
+    // Sons (remplacez les URL par vos propres ressources)
+    const bgMusic = new Audio('https://actions.google.com/sounds/v1/ambiences/office_noise.ogg');
+    bgMusic.loop = true; bgMusic.volume = 0.3;
+    const bombSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+    const explosionSound = new Audio('https://actions.google.com/sounds/v1/explosions/explosion.ogg');
+
+    const CELL_TYPES = {
+      WALL: 'WALL',
+      SOFT_WALL: 'SOFT_WALL',
+      BOMB: 'BOMB'
+    };
+    // Types d’items
+    const ITEM_TYPES = {
+      BOMB_UP: 'BOMB_UP',
+      FIRE_UP: 'FIRE_UP',
+      SPEED_UP: 'SPEED_UP',
+      BOMB_KICK: 'BOMB_KICK',
+      INVINCIBLE: 'INVINCIBLE'
+    };
+
+    // Template pour les murs fixes – le reste sera aléatoirement des soft walls
+    const template = [
+      ['WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL'],
+      ['WALL', null,   null,    null,    null,    null,    null,    null,    null,    null,    null,    null,  null,  null,'WALL'],
+      ['WALL', null, 'WALL',  null, 'WALL',    null, 'WALL',    null, 'WALL',    null, 'WALL',    null, 'WALL',  null,'WALL'],
+      ['WALL', null,   null,    null,    null,    null,    null,    null,    null,    null,    null,    null,  null,  null,'WALL'],
+      ['WALL', null, 'WALL',  null, 'WALL',    null, 'WALL',    null, 'WALL',    null, 'WALL',    null, 'WALL',  null,'WALL'],
+      ['WALL', null,   null,    null,    null,    null,    null,    null,    null,    null,    null,    null,  null,  null,'WALL'],
+      ['WALL', null, 'WALL',  null, 'WALL',    null, 'WALL',    null, 'WALL',    null, 'WALL',    null, 'WALL',  null,'WALL'],
+      ['WALL', null,   null,    null,    null,    null,    null,    null,    null,    null,    null,    null,  null,  null,'WALL'],
+      ['WALL', null, 'WALL',  null, 'WALL',    null, 'WALL',    null, 'WALL',    null, 'WALL',    null, 'WALL',  null,'WALL'],
+      ['WALL', null,   null,    null,    null,    null,    null,    null,    null,    null,    null,    null,  null,  null,'WALL'],
+      ['WALL', null, 'WALL',  null, 'WALL',    null, 'WALL',    null, 'WALL',    null, 'WALL',    null, 'WALL',  null,'WALL'],
+      ['WALL', null,   null,    null,    null,    null,    null,    null,    null,    null,    null,    null,  null,  null,'WALL'],
+      ['WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL','WALL']
+    ];
+
+    // -----------------------------------------
+    // CANVASES HORS-ÉCRAN POUR LES TUILES
+    // -----------------------------------------
+    function createSoftWallCanvas() {
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = offCanvas.height = gridSize;
+      const offCtx = offCanvas.getContext('2d');
+      const grad = offCtx.createLinearGradient(0, 0, gridSize, gridSize);
+      grad.addColorStop(0, '#555');
+      grad.addColorStop(1, '#333');
+      offCtx.fillStyle = grad;
+      offCtx.fillRect(0, 0, gridSize, gridSize);
+      offCtx.fillStyle = '#a9a9a9';
+      offCtx.fillRect(4, 4, gridSize - 8, 12);
+      offCtx.fillRect(4, gridSize / 2, gridSize - 8, 12);
+      return offCanvas;
+    }
+    function createWallCanvas() {
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = offCanvas.height = gridSize;
+      const offCtx = offCanvas.getContext('2d');
+      offCtx.fillStyle = '#222';
+      offCtx.fillRect(0, 0, gridSize, gridSize);
+      offCtx.fillStyle = '#bbb';
+      offCtx.fillRect(0, 0, gridSize, gridSize);
+      offCtx.fillStyle = '#999';
+      offCtx.fillRect(4, 4, gridSize - 8, gridSize - 8);
+      return offCanvas;
+    }
+    const softWallCanvas = createSoftWallCanvas();
+    const wallCanvas = createWallCanvas();
+
+    // -----------------------------------------
+    // CLASSES POUR LES PARTICULES D'EXPLOSION
+    // -----------------------------------------
+    class Particle {
+      constructor(x, y, dx, dy, life) {
+        this.x = x; this.y = y;
+        this.dx = dx; this.dy = dy;
+        this.life = life; this.maxLife = life;
+      }
+      update(dt) {
+        this.life -= dt;
+        this.x += this.dx;
+        this.y += this.dy;
+      }
+      render() {
+        const alpha = Math.max(this.life / this.maxLife, 0);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // -----------------------------------------
+    // FONCTION DE PATHFINDING (A*)
+    // -----------------------------------------
+    function findPath(startRow, startCol, targetRow, targetCol) {
+      function hash(r, c) { return r + ',' + c; }
+      let openSet = [];
+      let cameFrom = {};
+      let gScore = {};
+      let fScore = {};
+      const startKey = hash(startRow, startCol);
+      gScore[startKey] = 0;
+      fScore[startKey] = Math.abs(startRow - targetRow) + Math.abs(startCol - targetCol);
+      openSet.push({ row: startRow, col: startCol, f: fScore[startKey] });
+
+      while (openSet.length > 0) {
+        openSet.sort((a, b) => a.f - b.f);
+        const current = openSet.shift();
+        if (current.row === targetRow && current.col === targetCol) {
+          let path = [];
+          let currKey = hash(current.row, current.col);
+          let curr = current;
+          while (cameFrom[currKey]) {
+            path.push({ row: curr.row, col: curr.col });
+            curr = cameFrom[currKey];
+            currKey = hash(curr.row, curr.col);
+          }
+          path.reverse();
+          return path;
+        }
+        const neighbors = [
+          { r: current.row - 1, c: current.col },
+          { r: current.row + 1, c: current.col },
+          { r: current.row, c: current.col - 1 },
+          { r: current.row, c: current.col + 1 }
+        ];
+        for (let n of neighbors) {
+          if (n.r < 0 || n.r >= numRows || n.c < 0 || n.c >= numCols) continue;
+          let dangerCost = 0;
+          for (let entity of entities) {
+            if (entity instanceof Bomb && Math.abs(n.r - entity.row) + Math.abs(n.c - entity.col) <= 1 && entity.timer < 1500)
+              dangerCost += 5;
+          }
+          if ((cells[n.r][n.c] !== null) && !(n.r === targetRow && n.c === targetCol)) continue;
+          const neighborKey = hash(n.r, n.c);
+          const tentativeG = gScore[hash(current.row, current.col)] + 1 + dangerCost;
+          if (gScore[neighborKey] === undefined || tentativeG < gScore[neighborKey]) {
+            cameFrom[neighborKey] = current;
+            gScore[neighborKey] = tentativeG;
+            fScore[neighborKey] = tentativeG + Math.abs(n.r - targetRow) + Math.abs(n.c - targetCol);
+            if (!openSet.some(node => node.row === n.r && node.col === n.c)) {
+              openSet.push({ row: n.r, col: n.c, f: fScore[neighborKey] });
+            }
+          }
+        }
+      }
+      return null;
+    }
+
+    // -----------------------------------------
+    // FONCTIONS D'AIDE POUR L'IA & DANGER
+    // -----------------------------------------
+    function hasSoftWallBetween(enemy, player) {
+      if (enemy.row === player.row) {
+        let start = Math.min(enemy.col, player.col) + 1;
+        let end = Math.max(enemy.col, player.col);
+        for (let c = start; c < end; c++) {
+          if (cells[enemy.row][c] === CELL_TYPES.SOFT_WALL) return true;
+        }
+      } else if (enemy.col === player.col) {
+        let start = Math.min(enemy.row, player.row) + 1;
+        let end = Math.max(enemy.row, player.row);
+        for (let r = start; r < end; r++) {
+          if (cells[r][enemy.col] === CELL_TYPES.SOFT_WALL) return true;
+        }
+      }
+      return false;
+    }
+    function isCellDangerous(row, col) {
+      for (let entity of entities) {
+        if (entity instanceof Explosion && entity.row === row && entity.col === col) return true;
+        if (entity instanceof Bomb && entity.row === row && entity.col === col && entity.timer < 1000) return true;
+      }
+      return false;
+    }
+    function getSafeAdjacentCells(row, col) {
+      const directions = [ { dr: -1, dc: 0 }, { dr: 1, dc: 0 }, { dr: 0, dc: -1 }, { dr: 0, dc: 1 } ];
+      return directions
+        .map(dir => ({ row: row + dir.dr, col: col + dir.dc }))
+        .filter(cell => cell.row >= 0 && cell.row < numRows &&
+                        cell.col >= 0 && cell.col < numCols &&
+                        cells[cell.row][cell.col] === null &&
+                        !isCellDangerous(cell.row, cell.col));
+    }
+    function findSafeCellIncludingDiagonals(row, col) {
+      const directions = [
+        { dr: -1, dc: 0 }, { dr: 1, dc: 0 }, { dr: 0, dc: -1 }, { dr: 0, dc: 1 },
+        { dr: -1, dc: -1 }, { dr: -1, dc: 1 }, { dr: 1, dc: -1 }, { dr: 1, dc: 1 }
+      ];
+      const safeCells = directions
+        .map(dir => ({ row: row + dir.dr, col: col + dir.dc }))
+        .filter(cell => cell.row >= 0 && cell.row < numRows &&
+                        cell.col >= 0 && cell.col < numCols &&
+                        cells[cell.row][cell.col] === null &&
+                        !isCellDangerous(cell.row, cell.col));
+      if (safeCells.length > 0) {
+        return safeCells[Math.floor(Math.random() * safeCells.length)];
+      }
+      return null;
+    }
+    function isMoveCloserToBomb(enemy, newRow, newCol) {
+      for (let entity of entities) {
+        if (entity instanceof Bomb && entity.timer < 1000) {
+          let currentDist = Math.abs(enemy.row - entity.row) + Math.abs(enemy.col - entity.col);
+          let newDist = Math.abs(newRow - entity.row) + Math.abs(newCol - entity.col);
+          if (newDist < currentDist) return true;
+        }
+      }
+      return false;
+    }
+
+    // -----------------------------------------
+    // CLASSES DU JEU
+    // -----------------------------------------
+    class Bomb {
+      constructor(row, col, size, owner) {
+        this.row = row; this.col = col; this.size = size;
+        this.owner = owner; this.alive = true;
+        this.type = CELL_TYPES.BOMB; this.timer = 3000;
+        this.radius = gridSize * 0.4;
+      }
+      update(dt) {
+        this.timer -= dt;
+        if (this.timer <= 0) {
+          this.explode();
+          bombSound.currentTime = 0; bombSound.play();
+        } else {
+          const interval = Math.ceil(this.timer / 500);
+          this.radius = (interval % 2 === 0) ? gridSize * 0.4 : gridSize * 0.5;
+        }
+      }
+      explode() {
+        if (!this.alive) return;
+        this.alive = false;
+        cells[this.row][this.col] = null;
+        entities.push(new Explosion(this.row, this.col, null, true));
+        explosionSound.currentTime = 0; explosionSound.play();
+        shakeTime = 150;
+        shakeIntensity = 5;
+        for (let i = 0; i < 10; i++) {
+          let angle = Math.random() * Math.PI * 2;
+          let speed = Math.random() * 2 + 1;
+          particles.push(new Particle((this.col + 0.5) * gridSize, (this.row + 0.5) * gridSize, Math.cos(angle) * speed, Math.sin(angle) * speed, 500));
+        }
+        const directions = [ { row: -1, col: 0 }, { row: 1, col: 0 }, { row: 0, col: -1 }, { row: 0, col: 1 } ];
+        for (let dir of directions) {
+          for (let i = 1; i <= this.size; i++) {
+            const newRow = this.row + dir.row * i;
+            const newCol = this.col + dir.col * i;
+            if (newRow < 0 || newRow >= numRows || newCol < 0 || newCol >= numCols) break;
+            if (cells[newRow][newCol] === CELL_TYPES.WALL) break;
+            entities.push(new Explosion(newRow, newCol, dir, i === 1));
+            if (cells[newRow][newCol] === CELL_TYPES.SOFT_WALL) {
+              cells[newRow][newCol] = null; score += 10;
+              if (Math.random() < 0.3) {
+                let rnd = Math.random();
+                let itemType;
+                if (rnd < 0.20) itemType = ITEM_TYPES.BOMB_UP;
+                else if (rnd < 0.40) itemType = ITEM_TYPES.FIRE_UP;
+                else if (rnd < 0.60) itemType = ITEM_TYPES.SPEED_UP;
+                else if (rnd < 0.80) itemType = ITEM_TYPES.BOMB_KICK;
+                else itemType = ITEM_TYPES.INVINCIBLE;
+                items.push(new Item(newRow, newCol, itemType));
+              }
+              break;
+            }
+            if (cells[newRow][newCol] === CELL_TYPES.BOMB) {
+              const chainedBomb = entities.find(entity =>
+                entity.type === CELL_TYPES.BOMB &&
+                entity.row === newRow && entity.col === newCol);
+              if (chainedBomb) chainedBomb.explode();
+              break;
+            }
+          }
+        }
+      }
+      render() {
+        const x = (this.col + 0.5) * gridSize, y = (this.row + 0.5) * gridSize;
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(x, y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        const fuseOffset = (this.radius === gridSize * 0.5) ? gridSize * 0.15 : 0;
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc((this.col + 0.75) * gridSize, (this.row + 0.25) * gridSize - fuseOffset, 10, Math.PI, -Math.PI/2);
+        ctx.stroke();
+      }
+    }
+
+    class Explosion {
+      constructor(row, col, direction, isCenter = false) {
+        this.row = row; this.col = col; this.direction = direction;
+        this.isCenter = isCenter; this.alive = true; this.timer = 300;
+      }
+      update(dt) {
+        this.timer -= dt;
+        if (this.timer <= 0) this.alive = false;
+      }
+      render() {
+        const alpha = Math.max(this.timer / 300, 0);
+        ctx.save(); ctx.globalAlpha = alpha;
+        const x = this.col * gridSize, y = this.row * gridSize;
+        ctx.fillStyle = '#D72B16'; ctx.fillRect(x, y, gridSize, gridSize);
+        ctx.fillStyle = '#F39642';
+        if (this.isCenter || (this.direction && this.direction.col !== 0))
+          ctx.fillRect(x, y + 6, gridSize, gridSize - 12);
+        if (this.isCenter || (this.direction && this.direction.row !== 0))
+          ctx.fillRect(x + 6, y, gridSize - 12, gridSize);
+        ctx.fillStyle = '#FFE5A8';
+        if (this.isCenter || (this.direction && this.direction.col !== 0))
+          ctx.fillRect(x, y + 12, gridSize, gridSize - 24);
+        if (this.isCenter || (this.direction && this.direction.row !== 0))
+          ctx.fillRect(x + 12, y, gridSize - 24, gridSize);
+        ctx.restore();
+      }
+    }
+
+    class Item {
+      constructor(row, col, itemType) {
+        this.row = row; this.col = col; this.type = itemType;
+        this.alive = true; this.angle = 0;
+      }
+      update(dt) { this.angle += dt * 0.005; }
+      render() {
+        const x = (this.col + 0.5) * gridSize, y = (this.row + 0.5) * gridSize;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(this.angle);
+        if (this.type === ITEM_TYPES.BOMB_UP) ctx.fillStyle = 'blue';
+        else if (this.type === ITEM_TYPES.FIRE_UP) ctx.fillStyle = 'orange';
+        else if (this.type === ITEM_TYPES.SPEED_UP) ctx.fillStyle = 'lime';
+        else if (this.type === ITEM_TYPES.BOMB_KICK) ctx.fillStyle = 'purple';
+        else if (this.type === ITEM_TYPES.INVINCIBLE) ctx.fillStyle = 'gold';
+        ctx.fillRect(-gridSize * 0.2, -gridSize * 0.2, gridSize * 0.4, gridSize * 0.4);
+        ctx.restore();
+      }
+    }
+
+    // Classe du joueur avec déplacement fluide et invincibilité temporaire
+    class Player {
+      constructor(row, col) {
+        this.row = row; this.col = col;
+        this.numBombs = 1; this.bombSize = 3;
+        this.radius = gridSize * 0.35;
+        this.x = (this.col + 0.5) * gridSize;
+        this.y = (this.row + 0.5) * gridSize;
+        this.targetX = this.x;
+        this.targetY = this.y;
+        this.moveDelay = 250;
+        this.moveTimer = 0;
+        this.speedBoost = 0;
+        this.bombKick = false;
+        this.invincible = false;
+        this.invincibleTimer = 0;
+      }
+      update(dt) {
+        this.x += (this.targetX - this.x) * 0.2;
+        this.y += (this.targetY - this.y) * 0.2;
+        this.moveTimer = Math.max(0, this.moveTimer - dt);
+        if (this.invincible) {
+          this.invincibleTimer -= dt;
+          if (this.invincibleTimer <= 0) {
+            this.invincible = false;
+          }
+        }
+      }
+      render() {
+        ctx.save();
+        ctx.fillStyle = this.invincible ? 'gold' : '#fff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // Classe des ennemis avec IA « joueur » améliorée
+    class Enemy {
+      constructor(row, col) {
+        this.row = row; this.col = col; this.alive = true;
+        this.radius = gridSize * 0.35;
+        this.moveTimer = 0;
+        this.inputTimer = 0; // Timer pour simuler les décisions
+        this.bombCooldown = 0;
+        this.x = (this.col + 0.5) * gridSize;
+        this.y = (this.row + 0.5) * gridSize;
+        this.targetX = this.x;
+        this.targetY = this.y;
+      }
+      // Simule l'appui sur une touche pour se déplacer ou poser une bombe.
+      // L'IA vérifie également si un mur destructible est à portée pour le détruire.
+      simulateInput() {
+        let commands = { move: null, bomb: false };
+        const distanceToPlayer = Math.abs(this.row - player.row) + Math.abs(this.col - player.col);
+        // Vérifier les cellules adjacentes pour un mur destructible
+        const adjacentCells = [
+          { row: this.row - 1, col: this.col },
+          { row: this.row + 1, col: this.col },
+          { row: this.row, col: this.col - 1 },
+          { row: this.row, col: this.col + 1 }
+        ];
+        for (let cell of adjacentCells) {
+          if (cell.row >= 0 && cell.row < numRows && cell.col >= 0 && cell.col < numCols) {
+            if (cells[cell.row][cell.col] === CELL_TYPES.SOFT_WALL && this.bombCooldown <= 0 && cells[this.row][this.col] === null) {
+              commands.bomb = true;
+              return commands;
+            }
+          }
+        }
+        // Si proche du joueur, poser aussi une bombe
+        if (distanceToPlayer <= 2 && this.bombCooldown <= 0 && cells[this.row][this.col] === null) {
+          commands.bomb = true;
+          return commands;
+        }
+        // Sinon, simuler un déplacement vers le joueur en évitant le danger
+        let possibleMoves = getSafeAdjacentCells(this.row, this.col);
+        if (possibleMoves.length > 0) {
+          possibleMoves.sort((a, b) => {
+            let distA = Math.abs(a.row - player.row) + Math.abs(a.col - player.col);
+            let distB = Math.abs(b.row - player.row) + Math.abs(b.col - player.col);
+            return distA - distB;
+          });
+          if (Math.random() < 0.7) {
+            commands.move = possibleMoves[0];
+          } else {
+            commands.move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+          }
+        }
+        return commands;
+      }
+      update(dt) {
+        this.moveTimer -= dt;
+        this.bombCooldown -= dt;
+        this.inputTimer -= dt;
+        if (this.inputTimer <= 0) {
+          let input = this.simulateInput();
+          if (input.bomb) {
+            const bomb = new Bomb(this.row, this.col, 3, this);
+            entities.push(bomb);
+            cells[this.row][this.col] = CELL_TYPES.BOMB;
+            this.bombCooldown = Math.max(4000 - (level * 200), 2000);
+          }
+          if (input.move && this.moveTimer <= 0) {
+            if (cells[input.move.row][input.move.col] === null) {
+              this.row = input.move.row;
+              this.col = input.move.col;
+              this.targetX = (this.col + 0.5) * gridSize;
+              this.targetY = (this.row + 0.5) * gridSize;
+              this.moveTimer = Math.max(250 - level * 10, 100);
+            }
+          }
+          this.inputTimer = 300;
+        }
+        this.x += (this.targetX - this.x) * 0.2;
+        this.y += (this.targetY - this.y) * 0.2;
+      }
+      render() {
+        ctx.save();
+        ctx.fillStyle = 'red';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // -----------------------------------------
+    // INITIALISATION DU NIVEAU
+    // -----------------------------------------
+    let player;
+    function generateLevel() {
+      cells = []; entities = []; items = []; enemies = [];
+      for (let row = 0; row < numRows; row++) {
+        cells[row] = [];
+        for (let col = 0; col < numCols; col++) {
+          if (template[row][col] === 'WALL')
+            cells[row][col] = CELL_TYPES.WALL;
+          else
+            cells[row][col] = (Math.random() < 0.90) ? CELL_TYPES.SOFT_WALL : null;
+        }
+      }
+      // Zones sûres pour le spawn du joueur
+      cells[1][1] = null; cells[1][2] = null; cells[2][1] = null;
+      // Zones sûres pour les ennemis
+      cells[1][numCols-2] = null; cells[1][numCols-3] = null;
+      cells[2][numCols-2] = null; cells[2][numCols-3] = null;
+      cells[numRows-2][1] = null; cells[numRows-3][1] = null;
+      cells[numRows-2][2] = null; cells[numRows-3][2] = null;
+      cells[numRows-2][numCols-2] = null; cells[numRows-3][numCols-2] = null;
+      cells[numRows-2][numCols-3] = null; cells[numRows-3][numCols-3] = null;
+
+      player = new Player(1, 1);
+      enemies.push(new Enemy(1, numCols-2));
+      enemies.push(new Enemy(numRows-2, 1));
+      enemies.push(new Enemy(numRows-2, numCols-2));
+    }
+
+    // -----------------------------------------
+    // BOUCLE DE JEU
+    // -----------------------------------------
+    let lastTime;
+    function gameLoop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const dt = timestamp - lastTime;
+      lastTime = timestamp;
+
+      if (gameState === GAME_STATE.PLAYING) {
+        player.update(dt);
+      }
+
+      if (shakeTime > 0) {
+        const dx = (Math.random() - 0.5) * shakeIntensity;
+        const dy = (Math.random() - 0.5) * shakeIntensity;
+        ctx.save();
+        ctx.translate(dx, dy);
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (gameState === GAME_STATE.PLAYING) {
+        // Affichage de la grille
+        for (let row = 0; row < numRows; row++) {
+          for (let col = 0; col < numCols; col++) {
+            const cell = cells[row][col];
+            if (cell === CELL_TYPES.WALL)
+              ctx.drawImage(wallCanvas, col * gridSize, row * gridSize);
+            else if (cell === CELL_TYPES.SOFT_WALL)
+              ctx.drawImage(softWallCanvas, col * gridSize, row * gridSize);
+          }
+        }
+        // Mise à jour et rendu des entités
+        entities.forEach(entity => { entity.update(dt); entity.render(); });
+        entities = entities.filter(entity => entity.alive);
+        items.forEach(item => { item.update(dt); item.render(); });
+        items = items.filter(item => item.alive);
+        enemies.forEach(enemy => { enemy.update(dt); enemy.render(); });
+        enemies = enemies.filter(enemy => enemy.alive);
+        particles.forEach(particle => {
+          particle.update(dt);
+          particle.render();
+        });
+        particles = particles.filter(p => p.life > 0);
+
+        // Collisions entre explosions et ennemis
+        enemies.forEach(enemy => {
+          entities.forEach(entity => {
+            if (entity instanceof Explosion && entity.row === enemy.row && entity.col === enemy.col && enemy.alive) {
+              enemy.alive = false; score += 100;
+            }
+          });
+        });
+        // Collision des explosions avec le joueur (sauf si invincible)
+        entities.forEach(entity => {
+          if (entity instanceof Explosion && entity.row === player.row && entity.col === player.col && !player.invincible)
+            gameOver();
+        });
+        // Collision directe joueur-ennemi
+        enemies.forEach(enemy => {
+          if (enemy.row === player.row && enemy.col === player.col && !player.invincible)
+            gameOver();
+        });
+        // Gestion des bonus
+        items.forEach(item => {
+          if (item.row === player.row && item.col === player.col) {
+            if (item.type === ITEM_TYPES.BOMB_UP) player.numBombs++;
+            else if (item.type === ITEM_TYPES.FIRE_UP) player.bombSize++;
+            else if (item.type === ITEM_TYPES.SPEED_UP) {
+              player.speedBoost++;
+              player.moveDelay = Math.max(100, 250 - player.speedBoost * 20);
+            }
+            else if (item.type === ITEM_TYPES.BOMB_KICK) {
+              player.bombKick = true;
+            }
+            else if (item.type === ITEM_TYPES.INVINCIBLE) {
+              player.invincible = true;
+              player.invincibleTimer = 5000;
+            }
+            item.alive = false; score += 50;
+          }
+        });
+        player.render();
+
+        // Passage au niveau suivant
+        if (enemies.length === 0 && !levelTransition) {
+          levelTransition = true;
+          // Si le joueur a atteint le niveau 10, il gagne
+          if(level >= 10) {
+            gameState = GAME_STATE.WIN;
+            overlay.style.display = 'flex';
+            overlay.innerHTML = 'Vous avez gagné !<br><small>Appuyez sur Entrée pour rejouer</small>';
+          } else {
+            overlay.style.display = 'flex';
+            overlay.innerHTML = 'Level Complete<br><small>Préparez-vous...</small>';
+            setTimeout(() => { level++; generateLevel(); overlay.style.display = 'none'; levelTransition = false; }, 2000);
+          }
+        }
+      }
+
+      // Effet de lumière autour du joueur
+      if (gameState === GAME_STATE.PLAYING) {
+        ctx.save();
+        const grad = ctx.createRadialGradient(player.x, player.y, gridSize * 2, player.x, player.y, gridSize * 8);
+        grad.addColorStop(0, "rgba(0, 0, 0, 0)");
+        grad.addColorStop(1, "rgba(0, 0, 0, 0.8)");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      }
+
+      // Affichage du score et du niveau
+      ctx.font = "24px sans-serif"; ctx.fillStyle = "white";
+      ctx.fillText("Score: " + score, 10, 30);
+      ctx.fillText("Niveau: " + level, 10, 60);
+      if (player) {
+        ctx.fillText("Bombes: " + player.numBombs, 10, 90);
+        ctx.fillText("Portée: " + player.bombSize, 10, 120);
+        ctx.fillText("Speed Boost: " + player.speedBoost, 10, 150);
+        ctx.fillText("Bomb Kick: " + (player.bombKick ? "Actif" : "Non"), 10, 180);
+        if(player.invincible) {
+          ctx.fillText("Invincible", 10, 210);
+        }
+      }
+
+      renderOverlay();
+
+      if (shakeTime > 0) {
+        ctx.restore();
+        shakeTime -= dt;
+      }
+      requestAnimationFrame(gameLoop);
+    }
+
+    // -----------------------------------------
+    // MENU & GESTION DES ÉTATS DU JEU
+    // -----------------------------------------
+    function renderOverlay() {
+      if (gameState === GAME_STATE.MENU) {
+        overlay.style.display = 'flex';
+        overlay.innerHTML = 'Bomberman Ultimate IA (Ennemis Futés)<br><small>Appuyez sur Entrée pour démarrer</small>';
+      } else if (gameState === GAME_STATE.GAMEOVER) {
+        overlay.style.display = 'flex';
+        overlay.innerHTML = 'Game Over<br><small>Score: ' + score + '<br>Appuyez sur Entrée pour recommencer</small>';
+      } else if (gameState === GAME_STATE.WIN) {
+        overlay.style.display = 'flex';
+      } else {
+        overlay.style.display = 'none';
+      }
+    }
+    function startGame() {
+      score = 0; level = 1; generateLevel();
+      gameState = GAME_STATE.PLAYING; bgMusic.currentTime = 0; bgMusic.play();
+    }
+    function gameOver() {
+      gameState = GAME_STATE.GAMEOVER; bgMusic.pause();
+    }
+
+    // -----------------------------------------
+    // GESTION DES ÉVÉNEMENTS CLAVIER
+    // -----------------------------------------
+    document.addEventListener('keydown', (e) => {
+      if ((gameState === GAME_STATE.MENU || gameState === GAME_STATE.GAMEOVER || gameState === GAME_STATE.WIN) && e.key === 'Enter') { 
+        startGame(); 
+        return; 
+      }
+      if (gameState !== GAME_STATE.PLAYING) return;
+
+      // Contrôle du joueur
+      if(e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown'){
+        if(player.moveTimer > 0) return;
+        let newRow = player.row, newCol = player.col;
+        if (e.key === 'ArrowLeft') newCol--;
+        else if (e.key === 'ArrowRight') newCol++;
+        else if (e.key === 'ArrowUp') newRow--;
+        else if (e.key === 'ArrowDown') newRow++;
+        if(newRow >= 0 && newRow < numRows && newCol >= 0 && newCol < numCols) {
+          if(cells[newRow][newCol] === null) {
+            player.row = newRow; player.col = newCol;
+            player.targetX = (player.col + 0.5) * gridSize;
+            player.targetY = (player.row + 0.5) * gridSize;
+          }
+          else if(cells[newRow][newCol] === CELL_TYPES.BOMB && player.bombKick) {
+            let kickRow = newRow + (newRow - player.row);
+            let kickCol = newCol + (newCol - player.col);
+            if(kickRow >= 0 && kickRow < numRows && kickCol >= 0 && kickCol < numCols && cells[kickRow][kickCol] === null) {
+              let bombEntity = entities.find(entity => entity instanceof Bomb && entity.row === newRow && entity.col === newCol);
+              if(bombEntity) {
+                cells[newRow][newCol] = null;
+                bombEntity.row = kickRow;
+                bombEntity.col = kickCol;
+                bombEntity.targetX = (kickCol + 0.5) * gridSize;
+                bombEntity.targetY = (kickRow + 0.5) * gridSize;
+                cells[kickRow][kickCol] = CELL_TYPES.BOMB;
+                player.row = newRow; player.col = newCol;
+                player.targetX = (player.col + 0.5) * gridSize;
+                player.targetY = (player.row + 0.5) * gridSize;
+              }
+            }
+          }
+          player.moveTimer = player.moveDelay;
+        }
+      }
+      if (e.key === ' ') {
+        const bombsPlaced = entities.filter(entity => entity.type === CELL_TYPES.BOMB && entity.owner === player).length;
+        if (cells[player.row][player.col] === null && bombsPlaced < player.numBombs) {
+          const bomb = new Bomb(player.row, player.col, player.bombSize, player);
+          entities.push(bomb); cells[player.row][player.col] = CELL_TYPES.BOMB;
+        }
+      }
+    });
+
+    // -----------------------------------------
+    // LANCEMENT DU JEU
+    // -----------------------------------------
+    renderOverlay();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

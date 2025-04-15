@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/public/img/icon/Logo.png">
+    <link rel="stylesheet" href="/public/import/css/forms/account/add_network.css">
+    <title>Ajouter des Réseaux Sociaux</title>
+</head>
+<body>
+<form id="socialForm" action="/public/import/php/script/forms/account/réseaux.php" method="post" onsubmit="return validateForm()">
+    <div id="socialInputs" aria-live="polite">
+        <div class="social-inputs">
+            <label for="social">Réseau social :</label>
+            <select name="social" required onchange="updateLink(this)">
+                <option value="">Choisir un réseau social</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Snapchat">Snapchat</option>
+                <option value="Instagram">Instagram</option>
+                <option value="YouTube">YouTube</option>
+                <option value="Discord">Discord</option>
+                <option value="Twitch">Twitch</option>
+            </select>
+            <input type="text" name="link" placeholder="Veuillez entrer le lien" required pattern="https?://.+" id="socialLink">
+            <input type="hidden" name="user_id" value="1">
+            <button type="button" class="remove-social-button" aria-label="Supprimer ce réseau social" onclick="removeSocialInput(this)">X</button>
+        </div>
+    </div>
+    <div class="add-social-button">
+        <button id="addSocialButton" type="button" onclick="addSocialInput()">Ajouter un autre réseau social</button>
+    </div>
+    <input type="submit" value="Soumettre">
+    <div id="selectedSocialsContainer" class="selected-socials" aria-live="polite">
+        <!-- Les icônes des réseaux sociaux ajoutés seront affichées ici -->
+    </div>
+</form>
+
+<script>
+    const socialLinks = {
+        TikTok: 'https://www.tiktok.com/@',
+        Snapchat: 'https://www.snapchat.com/add/',
+        Instagram: 'https://www.instagram.com/',
+        YouTube: 'https://www.youtube.com/c/',
+        Discord: 'https://discord.gg/',
+        Twitch: 'https://www.twitch.tv/'
+    };
+
+    function addSocialInput() {
+        var socialInputs = document.querySelectorAll('.social-inputs select[name="social"]');
+        var selectedSocials = Array.from(socialInputs).map(select => select.value);
+        var availableOptions = ['TikTok', 'Snapchat', 'Instagram', 'YouTube', 'Discord', 'Twitch'];
+
+        var remainingOptions = availableOptions.filter(option => !selectedSocials.includes(option));
+
+        if (remainingOptions.length === 0) {
+            document.getElementById('addSocialButton').disabled = true;
+            return;
+        }
+
+        var newSocialInput = document.createElement('div');
+        newSocialInput.classList.add('social-inputs', 'added');
+        newSocialInput.innerHTML = `
+            <label for="social">Réseau social :</label>
+            <select name="social" required onchange="updateLink(this)">
+                <option value="">Choisir un réseau social</option>
+                ${remainingOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
+            </select>
+            <input type="text" name="link" placeholder="Veuillez entrer le lien" required pattern="https?://.+" id="socialLink">
+            <button type="button" class="remove-social-button" aria-label="Supprimer ce réseau social" onclick="removeSocialInput(this)">X</button>
+        `;
+        document.getElementById('socialInputs').appendChild(newSocialInput);
+        updateLink(newSocialInput.querySelector('select'));
+    }
+
+    function removeSocialInput(button) {
+        var socialInput = button.parentElement;
+        socialInput.classList.add('removed');
+        setTimeout(() => {
+            socialInput.remove();
+            updateSelectedSocials();
+            document.getElementById('addSocialButton').disabled = false;
+        }, 500);
+    }
+
+    function updateLink(select) {
+        var social = select.value;
+        var linkInput = select.parentElement.querySelector('input[name="link"]');
+        if (social && socialLinks[social]) {
+            linkInput.value = socialLinks[social];  // Pré-remplir le champ avec le lien
+        } else {
+            linkInput.value = '';  // Vider le champ si aucun réseau n'est sélectionné
+        }
+    }
+
+    function validateForm() {
+        var inputs = document.querySelectorAll('#socialInputs select[name="social"], #socialInputs input[name="link"]');
+        for (var i = 0; i < inputs.length; i++) {
+            if (!inputs[i].value) {
+                alert("Veuillez remplir tous les champs.");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateSelectedSocials();
+    });
+</script>
+</body>
+</html>

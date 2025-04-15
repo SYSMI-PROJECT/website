@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/Import/icons/Logo.png" type="image/png">
+    <title>Pierre, feuille, ciseaux !</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(circle, #021265, #003105);
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .score {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .matches {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .match {
+            width: 30px;
+            height: 30px;
+            background-color: #ccc;
+            margin: 0 5px;
+            border-radius: 50%;
+        }
+
+        .won {
+            background-color: yellow;
+        }
+
+        .choices {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .choice {
+            font-size: 20px;
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .choice:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #redirectBtn {
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #2196F3;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        #redirectBtn:hover {
+            background-color: #0b7dda;
+        }
+
+        #roundCounter {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pierre-feuille-ciseaux</h1>
+        <div class="score">Votre score : <span id="playerScore">0</span> | Score de l'ordinateur : <span id="computerScore">0</span></div>
+        <div id="roundCounter">Manche <span id="round">1</span>/5</div>
+        <div class="matches" id="matches"></div>
+        <div class="choices">
+            <button class="choice" onclick="play('pierre')">Pierre</button>
+            <button class="choice" onclick="play('feuille')">Feuille</button>
+            <button class="choice" onclick="play('ciseaux')">Ciseaux</button>
+        </div>
+        <div id="result"></div>
+        <button id="redirectBtn" onclick="redirectToAnotherPage()">Menu home</button>
+    </div>
+
+    <script>
+        let playerScore = 0;
+        let computerScore = 0;
+        let playerMatches = 0;
+        let computerMatches = 0;
+        let round = 1;
+        const maxRounds = 5;
+
+        function play(userChoice) {
+            const choices = ['pierre', 'feuille', 'ciseaux'];
+            const computerChoice = choices[Math.floor(Math.random() * 3)];
+
+            let result;
+
+            if (userChoice === computerChoice) {
+                result = "Égalité !";
+            } else if ((userChoice === "pierre" && computerChoice === "ciseaux") ||
+                       (userChoice === "feuille" && computerChoice === "pierre") ||
+                       (userChoice === "ciseaux" && computerChoice === "feuille")) {
+                result = "Vous avez gagné !";
+                playerScore++;
+            } else {
+                result = "Vous avez perdu !";
+                computerScore++;
+            }
+
+            document.getElementById('result').innerHTML = result;
+            document.getElementById('playerScore').textContent = playerScore;
+            document.getElementById('computerScore').textContent = computerScore;
+
+            updateMatches();
+
+            round++;
+            document.getElementById('round').textContent = round;
+
+            if (round > maxRounds) {
+                endGame();
+            }
+        }
+
+        function updateMatches() {
+            if (playerScore > playerMatches) {
+                document.getElementById('matches').innerHTML += '<div class="match won"></div>';
+                playerMatches++;
+            }
+
+            if (computerScore > computerMatches) {
+                document.getElementById('matches').innerHTML += '<div class="match"></div>';
+                computerMatches++;
+            }
+        }
+
+        function endGame() {
+            if (playerScore > computerScore) {
+                window.location.href = "../Super étoile.php?winner=user";
+            } else {
+                playerScore = 0;
+                computerScore = 0;
+                playerMatches = 0;
+                computerMatches = 0;
+                round = 1;
+                document.getElementById('playerScore').textContent = playerScore;
+                document.getElementById('computerScore').textContent = computerScore;
+                document.getElementById('matches').innerHTML = '';
+                document.getElementById('result').innerHTML = '';
+                document.getElementById('round').textContent = round;
+            }
+        }
+
+        function redirectToAnotherPage() {
+            window.location.href = "../../home-menu.php";
+        }
+    </script>
+</body>
+</html>

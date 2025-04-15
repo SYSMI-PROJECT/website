@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saut du Ninja</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: white;
+            overflow: hidden;
+        }
+        h1 {
+            color: #FFD700;
+        }
+        #game-container {
+            position: relative;
+            width: 600px;
+            height: 200px;
+            background-color: #4CAF50;
+            margin: auto;
+            overflow: hidden;
+            border: 5px solid white;
+        }
+        #ninja {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: red;
+            bottom: 10px;
+            left: 50px;
+            transition: 0.1s;
+        }
+        .obstacle {
+            position: absolute;
+            width: 30px;
+            height: 40px;
+            background-color: black;
+            bottom: 10px;
+            right: -40px;
+        }
+        .button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #3498DB;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: 0.3s;
+        }
+        .button:hover {
+            background-color: #2980B9;
+        }
+    </style>
+</head>
+<body>
+    <h1>🥷 Saut du Ninja 🥷</h1>
+    <p>Appuie sur **ESPACE** pour sauter et éviter les obstacles !</p>
+
+    <div class="difficulty-selection">
+        <button class="button" onclick="startGame('easy')">Facile</button>
+        <button class="button" onclick="startGame('normal')">Normal</button>
+        <button class="button" onclick="startGame('hard')">Difficile</button>
+    </div>
+
+    <div id="game-container">
+        <div id="ninja"></div>
+    </div>
+    <p>Score : <span id="score">0</span></p>
+
+    <script>
+        let ninja, gameContainer, scoreDisplay, gravity, jumpStrength, speed, gameInterval, obstacleInterval, isJumping, score;
+        
+        function startGame(difficulty) {
+            document.querySelector(".difficulty-selection").style.display = "none";
+            ninja = document.getElementById("ninja");
+            gameContainer = document.getElementById("game-container");
+            scoreDisplay = document.getElementById("score");
+            score = 0;
+            isJumping = false;
+
+            if (difficulty === "easy") {
+                gravity = 2;
+                jumpStrength = 60;
+                speed = 2000;
+            } else if (difficulty === "normal") {
+                gravity = 3;
+                jumpStrength = 70;
+                speed = 1500;
+            } else {
+                gravity = 4;
+                jumpStrength = 80;
+                speed = 1000;
+            }
+
+            document.addEventListener("keydown", jump);
+            gameInterval = setInterval(updateGame, 20);
+            obstacleInterval = setInterval(createObstacle, speed);
+        }
+
+        function jump(event) {
+            if (event.code === "Space" && !isJumping) {
+                isJumping = true;
+                let jumpHeight = 0;
+                let jumpInterval = setInterval(() => {
+                    if (jumpHeight < jumpStrength) {
+                        jumpHeight += 5;
+                        ninja.style.bottom = (10 + jumpHeight) + "px";
+                    } else {
+                        clearInterval(jumpInterval);
+                        let fallInterval = setInterval(() => {
+                            if (jumpHeight > 0) {
+                                jumpHeight -= gravity;
+                                ninja.style.bottom = (10 + jumpHeight) + "px";
+                            } else {
+                                clearInterval(fallInterval);
+                                isJumping = false;
+                            }
+                        }, 20);
+                    }
+                }, 20);
+            }
+        }
+
+        function createObstacle() {
+            let obstacle = document.createElement("div");
+            obstacle.classList.add("obstacle");
+            gameContainer.appendChild(obstacle);
+
+            let moveInterval = setInterval(() => {
+                let obstaclePosition = parseInt(getComputedStyle(obstacle).right);
+                if (obstaclePosition < -40) {
+                    clearInterval(moveInterval);
+                    obstacle.remove();
+                    score++;
+                    scoreDisplay.textContent = score;
+                } else {
+                    obstacle.style.right = (obstaclePosition + 5) + "px";
+
+                    let ninjaRect = ninja.getBoundingClientRect();
+                    let obstacleRect = obstacle.getBoundingClientRect();
+                    if (
+                        ninjaRect.right > obstacleRect.left &&
+                        ninjaRect.left < obstacleRect.right &&
+                        ninjaRect.bottom > obstacleRect.top
+                    ) {
+                        clearInterval(gameInterval);
+                        clearInterval(obstacleInterval);
+                        alert(`Perdu ! 😢 Score : ${score}`);
+                        location.reload();
+                    }
+                }
+            }, 20);
+        }
+
+        function updateGame() {
+            // Mise à jour continue (par ex. accélération progressive)
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/public/img/icon/Logo.png">
+    <link rel="stylesheet" href="/public/import/css/forms/account/add_bio.css">
+    <title>Modifier la biographie</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Modifier votre biographie</h1>
+        <form action="/public/import/php/script/forms/account/biographie.php" method="post">
+            <div class="form-group">
+                <label for="bio">Biographie :</label>
+                <textarea id="bio" name="bio" rows="5" maxlength="100" required></textarea>
+                <p id="char-count" class="char-count">0/100 caractères</p>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Mettre à jour la biographie">
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const bioTextarea = document.getElementById('bio');
+        const charCount = document.getElementById('char-count');
+        const maxChars = 100;
+
+        bioTextarea.addEventListener('input', function() {
+            const charCountValue = bioTextarea.value.length; // Nombre de caractères
+            const remainingChars = maxChars - charCountValue;
+
+            // Mettre à jour l'affichage du nombre de caractères
+            charCount.textContent = `${charCountValue}/${maxChars} caractères`;
+
+            // Modifier la couleur en fonction de la limite
+            if (charCountValue >= maxChars) {
+                charCount.classList.add('warning');
+            } else {
+                charCount.classList.remove('warning');
+            }
+        });
+    </script>
+</body>
+</html>
