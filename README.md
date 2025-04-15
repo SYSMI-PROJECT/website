@@ -1,6 +1,6 @@
 # 🌐 SYSMI PROJECT - REMAKE
 
-Bienvenue dans le projet **SYSMI REMAKE**, une plateforme web innovante construite autour de **Discord** pour offrir un **réseau social communautaire, interactif et bienveillant**.
+Bienvenue dans le projet **SYSMI PROJECT**, l'objectif est de créer une plateforme innovante pour offrir un **réseau social communautaire, interactif et bienveillant**.
 
 ---
 
