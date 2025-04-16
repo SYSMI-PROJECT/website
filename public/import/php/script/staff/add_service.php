@@ -51,7 +51,7 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Import/css/navbar.css?v=0.1">
+    <link rel="stylesheet" href="/public/import/css/navbar.css?v=0.1">
     <link rel="icon" href="/Import/icons/Logo.png" type="image/png">
     <title>Gestion des Services</title>
     <style>
@@ -163,8 +163,8 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
     <div class="navbar">
         <div class="navbar-logo">
-            <a href="/PAGES/STAFF/Dashboard.php" target="_self">
-                <img src="/Import/icons/Logo.png" alt="Logo La SYSMI PROJECT" class="logo">
+            <a href="/public/pages/miscellaneous/dashboard.php" target="_self">
+                <img src="/public/img/icon/Logo.png" alt="Logo La SYSMI PROJECT" class="logo">
             </a>
         </div>
     </div>

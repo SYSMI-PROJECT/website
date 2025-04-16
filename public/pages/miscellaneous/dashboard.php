@@ -25,14 +25,6 @@ include __DIR__ . '/../../../requiments/UsersData.php';
     </div>
 
     <?php if ($role === 'staff') : ?>
-		<div class="container">
-        <div class="dashboard" id="dashboard">
-            <div class="widget system-category">
-                <h2>Gestionnaire</h2>
-                <button class="system-button" id="btnBanUser"><a href="/PAGES/user/create_test.php">création contenu</a></button>
-            </div>
-		</div>
-	</div>
     <div class="container">
         <div class="dashboard" id="dashboard">
             <div class="widget system-category">
@@ -49,13 +41,13 @@ include __DIR__ . '/../../../requiments/UsersData.php';
             <!-- Section pour la cybersécurité -->
             <div class="widget cybersecurity-section" id="cybersecurity">
                 <h2>Service Utilisateurs</h2>
-                <button class="system-button" id="btnBanUser"><a href="/traitements/STAFF/add_service.php">Ouvrir et gérer</a></button>
+                <button class="system-button" id="btnBanUser"><a href="/public/import/php/script/staff/add_service.php">Ouvrir et gérer</a></button>
             </div>
             <!-- Section pour les développeurs web -->
             <div class="widget web-developers-section" id="developers">
                 <h2>Recompenses</h2>
-                <button class="system-button" id="btnBanUser"><a href="/traitements/STAFF/remove_item.php">En retirer</a></button>
-                <button class="system-button" id="btnBanUser"><a href="/traitements/STAFF/add_item.php">En ajouter</a></button>
+                <button class="system-button" id="btnBanUser"><a href="/public/import/php/script/staff/remove_item.php">En retirer</a></button>
+                <button class="system-button" id="btnBanUser"><a href="/public/import/php/script/staff/add_item.php">En ajouter</a></button>
             </div>
         </div>
     </div>

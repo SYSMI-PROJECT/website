@@ -123,7 +123,7 @@ function displayImage($blob) {
 					<?php else: ?>
 						<img src="https://p7.hiclipart.com/preview/782/114/405/5bbc3519d674c.jpg" alt="Profile Picture" class="profile-								picture">
 					<?php endif; ?>
-					<div  style="width: 100%">
+					<div  class="bubble-text">
 						<?php if ($isUserLoggedIn): ?>
 							<h1><?php echo htmlspecialchars($prenom); ?></h1>
 						    	<!-- ! -->  <div class="thought-bubble">
