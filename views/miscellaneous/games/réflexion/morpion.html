@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/Import/icons/Logo.png" type="image/png">
+    <title>Morpion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle, #021265, #003105);
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border: solid 2px #e1ff00;
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-gap: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .cell {
+            width: 80px;
+            height: 80px;
+            background-color: #ddd;
+            border: 2px solid #fff;
+            font-size: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            border-radius: 10px;
+        }
+
+        .cell.x { color: #2962ff; }
+        .cell.o { color: #ff1744; }
+        
+        .cell:hover { background-color: #ccc; }
+        
+        .cell.occupied { cursor: not-allowed; }
+
+        #restart-button, .redirect {
+            background-color: #ff1744;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+
+        #restart-button:hover, .redirect:hover {
+            background-color: #d50000;
+        }
+
+        h1 { color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Morpion vs Bot</h1>
+        <div id="board" class="board"></div>
+        <p id="status-message"></p>
+        <button id="restart-button">Recommencer</button>
+        <button class="redirect">Menu</button>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const statusMessage = document.getElementById('status-message');
+        const restartButton = document.getElementById('restart-button');
+
+        const X_CLASS = 'x';
+        const O_CLASS = 'o';
+        const HUMAN_PLAYER = X_CLASS;
+        const BOT_PLAYER = O_CLASS;
+        let currentPlayer = HUMAN_PLAYER;
+        let gameActive = true;
+        let cellElements = [];
+
+        startGame();
+
+        restartButton.addEventListener('click', startGame);
+
+        function startGame() {
+            gameActive = true;
+            currentPlayer = HUMAN_PLAYER;
+            board.innerHTML = '';
+            cellElements = [];
+            statusMessage.innerText = '';
+            
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', handleClick);
+                board.appendChild(cell);
+                cellElements.push(cell);
+            }
+
+            if (currentPlayer === BOT_PLAYER) {
+                setTimeout(botTurn, 500);
+            }
+        }
+
+        function handleClick(event) {
+            if (!gameActive) return;
+            const cell = event.target;
+            if (cell.classList.contains(X_CLASS) || cell.classList.contains(O_CLASS)) return;
+
+            placeMark(cell, HUMAN_PLAYER);
+            if (checkWin(HUMAN_PLAYER)) {
+                setTimeout(() => {
+                    window.location.href = '../victoire.php';
+                }, 1000);
+                return;
+            }
+            if (isDraw()) {
+                endGame("Match nul !");
+                return;
+            }
+
+            currentPlayer = BOT_PLAYER;
+            setTimeout(botTurn, 500);
+        }
+
+        function botTurn() {
+            if (!gameActive) return;
+            
+            let bestMove = minimax(cellElements, BOT_PLAYER).index;
+            placeMark(cellElements[bestMove], BOT_PLAYER);
+
+            if (checkWin(BOT_PLAYER)) {
+                endGame("Le Bot a gagné !");
+            } else if (isDraw()) {
+                endGame("Match nul !");
+            } else {
+                currentPlayer = HUMAN_PLAYER;
+            }
+        }
+
+        function placeMark(cell, player) {
+            cell.classList.add(player);
+            cell.innerText = player.toUpperCase();
+            cell.classList.add('occupied');
+        }
+
+        function checkWin(player) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            return winPatterns.some(pattern => 
+                pattern.every(index => cellElements[index].classList.contains(player))
+            );
+        }
+
+        function isDraw() {
+            return cellElements.every(cell => 
+                cell.classList.contains(X_CLASS) || cell.classList.contains(O_CLASS)
+            );
+        }
+
+        function endGame(message) {
+            gameActive = false;
+            statusMessage.innerText = message;
+        }
+
+        function minimax(newBoard, player) {
+            let emptyCells = newBoard.filter(cell => !cell.classList.contains(X_CLASS) && !cell.classList.contains(O_CLASS));
+
+            if (checkWin(HUMAN_PLAYER)) return { score: -10 };
+            if (checkWin(BOT_PLAYER)) return { score: 10 };
+            if (emptyCells.length === 0) return { score: 0 };
+
+            let moves = [];
+
+            emptyCells.forEach(cell => {
+                let move = {};
+                move.index = cellElements.indexOf(cell);
+                cell.classList.add(player);
+
+                if (player === BOT_PLAYER) {
+                    move.score = minimax(newBoard, HUMAN_PLAYER).score;
+                } else {
+                    move.score = minimax(newBoard, BOT_PLAYER).score;
+                }
+
+                cell.classList.remove(player);
+                moves.push(move);
+            });
+
+            let bestMove;
+            if (player === BOT_PLAYER) {
+                bestMove = moves.reduce((best, move) => move.score > best.score ? move : best, { score: -Infinity });
+            } else {
+                bestMove = moves.reduce((best, move) => move.score < best.score ? move : best, { score: Infinity });
+            }
+
+            return bestMove;
+        }
+
+        document.querySelector('.redirect').addEventListener('click', function() {
+            window.location.href = '../home-menu.php';
+        });
+
+    </script>
+</body>
+</html>

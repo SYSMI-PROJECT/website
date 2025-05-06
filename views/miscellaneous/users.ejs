@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= titre %></title>
+  <link rel="stylesheet" href="/src/css/views/users.css">
+  <link rel="icon" href="/src/img/Logo.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Rechercher par prénom, nom ou réseau social...">
+        <a href="/" class="btn">
+            <i class="fas fa-home"></i>
+        </a>
+    </div>
+  <div class="container">
+    <% usersData.forEach(userData => { %>
+      <div class="user-card">
+        <div class="profile-pic">
+          <a href="/profil/<%= userData.id %>">
+            <% if (userData.image_content) { %>
+              <img src="data:image/jpeg;base64,<%= Buffer.from(userData.image_content).toString('base64') %>" alt="Photo de profil">
+            <% } else { %>
+              <img src="https://p7.hiclipart.com/preview/782/114/405/5bbc3519d674c.jpg" alt="Avatar utilisateur">
+            <% } %>
+          </a>
+          <div class="user-name text">
+            <h2><%= userData.prenom %></h2>
+            <p><%= userData.nom %></p>
+            <div class="badges-container">
+              <% if (userData.verified) { %>
+                <div class="badge verified">
+                  <i class="fas fa-check-circle"></i> Vérifié
+                </div>
+              <% } %>
+              <% if (userData.role) { %>
+                <% if (userData.role === 'standard') { %>
+                  <div class="badge standard">
+                    <i class="fas fa-user"></i> Standard
+                  </div>
+                <% } else if (userData.role === 'premium') { %>
+                  <div class="badge premium">
+                    <i class="fas fa-crown"></i> Premium
+                  </div>
+                <% } else if (userData.role === 'staff') { %>
+                  <div class="badge staff">
+                    <i class="fas fa-user-shield"></i> Staff
+                  </div>
+                <% } %>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <div class="user-info">
+          <p class="bio"><%= userData.bio || 'Aucune bio' %></p>
+          <div class="social-links">
+            <% ['lien_tiktok','lien_youtube','lien_snapchat','lien_instagram','lien_discord','lien_twitch'].forEach(key => { %>
+              <% if (userData[key]) { %>
+                <a href="<%= userData[key] %>" class="social-icon reseau-link">
+                  <img src="/public/icons/<%= key %>.png" alt="<%= key.replace('lien_','') %>">
+                </a>
+              <% } %>
+            <% }) %>
+          </div>
+
+          <div class="action-buttons">
+            <% /* Récupérer le statut de la relation */ %>
+            <% let relationStatus = null, blocker = null; %>
+            <% /* On suppose que tu as passé relationData depuis la route si besoin */ %>
+
+            <% if (!relationStatus) { %>
+              <form action="/friends/send" method="POST" class="action-icon">
+                <input type="hidden" name="receiver_id" value="<%= userData.id %>">
+                <button type="submit" class="icon success"><i class="fas fa-user-plus"></i></button>
+              </form>
+            <% } else if (relationStatus === 0) { %>
+              <% /* etc. */ %>
+            <% } else if (relationStatus === 1) { %>
+              <% /* etc. */ %>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+  <script src="/src/js/UserSearch.js"></script>
+</body>
+</html>

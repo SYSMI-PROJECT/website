@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" href="/Import/icons/Logo.png" type="image/png">
+    <title>Puissance 4 - Compétitif</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle, #2c3e50, #34495e);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #gameContainer {
+            text-align: center;
+        }
+
+        #currentPlayer {
+            margin: 10px 0;
+            font-size: 24px;
+            color: white;
+        }
+
+        #scoreBoard {
+            margin: 20px 0;
+            font-size: 20px;
+            color: #ecf0f1;
+        }
+
+        #gameBoard {
+            display: grid;
+            grid-template-columns: repeat(7, 60px);
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .cell {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #7f8c8d;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .red {
+            background-color: #e74c3c;
+        }
+
+        .yellow {
+            background-color: #f1c40f;
+        }
+
+        #resetButton {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        #resetButton:hover {
+            background-color: #3498db;
+        }
+
+        .winner {
+            animation: winnerEffect 1s ease-out forwards;
+        }
+
+        @keyframes winnerEffect {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 10px gold;
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px gold;
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 30px gold;
+            }
+        }
+
+        #winnerMessage {
+            display: none;
+            font-size: 32px;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        #winnerMessage span {
+            color: gold;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="currentPlayer">Tour actuel : <span id="playerColor" style="font-weight: bold;">Vous (Rouge)</span></div>
+        <div id="scoreBoard">Score - Vous : <span id="playerScore">0</span> | Bot : <span id="botScore">0</span></div>
+        <div id="gameBoard"></div>
+        <button id="resetButton" onclick="resetGame()">Recommencer</button>
+        <div id="winnerMessage"></div>
+    </div>
+
+    <script>
+        const ROWS = 6;
+        const COLS = 7;
+        const board = [];
+        let currentPlayer = 'red';
+        let gameWon = false;
+        let playerScore = 0;
+        let botScore = 0;
+
+        // Création de la grille de jeu
+        function createBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+            for (let row = 0; row < ROWS; row++) {
+                board[row] = [];
+                for (let col = 0; col < COLS; col++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.addEventListener('click', () => playerMove(col));
+                    gameBoard.appendChild(cell);
+                    board[row][col] = null;
+                }
+            }
+        }
+
+        // Mouvement du joueur
+        function playerMove(col) {
+            if (gameWon || currentPlayer !== 'red') return;
+            const row = getAvailableRow(col);
+            if (row !== null) {
+                placePiece(row, col, 'red');
+                if (checkWin(row, col)) {
+                    endGame('Vous avez gagné ! 🎉', 'red');
+                } else {
+                    currentPlayer = 'yellow';
+                    updateCurrentPlayer();
+                    setTimeout(botMove, 500);
+                }
+            }
+        }
+
+        // Mouvement du bot avec Minimax
+        function botMove() {
+            if (gameWon) return;
+
+            const bestMove = minimax(board, 5, -Infinity, Infinity, true);
+            const col = bestMove.col;
+            const row = getAvailableRow(col);
+            if (row !== null) {
+                placePiece(row, col, 'yellow');
+                if (checkWin(row, col)) {
+                    endGame('Le bot a gagné ! 😢', 'yellow');
+                } else {
+                    currentPlayer = 'red';
+                    updateCurrentPlayer();
+                }
+            }
+        }
+
+        // Placer un pion sur le plateau
+        function placePiece(row, col, player) {
+            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            cell.classList.add(player);
+            cell.style.transform = "scale(0)";
+            setTimeout(() => cell.style.transform = "scale(1)", 100);
+            board[row][col] = player;
+        }
+
+        // Trouver la première ligne disponible dans une colonne
+        function getAvailableRow(col) {
+            for (let row = ROWS - 1; row >= 0; row--) {
+                if (board[row][col] === null) {
+                    return row;
+                }
+            }
+            return null;
+        }
+
+        // Vérification des conditions de victoire
+        function checkWin(row, col) {
+            return (
+                checkDirection(row, col, 0, 1) || 
+                checkDirection(row, col, 1, 0) || 
+                checkDirection(row, col, 1, 1) || 
+                checkDirection(row, col, -1, 1)
+            );
+        }
+
+        // Vérification des directions pour la victoire
+        function checkDirection(row, col, deltaRow, deltaCol) {
+            const player = board[row][col];
+            let count = 1;
+            const winningCells = [[row, col]];
+
+            for (let i = 1; i < 4; i++) {
+                const newRow = row + deltaRow * i;
+                const newCol = col + deltaCol * i;
+                if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS || board[newRow][newCol] !== player) {
+                    break;
+                }
+                count++;
+                winningCells.push([newRow, newCol]);
+            }
+
+            for (let i = 1; i < 4; i++) {
+                const newRow = row - deltaRow * i;
+                const newCol = col - deltaCol * i;
+                if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS || board[newRow][newCol] !== player) {
+                    break;
+                }
+                count++;
+                winningCells.push([newRow, newCol]);
+            }
+
+            if (count >= 4) {
+                highlightWinningCells(winningCells);
+                return true;
+            }
+            return false;
+        }
+
+        // Mise en surbrillance des cellules gagnantes
+        function highlightWinningCells(cells) {
+            cells.forEach(([row, col]) => {
+                const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                cell.classList.add('winner');
+            });
+        }
+
+        // Fin du jeu
+        function endGame(message, winner) {
+            gameWon = true;
+            const winnerMessage = document.getElementById('winnerMessage');
+            winnerMessage.textContent = message;
+            winnerMessage.style.display = 'block';
+
+            if (winner === 'red') {
+                playerScore++;
+                document.getElementById('playerScore').textContent = playerScore;
+                if (playerScore >= 5) {
+                    // Envoi d'une requête au serveur PHP lorsque le joueur gagne 5 parties
+                    fetch('game_winner.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'player=win'
+                    });
+                }
+            } else {
+                botScore++;
+                document.getElementById('botScore').textContent = botScore;
+            }
+        }
+
+        // Mise à jour du joueur actuel
+        function updateCurrentPlayer() {
+            const playerColor = document.getElementById('playerColor');
+            playerColor.textContent = currentPlayer === 'red' ? 'Vous (Rouge)' : 'Bot (Jaune)';
+            playerColor.style.color = currentPlayer === 'red' ? '#e74c3c' : '#f1c40f';
+        }
+
+        // Réinitialisation du jeu
+        function resetGame() {
+            gameWon = false;
+            currentPlayer = 'red';
+            updateCurrentPlayer();
+            createBoard();
+            document.getElementById('winnerMessage').style.display = 'none';
+        }
+
+        // Fonction Minimax pour le bot avec priorité à la défense
+        function minimax(board, depth, alpha, beta, isMaximizing) {
+            if (depth === 0 || gameWon) {
+                return { score: evaluateBoard(board, isMaximizing) };
+            }
+
+            let bestMove = { score: isMaximizing ? -Infinity : Infinity };
+
+            for (let col = 0; col < COLS; col++) {
+                const row = getAvailableRow(col);
+                if (row !== null) {
+                    board[row][col] = isMaximizing ? 'yellow' : 'red';
+
+                    const currentScore = minimax(board, depth - 1, alpha, beta, !isMaximizing).score;
+
+                    board[row][col] = null;
+
+                    if (isMaximizing) {
+                        if (currentScore > bestMove.score) {
+                            bestMove = { score: currentScore, col };
+                        }
+                        alpha = Math.max(alpha, bestMove.score);
+                    } else {
+                        if (currentScore < bestMove.score) {
+                            bestMove = { score: currentScore, col };
+                        }
+                        beta = Math.min(beta, bestMove.score);
+                    }
+
+                    if (beta <= alpha) {
+                        break;
+                    }
+                }
+            }
+
+            return bestMove;
+        }
+
+        // Évaluation du plateau de jeu avec défense du bot
+        function evaluateBoard(board, isMaximizing) {
+            let score = 0;
+
+            // Évaluation de l'attaque et de la défense
+            score += evaluateThreats(board, isMaximizing);
+
+            return score;
+        }
+
+        // Détection des menaces et évaluation pour défense
+        function evaluateThreats(board, isMaximizing) {
+            let score = 0;
+
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    if (board[row][col] === null) continue;
+                    if (isMaximizing && board[row][col] === 'yellow') {
+                        if (checkWin(row, col)) score += 10;
+                    } else if (!isMaximizing && board[row][col] === 'red') {
+                        if (checkWin(row, col)) score -= 10;
+                    }
+                }
+            }
+            return score;
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>

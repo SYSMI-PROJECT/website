@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYSMI PROJECT</title>
+  <link rel="icon" type="image/png" href="/src/img/Logo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="manifest" href="/Import/assets/manifest.json">
+  <link rel="stylesheet" href="/src/css/index.css">
+  <link rel="stylesheet" href="/src/css/views/post.css">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<body>
+  <nav>
+    <div class="logo">
+      <img src="/src/img/Logo.png" alt="Logo de Mon Réseau" class="logo-img">
+      <span class="logo-text">the SYSMI</span>
+    </div>
+    <a href="#" class="menu-item" id="home-link" onclick="refreshPosts();">
+      <i id="home-icon" class="fas fa-home"></i>
+      <span>VOS POST</span>
+    </a>
+    <a href="/PAGES/user/test" class="menu-item" id="publier-link">
+      <i class="fas fa-plus-circle"></i>
+      <span>PUBLIER</span>
+    </a>
+    <a href="/" class="menu-item" id="compte-link">
+      <i class="fas fa-user"></i>
+      <span>COMPTE</span>
+    </a>
+  </nav>
+
+  <div id="contenu"></div>
+
+  <div class="scroll-container">
+    <main class="main">
+      <% if (!publications || publications.length === 0) { %>
+        <div id="posts-container" class="publication-container" style="margin:19rem auto; background-color:aliceblue;">
+          <% if (filterUserId && filterUserId !== user_id) { %>
+            <p style="background-color:aliceblue;color:black;font-weight:600;text-align:center;padding:20px;">
+              <span style="display:inline-block;width:60px;height:60px;background:#000;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:2rem;">
+                <i class="fas fa-lock"></i>
+              </span>
+              Ce compte est privé.
+            </p>
+          <% } else { %>
+            <div style="text-align:center;padding:15px;border-radius:10px;">
+              <h2 style="color:#ff6600;">📢 Deviens la star du moment ! 🎥</h2>
+              <p style="font-size:16px;color:#001eff;font-weight:600;">
+                Ajoute ta vidéo et fais vibrer la communauté !
+              </p>
+              <button onclick="uploadMedia()" style="background:#ff6600;color:#fff;padding:10px 15px;border:none;border-radius:5px;cursor:pointer;font-size:16px;">
+                🚀 Partage ta vidéo maintenant !
+              </button>
+            </div>
+          <% } %>
+        </div>
+      <% } else { %>
+        <div id="posts-container" class="publication-container">
+          <% publications.forEach(publication => {
+               const ext = publication.media_path?.split('.').pop().toLowerCase() || '';
+          %>
+            <div class="publication-wrapper">
+              <article class="publication" id="publication-<%= publication.id %>">
+                <% if (publication.media_path) { %>
+                  <div class="media">
+                    <div class="media-wrapper" id="media-wrapper-<%= publication.id %>">
+                      <% if (['jpg','jpeg','png','gif'].includes(ext)) { %>
+                        <img src="<%= publication.media_path %>" alt="Image" loading="lazy"
+                             style="<%= publication.viaWebcam ? 'object-fit:cover;' : '' %>">
+                      <% } else if (['mp4','webm','ogg'].includes(ext)) { %>
+                        <div class="video-container" onclick="togglePlayPause(<%= publication.id %>)">
+                          <video id="video-<%= publication.id %>" class="media" preload="metadata"
+                                 playsinline loop muted style="<%= publication.viaWebcam ? 'object-fit:cover;' : '' %>">
+                            <source src="<%= publication.media_path %>" type="video/<%= ext %>">
+                          </video>
+                          <button class="play-pause-button" onclick="togglePlayPause(<%= publication.id %>); event.stopPropagation();">
+                            <i class="fas fa-play"></i>
+                          </button>
+                        </div>
+                      <% } else if (['mp3','wav','ogg'].includes(ext)) { %>
+                        <audio controls>
+                          <source src="<%= publication.media_path %>" type="audio/<%= ext %>">
+                        </audio>
+                      <% } else { %>
+                        <p>Type de média non pris en charge.</p>
+                      <% } %>
+
+                      <div class="overlay">
+                        <div class="follow-container">
+                          <h3><%= publication.auteur %></h3>
+                          <a href="#" class="follow-btn" onclick="toggleFollow(<%= publication.user_id %>, event)">Suivre</a>
+                        </div>
+                        <div class="desc">
+                          <p class="contenu truncated"><%- publication.contenu %></p>
+                          <button class="show-more">Afficher plus</button>
+                        </div>
+                        <small class="timestamp">
+                          Publié le : <%= new Date(publication.date_creation)
+                                         .toLocaleString('fr-FR', { day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit' }) %>
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                <% } %>
+              </article>
+
+              <div class="interactions" data-publication-id="<%= publication.id %>">
+                <div class="avatar-container">
+                  <% if (user_id) { %>
+                    <a href="/PAGES/user/home?id=<%= publication.user_id %>">
+                      <img src="<%= publication.avatar || 'https://via.placeholder.com/40' %>" alt="Avatar" loading="lazy">
+                    </a>
+                  <% } else { %>
+                    <a href="/public/forms/login" style="display:flex;align-items:center;justify-content:center;width:50px;height:50px;background:#f00;border-radius:50%;">
+                      <i class="fas fa-sign-in" style="color:#fff;"></i>
+                    </a>
+                  <% } %>
+                </div>
+                <button class="mute-button" data-publication-id="<%= publication.id %>">
+                  <i class="fas fa-volume-low"></i>
+                </button>
+                <div class="like-container">
+                  <button type="button" class="like-button <?= $userLiked ? 'liked' : '' ?>"
+                          data-publication-id="<?= $publication['id'] ?>"
+                          data-action="<?= $userLiked ? 'unlike' : 'like' ?>">
+                    <i class="fas fa-heart"></i>
+                  </button>
+                  <div class="like-count"><?= $likesCount ?></div>
+                </div>
+                <div class="speed-container">
+                  <button type="button" class="speed-button" onclick="cyclePlaybackSpeed(<?= $publication['id'] ?>, event)">
+                    <i class="fas fa-tachometer-alt"></i>
+                  </button>
+                  <div class="comment-count" id="speed-display-<?= $publication['id'] ?>">1x</div>
+                </div>
+                <div class="comment-container">
+                  <button type="button" class="comment-button" data-publication-id="<?= $publication['id'] ?>">
+                    <i class="fas fa-comment"></i>
+                  </button>
+                    <div class="comment-count"><?= $commentCount ?></div>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </main>
+    </div>
+
+    <div class="scroll-buttons-container">
+      <button id="scroll-up" class="scroll-button"><i class="fas fa-arrow-up"></i></button>
+      <button id="scroll-down" class="scroll-button"><i class="fas fa-arrow-down"></i></button>
+    </div>
+
+    <script src="/src/js/post.js"></script>
+  </body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/src/img/Logo.png" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plan d'action – La SYSMI PROJECT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Style inchangé + barre de recherche */
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 1rem 2rem;
+      color: #333;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      background-color: #0080ff;
+      padding: 0px 20px;
+      border-radius: 20px;
+    }
+    .home-button {
+      background: #4b0082;
+      color: white;
+      padding: 0.7rem 1.3rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .home-button:hover {
+      background: #370064;
+    }
+    h1 {
+      text-align: center;
+      color: #fff;
+      font-size: 2.5rem;
+      flex-grow: 1;
+    }
+    .stats-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .stat-card {
+      border-radius: 16px;
+      text-align: center;
+      flex: 1 1 150px;
+    }
+    .stat-card div { font-size: 0.95rem; color: #666; }
+    .stat-card h3 { margin-top: 0.3rem; font-size: 2rem; color: #4b0082; }
+
+    .form-container {
+      background: white;
+      border-radius: 16px;
+      padding: 1rem;
+      margin: 1rem auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .form-container input[type="text"], .form-container select {
+      padding: 0.7rem;
+      margin: 0.4rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+    }
+    .form-container input[type="text"] {
+      width: 200px;
+    }
+    button {
+      background: #4b0082;
+      color: white;
+      font-weight: bold;
+      padding: 0.7rem 1.2rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #370064;
+      transform: scale(1.05);
+    }
+
+    .search-container {
+      text-align: right;
+      margin-top: 1rem;
+    }
+    .search-container input {
+      padding: 0.6rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 300px;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 1rem;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 0.9rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background: #4b0082;
+      color: white;
+    }
+    tr:hover {
+      background: #f5f5f5;
+    }
+
+    .status {
+      padding: 0.3rem 0.8rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .todo { background: #ffe5e5; color: #c0392b; }
+    .doing { background: #fff3cd; color: #856404; }
+    .done { background: #d4edda; color: #155724; }
+
+    .high { color: #c0392b; font-weight: bold; }
+    .medium { color: #e67e22; font-weight: 600; }
+    .low { color: #27ae60; }
+
+    .delete-btn {
+      background: transparent;
+      color: #c0392b;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+      .form-container input, .form-container select {
+        width: 100%;
+        margin: 0.5rem 0;
+      }
+    }
+  </style>
+</head>
+<body onload="loadTasks()">
+
+  <header>
+    <button class="home-button" onclick="window.location.href='/dashboard'">🏠 Accueil</button>
+    <h1>Plan d'action – La SYSMI PROJECT</h1>
+  </header>
+
+  <div class="stats-container">
+    <div class="stat-card"><div>Total</div><h3 id="totalTasks">0</h3></div>
+    <div class="stat-card"><div>À faire</div><h3 id="todoTasks">0</h3></div>
+    <div class="stat-card"><div>En cours</div><h3 id="doingTasks">0</h3></div>
+    <div class="stat-card"><div>Faites</div><h3 id="doneTasks">0</h3></div>
+  </div>
+
+  <div class="form-container">
+    <input type="text" id="taskName" placeholder="Nom de la tâche" required />
+    <select id="taskObjective">
+      <option value="">Objectif</option>
+      <option>Identité</option>
+      <option>Technique</option>
+      <option>Mini-jeux</option>
+      <option>Réseau social</option>
+      <option>Sécurité</option>
+      <option>Visibilité</option>
+      <option>Long terme</option>
+    </select>
+    <select id="taskCategory">
+      <option value="">Catégorie</option>
+      <option>Frontend</option>
+      <option>Backend</option>
+      <option>Design</option>
+      <option>Base de données</option>
+      <option>Communication</option>
+    </select>
+    <select id="taskPriority">
+      <option value="">Priorité</option>
+      <option>Haute</option>
+      <option>Moyenne</option>
+      <option>Faible</option>
+    </select>
+    <input type="text" id="taskOwner" placeholder="Responsable" />
+    <button onclick="addTask()">➕ Ajouter</button>
+  </div>
+
+  <div class="search-container">
+    🔍 <input type="text" id="searchInput" placeholder="Rechercher par objectif, catégorie ou statut..." onkeyup="filterTasks()">
+  </div>
+
+  <table id="planTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Objectif</th>
+        <th>Tâche</th>
+        <th>Catégorie</th>
+        <th>Responsable</th>
+        <th>Statut</th>
+        <th>Priorité</th>
+        <th>🗑</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    let taskId = 1;
+
+    function addTask() {
+      const name = document.getElementById('taskName').value.trim();
+      const objective = document.getElementById('taskObjective').value;
+      const category = document.getElementById('taskCategory').value;
+      const priority = document.getElementById('taskPriority').value;
+      const owner = document.getElementById('taskOwner').value.trim();
+
+      if (!name || !objective || !category || !priority) {
+        alert("Veuillez remplir tous les champs obligatoires.");
+        return;
+      }
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${taskId++}</td>
+        <td>${objective}</td>
+        <td contenteditable="true">${name}</td>
+        <td>${category}</td>
+        <td contenteditable="true">${owner || "-"}</td>
+        <td><span class="status todo" onclick="toggleStatus(this)">À faire</span></td>
+        <td class="${priority.toLowerCase()}">${priority}</td>
+        <td><button class="delete-btn" onclick="deleteRow(this)">✖</button></td>
+      `;
+      document.querySelector("#planTable tbody").appendChild(row);
+      saveTasks();
+      updateStats();
+      clearForm();
+    }
+
+    function deleteRow(btn) {
+      if (confirm("Supprimer cette tâche ?")) {
+        btn.closest("tr").remove();
+        saveTasks();
+        updateStats();
+      }
+    }
+
+    function toggleStatus(el) {
+      if (el.classList.contains("todo")) {
+        el.className = "status doing";
+        el.textContent = "En cours";
+      } else if (el.classList.contains("doing")) {
+        el.className = "status done";
+        el.textContent = "Fait";
+      } else {
+        el.className = "status todo";
+        el.textContent = "À faire";
+      }
+      saveTasks();
+      updateStats();
+    }
+
+    function updateStats() {
+      const rows = document.querySelectorAll("#planTable tbody tr");
+      let total = rows.length, todo = 0, doing = 0, done = 0;
+      rows.forEach(row => {
+        const status = row.querySelector(".status");
+        if (status.classList.contains("todo")) todo++;
+        else if (status.classList.contains("doing")) doing++;
+        else if (status.classList.contains("done")) done++;
+      });
+      document.getElementById("totalTasks").textContent = total;
+      document.getElementById("todoTasks").textContent = todo;
+      document.getElementById("doingTasks").textContent = doing;
+      document.getElementById("doneTasks").textContent = done;
+    }
+
+    function clearForm() {
+      document.getElementById("taskName").value = "";
+      document.getElementById("taskObjective").value = "";
+      document.getElementById("taskCategory").value = "";
+      document.getElementById("taskPriority").value = "";
+      document.getElementById("taskOwner").value = "";
+    }
+
+    function saveTasks() {
+      const rows = document.querySelectorAll("#planTable tbody tr");
+      const data = [];
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const statusEl = row.querySelector(".status");
+        data.push({
+          id: cells[0].textContent,
+          objective: cells[1].textContent,
+          name: cells[2].textContent,
+          category: cells[3].textContent,
+          owner: cells[4].textContent,
+          status: statusEl.classList[1],
+          statusText: statusEl.textContent,
+          priority: cells[6].textContent
+        });
+      });
+      localStorage.setItem("tasks", JSON.stringify(data));
+    }
+
+    function loadTasks() {
+      const data = JSON.parse(localStorage.getItem("tasks") || "[]");
+      data.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${taskId++}</td>
+          <td>${item.objective}</td>
+          <td contenteditable="true">${item.name}</td>
+          <td>${item.category}</td>
+          <td contenteditable="true">${item.owner}</td>
+          <td><span class="status ${item.status}" onclick="toggleStatus(this)">${item.statusText}</span></td>
+          <td class="${item.priority.toLowerCase()}">${item.priority}</td>
+          <td><button class="delete-btn" onclick="deleteRow(this)">✖</button></td>
+        `;
+        document.querySelector("#planTable tbody").appendChild(row);
+      });
+      updateStats();
+    }
+
+    function filterTasks() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const rows = document.querySelectorAll("#planTable tbody tr");
+      rows.forEach(row => {
+        const objective = row.cells[1].textContent.toLowerCase();
+        const category = row.cells[3].textContent.toLowerCase();
+        const status = row.cells[5].textContent.toLowerCase();
+        row.style.display =
+          objective.includes(input) ||
+          category.includes(input) ||
+          status.includes(input)
+          ? "" : "none";
+      });
+    }
+  </script>
+</body>
+</html>

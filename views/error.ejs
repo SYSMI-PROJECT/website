@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../icons/Logo.png" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/src/css/errors/No_connected.css">
+    <title>Utilisateur Non Connecté</title>
+</head>
+<body>
+    <div class="error-container">
+        <!-- Icône Font Awesome pour l'erreur -->
+        <i class="fas fa-exclamation-circle"></i>
+        <h1>Une erreur est survenue</h1>
+        <p><%= message %></p>
+        <div class="button-container">
+            <button class="login-button" onclick="history.back()">Retourner</button>
+            <button class="home-button" onclick="window.location.href='/login'">Connexion</button>
+        </div>
+    </div>
+</body>
+</html>

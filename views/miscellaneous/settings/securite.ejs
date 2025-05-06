@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/src/css/navbar.css">
+    <link rel="icon" href="/src/img/Logo.png" type="image/png">
+    <link rel="stylesheet" href="/src/css/forms/securite.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Gestion du Compte</title>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="javascript:history.back()" class="back-arrow"><i class="fas fa-chevron-left"></i></a>
+            <h2>Gestion du Compte</h2>
+        </div>
+
+        <form action="/visibility" method="POST" id="accountForm">
+
+            <!-- Section pour la confidentialité du compte -->
+            <div class="form-section">
+                <label>Confidentialité du compte :</label>
+                <div class="settings-group">
+                    <div>
+                        <input type="radio" name="visibility" value="public" id="public"
+                        <%= user_settings.visibility === 'public' ? 'checked' : '' %>>
+                        <label for="public">Public</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="visibility" value="private" id="private"
+                        <%= user_settings.visibility === 'private' ? 'checked' : '' %>>
+                        <label for="private">Privé</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section pour gérer les publications -->
+            <div class="form-section">
+                <label>Qui peut voir vos publications ?</label>
+                <div class="settings-group">
+                    <div>
+                        <input type="checkbox" name="visibility_posts[]" value="followers" id="followers"
+                        <%= user_settings.visibility_posts?.includes('followers') ? 'checked' : '' %>>
+                        <label for="followers">Abonnés uniquement</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="visibility_posts[]" value="friends" id="friends"
+                        <%= user_settings.visibility_posts?.includes('friends') ? 'checked' : '' %>>
+                        <label for="friends">Amis uniquement</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="visibility_posts[]" value="everyone" id="everyone"
+                        <%= user_settings.visibility_posts?.includes('everyone') ? 'checked' : '' %>>
+                        <label for="everyone">Tout le monde</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section pour les notifications -->
+            <div class="form-section">
+                <label>Notifications :</label>
+                <div class="settings-group">
+                    <div>
+                        <input type="radio" name="notifications" value="enabled" id="notifications_enabled"
+                        <%= user_settings.notifications === 'enabled' ? 'checked' : '' %>>
+                        <label for="notifications_enabled">Activer les notifications</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="notifications" value="disabled" id="notifications_disabled"
+                        <%= user_settings.notifications === 'disabled' ? 'checked' : '' %>>
+                        <label for="notifications_disabled">Désactiver les notifications</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section pour les autres paramètres -->
+            <div class="form-section">
+                <label>Autres paramètres :</label>
+                <div class="settings-group">
+                    <div>
+                        <input type="checkbox" name="two_factor_auth" value="enabled" id="two_factor_enabled"
+                        <%= user_settings.two_factor_auth === 'enabled' ? 'checked' : '' %>>
+                        <label for="two_factor_enabled">Activer l'authentification à deux facteurs</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="dark_mode" value="enabled" id="dark_mode_enabled"
+                        <%= user_settings.dark_mode === 'enabled' ? 'checked' : '' %>>
+                        <label for="dark_mode_enabled">Mode sombre</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Enregistrer les paramètres</button>
+        </form>
+    </div>
+
+</body>
+</html>

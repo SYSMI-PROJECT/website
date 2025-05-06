@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+body {
+    background: linear-gradient(135deg, #ff6f61, #de5d8c); /* Dégradé rose et orange */
+    background-size: 400% 400%;
+    animation: gradientAnimation 10s ease infinite;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #fff;
+}
+
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.container {
+    background-color: rgba(0, 0, 0, 0.6); /* Légèrement sombre pour le contraste */
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+h2 {
+    color: #ffcc00; /* Couleur jaune */
+    margin-bottom: 30px;
+}
+
+.form-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+    margin-bottom: 20px;
+}
+
+label {
+    color: #ddd;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+    text-align: left;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 2px solid #ffcc00; /* Bordure jaune */
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #ffd700; /* Bordure au focus */
+}
+
+button {
+    background: linear-gradient(135deg, #ff8c00, #ff4500); /* Dégradé vibrant d'orange à rouge */
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 15px;
+    font-size: 18px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #ff7f50, #ff6347); /* Changement de couleur au survol */
+    transform: translateY(-3px);
+}
+
+.password-container {
+    position: relative;
+}
+
+#motDePasse {
+    padding-right: 50px;
+}
+
+option {
+    color: black;
+}
+
+#eyeIcon {
+    position: absolute;
+    top: 51%;
+    right: 20px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #000;
+}
+
+#eyeIcon:hover {
+    color: #ffd700;
+}
+
+.strength-bar {
+    width: 100%;
+    height: 5px;
+    background-color: #ddd;
+    margin-bottom: 10px;
+}
+
+.strength-bar div {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.error-message-container {
+    margin-bottom: 15px;
+}
+
+.error-message {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+}

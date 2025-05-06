@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/src/img/Logo.png" type="image/png">
+    <title>Gestion des Utilisateurs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/src/css/staffs/user_dashboard.css">
+</head>
+<body>
+    <header>Gestion des Utilisateurs</header>
+
+    <!-- Statistiques -->
+    <div class="count-container">
+        <div>Total d'utilisateurs : <%= total %></div>
+        <div>Utilisateurs actifs : <%= active %></div>
+        <div>Utilisateurs bannis : <%= banned %></div>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Rechercher un utilisateur par prénom ou nom..." onkeyup="searchAccounts()">
+    </div>
+
+    <!-- Filtre par rôle -->
+    <div class="filter-bar">
+        <select id="filterStatus" onchange="filterUsersByStatus()">
+            <option value="">Tous les utilisateurs</option>
+            <option value="actif">Actifs</option>
+            <option value="banni">Bannis</option>
+        </select>
+    </div>
+
+    <!-- Bouton redirection -->
+    <div style="text-align: center;">
+        <button class="redirection-button" onclick="window.location.href = '/dashboard';">Retour au menu</button>
+    </div>    
+
+    <!-- Tableau des utilisateurs -->
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom d'utilisateur</th>
+                <th>Statut</th>
+                <th>Rôle</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(user => { %>
+                <tr>
+                    <td><%= user.id %></td>
+                    <td><%= user.prenom %> <%= user.nom %></td>
+                    <td><%= user.statut.charAt(0).toUpperCase() + user.statut.slice(1) %></td>
+                    <td><%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %></td>
+                    <td class="action-buttons">
+                        <form method="post" action="/traitements/STAFF/delete_account.php">
+                            <input type="hidden" name="id_utilisateur" value="<%= user.id %>">
+                            <button type="submit" class="confirmation-no" onclick="return confirmerSuppression('<%= user.id %>')">Supprimer</button>
+                        </form>
+                        <% if (user.statut === 'banni') { %>
+                            <form method="post" action="/public/import/php/script/staff/unban.php">
+                                <input type="hidden" name="id_utilisateur" value="<%= user.id %>">
+                                <button type="submit" class="confirmation-no">Débannir</button>
+                            </form>
+                        <% } else { %>
+                            <form method="post" action="/public/import/php/script/staff/banissement.php">
+                                <input type="hidden" name="id_utilisateur" value="<%= user.id %>">
+                                <button type="submit" onclick="return confirmerBannissement('<%= user.id %>')">Bannir</button>
+                            </form>
+                        <% } %>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+    <!-- Formulaire d'ajout d'utilisateur -->
+    <form action="add_user.php" method="POST">
+        <input type="text" name="prenom" placeholder="Prénom" required>
+        <input type="text" name="nom" placeholder="Nom" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <button type="submit">Ajouter un utilisateur</button>
+    </form>
+
+    <script>
+        function confirmerSuppression(id) {
+            return confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?");
+        }
+
+        function confirmerBannissement(id) {
+            return confirm("Êtes-vous sûr de vouloir bannir cet utilisateur ?");
+        }
+
+        function searchAccounts() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById("userTable");
+            const tr = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+                    tr[i].style.display = txtValue.toUpperCase().includes(filter) ? "" : "none";
+                }
+            }
+        }
+
+        function filterUsersByStatus() {
+            const filter = document.getElementById("filterStatus").value.toUpperCase();
+            const table = document.getElementById("userTable");
+            const tr = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < tr.length; i++) {
+                const statusCell = tr[i].getElementsByTagName("td")[2];
+                const statusValue = statusCell.textContent || statusCell.innerText;
+                tr[i].style.display = (filter === "" || statusValue.toUpperCase() === filter) ? "" : "none";
+            }
+        }
+    </script>
+</body>
+</html>

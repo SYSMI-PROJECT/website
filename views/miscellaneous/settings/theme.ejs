@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/src/css/navbar.css">
+    <link rel="icon" href="/public/img/icon/Logo.png" type="image/png">
+    <link rel="stylesheet" href="/src/css/forms/theme.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Choisir un Thème</title>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="javascript:history.back()" class="back-arrow"><i class="fas fa-chevron-left"></i></a>
+            <h2>Choisissez votre thème</h2>
+        </div>
+        <!-- Le formulaire renvoie vers le fichier PHP -->
+        <form action="/settings/theme" method="POST" id="themeForm">
+            <div class="theme-list">
+                <label class="theme-item theme-blanc">
+                    Blanc
+                    <input type="radio" name="theme" value="blanc">
+                </label>
+                <label class="theme-item theme-noir">
+                    Noir
+                    <input type="radio" name="theme" value="noir">
+                </label>
+                <label class="theme-item theme-bleu">
+                    Bleu
+                    <input type="radio" name="theme" value="bleu">
+                </label>
+                <label class="theme-item theme-rouge">
+                    Rouge
+                    <input type="radio" name="theme" value="rouge">
+                </label>
+                <label class="theme-item theme-vert">
+                    Vert
+                    <input type="radio" name="theme" value="vert">
+                </label>
+            </div>
+            <button type="submit">Enregistrer</button>
+        </form>
+    </div>
+
+    <script src="/src/js/theme.js"></script>
+
+</body>
+</html>

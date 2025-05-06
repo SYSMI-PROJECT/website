@@ -1,0 +1,104 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #dfe9f3, #ffffff);
+    color: #2c3e50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.3s ease;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+}
+
+h1 {
+    color: #34495e;
+    margin-bottom: 25px;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+label {
+    display: block;
+    margin-bottom: 20px;
+    font-size: 17px;
+    color: #566573;
+    font-weight: 500;
+}
+
+input[type="file"] {
+    display: block;
+    margin: 0 auto 25px;
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed #b0bec5;
+    border-radius: 12px;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="file"]:hover {
+    border-color: #5dade2;
+    background-color: #eef6ff;
+}
+
+input[type="file"]:focus {
+    outline: none;
+    border-color: #3498db;
+    background-color: #eef6ff;
+}
+
+input[type="submit"] {
+    background: linear-gradient(135deg, #3498db, #5dade2);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+input[type="submit"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(41, 128, 185, 0.4);
+}
+
+input[type="submit"]:active {
+    transform: scale(0.98);
+    box-shadow: 0 3px 8px rgba(41, 128, 185, 0.2);
+}
+
+/* Animation d'apparition douce */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

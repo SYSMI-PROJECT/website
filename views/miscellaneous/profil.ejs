@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= titre %></title>
+  <link rel="icon" type="image/png" href="/src/img/Logo.png">
+  <link rel="stylesheet" href="/src/css/views/account.css">
+  <link rel="stylesheet" href="/src/css/navbar.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- En-tête du Profil -->
+    <header class="profile-header" role="banner">
+      <div class="avatar-container">
+        <div class="avatar">
+          <img src="<%= userData.photo_profil ? userData.photo_profil : 'https://p7.hiclipart.com/preview/782/114/405/5bbc3519d674c.jpg' %>" alt="Photo de profil">
+      </div>
+      <div class="avatar-buttons">
+        <% if (!userData.photo_profil) { %>
+        <a href="/add_pdp">
+          <button class="edit-btn" type="button">Ajouter</button>
+        </a> 
+        <% } else { %>
+        <a href="/pdp_editor">
+          <button class="edit-btn" type="button">changer</button>
+        </a>        
+          <form action="/settings/delete" method="POST" onsubmit="return confirm('Es-tu sûr de vouloir supprimer ta photo de profil ?');">
+            <button class="edit-btn" type="submit">Supprimer</button>
+          </form> 
+        <% } %>         
+        </div>
+      </div>
+        <div class="user-info">
+          <h1><%= prenom || "Prénom inconnu" %> <%= nom || "Nom inconnu" %></h1>
+            <p class="bio"><%= bio || "Bio non définie" %></p>
+            <p class="account-status <%= userData.visibilityStatus %>">
+              <i class="fas <%= userData.visibility === 'private' ? 'fa-lock' : 'fa-globe' %>"></i>
+              <%= userData.visibility === 'private' ? 'Compte Privé' : 'Compte Public' %>
+          </p>                    
+            <a href="/public/forms/account/add_bio.html" class="edit-bio-btn">Modifier ma Bio</a>
+            <?php endif; ?>
+          <div class="level-bar">
+            <div class="level-bar-fill">
+          </div>
+        </div>
+      </header>
+
+      <div class="tab-navigation" aria-label="Navigation des onglets">
+          <button id="globalTab" class="tab active" onclick="showTab('global')" tabindex="0">Globale</button>
+          <button id="publicationTab" class="tab" onclick="showTab('publication')" tabindex="0">Publication</button>
+      </div>
+
+      <div class="back-to-home">
+          <a href="/">Retour à l'accueil</a>
+      </div>
+
+      <main id="globalContainer" role="main">
+        <!-- Statistiques -->
+        <section class="stats">
+            <div class="stat">
+                <h2><?= htmlspecialchars((string)$nombreAmis); ?></h2>
+                <p>Amis</p>
+            </div>
+            <div class="stat">
+                <h2>42</h2>
+                <p>Projets</p>
+            </div>
+            <div class="stat">
+                <h2>12</h2>
+                <p>Badges</p>
+            </div>
+        </section>
+
+        <section class="badges">
+          <h2 class="activity-title">Mes Badges</h2>
+          <div class="badge-container">
+              <?php if ($accountActive) : ?>
+                  <div class="badge"><i class="fas fa-check-circle"></i> Vérifié</div>
+              <?php endif; ?>
+              <?php if ($status === 'banni') : ?>
+                  <div class="badge"><i class="fas fa-star"></i> Banni</div>
+              <?php endif; ?>
+              <?php if ($role === 'standard') : ?>
+                  <div class="badge"><i class="fas fa-user" style="color: green;"></i> Standard</div>
+              <?php endif; ?>
+              <?php if ($role === 'staff') : ?>
+                  <div class="badge"><i class="fas fa-user-shield" style="color: #ff4900;"></i> Staff</div>
+              <?php endif; ?>
+              <?php if ($role === 'premium') : ?>
+                  <div class="badge" style="background-color: goldenrod;"><i class="fas fa-crown" style="color: #654200;"></i> Premium</div>
+              <?php endif; ?>
+          </div>
+      </section>
+
+      <section class="profile-section">
+        <div class="edit_profile">
+            <h2>Informations</h2>
+            <?php if ($userID == $loggedInUserID) : ?>
+                <a href="/public/import/php/script/forms/account/info_visibility.php?id=<?= htmlspecialchars((string)$userID); ?>" class="edit-btn">
+                    <i class="fa-solid fa-pen-to-square"></i> Modifier
+                </a>
+            <?php endif; ?>
+        </div>
+        <p>Inscrit le : <?= htmlspecialchars((string)$userInscription); ?></p>
+        <?php if (!empty($userEmail)) : ?>
+            <p>Email : <?= htmlspecialchars((string)$userEmail); ?></p>
+        <?php endif; ?>
+      </section>
+
+      <section class="profile-section social-media">
+        <div class="edit_profile">
+          <h2>Réseaux Sociaux</h2>
+            <?php if ($userID == $loggedInUserID) : ?>
+              <a href="/public/forms/account/add_network.html" class="edit-btn">
+                  <i class="fa-solid fa-pen-to-square"></i> Modifier
+              </a>
+          <?php endif; ?>
+      </div>
+      <?php if ($userTikTok || $userYouTube || $userSnapchat || $userInstagram || $userDiscord || $userTwitch) : ?>
+          <ul class="social-media-links">
+              <?php if ($userTikTok) : ?>
+                <li><a class="social-media-link" href="<?= htmlspecialchars((string)$userTikTok); ?>" target="_blank"><img src="https://logodownload.org/wp-content/uploads/2019/08/tiktok-logo-icon.png" alt="TikTok"></a></li>
+              <?php endif; ?>
+              <?php if ($userYouTube) : ?>
+                <li><a class="social-media-link" href="<?= htmlspecialchars((string)$userYouTube); ?>" target="_blank"><img src="https://clipartcraft.com/images/youtube-icon-clipart-square-4.png" alt="YouTube"></a></li>
+              <?php endif; ?>
+              <?php if ($userSnapchat) : ?>
+                <li><a class="social-media-link" href="<?= htmlspecialchars((string)$userSnapchat); ?>" target="_blank"><img src="https://pngimg.com/uploads/snapchat/snapchat_PNG15.png" alt="Snapchat"></a></li>
+              <?php endif; ?>
+              <?php if ($userInstagram) : ?>
+                <li><a class="social-media-link" href="<?= htmlspecialchars((string)$userInstagram); ?>" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/1200px-Instagram_logo_2016.svg.png" alt="Instagram"></a></li>
+              <?php endif; ?>
+              <?php if ($userDiscord) : ?>
+                <li><a class="social-media-link" href="<?= htmlspecialchars((string)$userDiscord); ?>" target="_blank"><img src="https://wallpaperaccess.com/full/765574.jpg" alt="Discord"></a></li>
+              <?php endif; ?>
+              <?php if ($userTwitch) : ?>
+                <li><a class="social-media-link" href="<?= htmlspecialchars((string)$userTwitch); ?>" target="_blank"><img src="https://is4-ssl.mzstatic.com/image/thumb/Purple114/v4/3b/9c/11/3b9c112f-3d13-c7ab-5631-d425c97a400a/source/512x512bb.jpg" alt="Twitch"></a></li>
+              <?php endif; ?>
+            </ul>
+          <?php endif; ?>
+        </section>
+      </main>
+
+        <!-- Section Publications -->
+        <section id="publicationContainer" class="hidden" aria-live="polite">
+          <div class="publication-header">
+            <?php if ($userID == $loggedInUserID) : ?>
+              <button class="new-publication-btn" onclick="window.location.href='../../formulaires/profil/nouvelle_publication.html'">
+                <i class="fas fa-plus"></i> Nouvelle Publication
+                  </button>
+                <?php endif; ?>
+                  <select class="sort-dropdown" aria-label="Trier les publications" id="sortDropdown" onchange="sortPublications()">
+                    <option value="recent">Les plus récentes</option>
+                    <option value="popular">Les plus populaires</option>
+                  </select>
+                </div>
+                <div class="profile-section">
+                  <h2>Publications</h2>
+                <div class="publication-grid" id="publicationGrid">
+                  <?php if (!empty($publications)) : ?>
+                    <?php foreach ($publications as $publication) : 
+                      // Récupérer les données de la publication
+                      $mediaPath = htmlspecialchars((string)($publication['media_path'] ?? ''));
+                      $extension = strtolower(pathinfo($mediaPath, PATHINFO_EXTENSION));
+                    ?>
+                    <div class="video-card">
+                      <a href="../../publication.php?id=<?= htmlspecialchars((string)$userID); ?>&publication_id=<?= htmlspecialchars((string)$publication['id']); ?>" target="_blank">
+                        <?php if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) : ?>
+                          <img src="<?= $mediaPath; ?>" alt="Contenu Image" class="post-media">
+                        <?php elseif (in_array($extension, ['mp4', 'webm'])) : ?>
+                          <video autoplay loop muted class="post-media">
+                          <source src="<?= $mediaPath; ?>" type="video/<?= $extension; ?>">
+                            Votre navigateur ne supporte pas la lecture de vidéos.
+                          </video>
+                        <?php endif; ?>
+                      </a>
+                    <div class="overlay">
+                      <p>Publié le : <?= htmlspecialchars((string)($publication['date_creation'] ?? 'Date inconnue')); ?></p>
+                      <p><?= htmlspecialchars((string)($publication['description'] ?? '')); ?></p>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+                <?php else : ?>
+                  <p>Aucune publication disponible.</p>
+                <?php endif; ?>
+              </div>
+            </div>
+          </section>
+        </div>
+    
+        </div>
+          <div class="profil-body">
+            <h2>Amis</h2>
+            <ul class="amis-list">
+              <% if (amis.length > 0) { %>
+                <% amis.forEach(ami => { %>
+                  <li>
+                    <img src="<%= ami.image_content ? 'data:image/png;base64,' + ami.image_content : '/src/images/default_avatar.png' %>" alt="Ami">
+                    <span><%= ami.prenom %></span>
+                  </li>
+                <% }) %>
+              <% } else { %>
+                <li>Aucun ami pour le moment.</li>
+              <% } %>
+            </ul>
+          </div>
+        </div>
+
+      <script>
+        function showTab(tabName) {
+            const globalContainer = document.getElementById('globalContainer');
+            const publicationContainer = document.getElementById('publicationContainer');
+            const globalTab = document.getElementById('globalTab');
+            const publicationTab = document.getElementById('publicationTab');
+
+            if (tabName === 'global') {
+                globalContainer.style.display = 'block';
+                publicationContainer.classList.add('hidden');
+                globalTab.classList.add('active');
+                publicationTab.classList.remove('active');
+            } else {
+                globalContainer.style.display = 'none';
+                publicationContainer.classList.remove('hidden');
+                publicationTab.classList.add('active');
+                globalTab.classList.remove('active');
+            }
+        }
+
+        // Gestion du tri des publications
+        document.getElementById('sortDropdown').addEventListener('change', function() {
+            const sortBy = this.value;
+            console.log('Tri des publications par : ' + sortBy);
+            // Vous pouvez ici déclencher une requête AJAX ou rediriger vers une URL avec un paramètre de tri.
+        });
+    </script>
+
+    <script src="/src/js/profil.js"></script>
+  </body>
+</html>

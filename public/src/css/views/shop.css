@@ -1,0 +1,107 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(-45deg, #1d003d, #211b1b, #00072b);
+  background: linear-gradient(-45deg, #a30000, #7500ff);
+  background-attachment: fixed;
+}
+
+.container {
+  background-color: #ffffff00;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+  margin: 100px auto;
+}
+
+.card {
+  width: 100%;
+  height: auto;
+  max-width: 300px;
+  max-height: 300px;
+  margin: 10px;
+  padding: 20px;
+  background-color: #00000075;
+  border-radius: 10px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  box-shadow: 0 0 10px rgb(0 0 0);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+  max-width: 100px;
+  max-height: 100px;
+  margin: 0 auto;
+  border-radius: 1em;
+}
+
+.info {
+  padding: 15px;
+}
+
+.info h2 {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  color: #00aeff;
+}
+
+.info p {
+  font-size: 1em;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.price {
+  font-weight: bold;
+  color: #555;
+}
+
+/* Bouton */
+.btn {
+  background-color: black;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: green;
+}
+
+/* Barre de navigation */
+.navbar {
+  padding: 10px 20px;
+}
+
+.navbar-brand {
+  font-size: 1.5em;
+  text-decoration: none;
+  color: #fff;
+}
+
+.navbar-menu a:hover {
+  color: #ddd;
+}
+
+@media screen and (max-width: 600px) {
+  .card {
+      width: 100%;
+      height: auto;
+      max-width: 300px;
+      max-height: 300px;
+  }
+}

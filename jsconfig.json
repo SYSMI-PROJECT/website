@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "target": "ES6", 
+        "jsx": "react",
+        "allowImportingTsExtensions": false,
+        "strict": false
+    },
+    "exclude": [
+        "node_modules",
+        "**/node_modules/*"
+    ]
+}

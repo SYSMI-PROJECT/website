@@ -1,0 +1,132 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+
+body {
+    background: linear-gradient(135deg, rgb(0 181 58) 0%, rgb(0 11 147)), url(Import/icons/banner.png) center / cover no-repeat;
+    background-attachment: fixed;
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 73%);
+    transition: background 0.3s ease, transform 0.3s ease;
+    flex-direction: column;
+    background: linear-gradient(180deg, #0e0e0e, #00030a);
+}
+
+
+.main {
+    max-width: 1500px;
+    margin: 100px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.container {
+    max-width: 1500px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+    background: #000000;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #000000;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ff8100;
+    border-radius: 10px;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ffca00;
+}
+
+/* Personnalisation des coins de défilement */
+::-webkit-scrollbar-corner {
+    background: #f1f1f1;
+}
+
+
+
+.navbar:hover {
+    background-color: #FFC107;
+}
+
+.navbar img {
+    width: 70px;
+    vertical-align: middle;
+    transition: transform 0.6s ease;
+}
+
+.navbar img:hover {
+    transform: rotate(360deg);
+}
+
+.navbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.navbar-icon {
+    font-size: 30px;
+    color: black;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.navbar-icon:hover {
+    color: #555;
+    transform: scale(1.1);
+    text-shadow: 2px 4px 4px rgb(0 0 0);
+}
+
+.profile-container .profile-picture {
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+    .profile-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #f0f0f0;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+    }
+
+.profile-picture:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: none;
+    }

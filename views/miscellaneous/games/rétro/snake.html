@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/Import/icons/Logo.png" type="image/png">
+    <title>snake</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle, #021265, #003105);
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* Empêche le défilement de la page */
+        }
+        canvas {
+            border: 1px solid #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Ombre autour du canvas */
+            background-color: #000;
+        }
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1; /* Assure que le message de jeu terminé est au-dessus du canvas */
+        }
+        #game-over h2 {
+            font-size: 32px;
+        }
+        #game-over p {
+            font-size: 24px;
+        }
+        #game-over button {
+            padding: 12px 24px;
+            margin-top: 20px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #000;
+            transition: background-color 0.3s;
+        }
+        #game-over button:hover {
+            background-color: #ddd;
+        }
+        #level-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: yellow;
+            z-index: 1; /* Assure que l'indicateur de niveau est au-dessus du canvas */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="800"></canvas>
+    <div id="game-over">
+        <h2>Jeu Terminé</h2>
+        <p id="final-score"></p>
+        <button onclick="restartGame()">Rejouer</button>
+    </div>
+    <div id="level-indicator"></div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const gridSize = 20;
+        let snake = [{ x: 400, y: 400 }];
+        let direction = { x: 0, y: -gridSize }; // Initial direction vers le haut
+        let food = { x: Math.floor(Math.random() * 40) * gridSize, y: Math.floor(Math.random() * 40) * gridSize };
+        let score = 0;
+        let isPaused = false;
+        let gameInterval;
+        let mouseMode = false;
+        let level = 1;
+        let speed = 100;
+
+        const eatSound = new Audio('https://www.soundjay.com/button/beep-07.wav');
+        const gameOverSound = new Audio('https://www.soundjay.com/button/beep-10.wav');
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dessiner le serpent
+            snake.forEach((part, index) => {
+                ctx.fillStyle = index === 0 ? 'lime' : 'green'; // Couleur différente pour la tête
+                ctx.fillRect(part.x, part.y, gridSize, gridSize);
+                ctx.strokeStyle = 'darkgreen';
+                ctx.strokeRect(part.x, part.y, gridSize, gridSize); // Bordure pour un meilleur look
+            });
+
+            // Dessiner la nourriture
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+
+            // Afficher le score
+            ctx.fillStyle = 'white';
+            ctx.font = '24px Arial';
+            ctx.fillText(`Score: ${score}`, 10, 30);
+
+            // Afficher le niveau
+            ctx.fillText(`Niveau: ${level}`, canvas.width - 100, 30);
+        }
+
+        function update() {
+            if (isPaused) return;
+
+            // Déplacer le serpent en fonction de la direction actuelle
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+            // Vérifier si le serpent mange la nourriture
+            if (head.x === food.x && head.y === food.y) {
+                snake.push({});
+                food = { x: Math.floor(Math.random() * 40) * gridSize, y: Math.floor(Math.random() * 40) * gridSize };
+                score += 10;
+                eatSound.play();
+                // Augmenter le niveau chaque fois que le score atteint un multiple de 50
+                if (score % 50 === 0) {
+                    level++;
+                    speed -= 10; // Augmenter la vitesse à chaque niveau
+                    clearInterval(gameInterval);
+                    gameInterval = setInterval(gameLoop, speed);
+                }
+            } else {
+                // Retirer la dernière partie du serpent s'il ne mange pas de nourriture
+                snake.pop();
+            }
+
+            // Ajouter la nouvelle tête au début du tableau du serpent
+            snake.unshift(head);
+
+            // Vérifier les collisions
+            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || isCollision(head)) {
+                gameOverSound.play();
+                clearInterval(gameInterval);
+                document.getElementById('final-score').innerText = `Score: ${score}`;
+                document.getElementById('game-over').style.display = 'block';
+            }
+        }
+
+        function isCollision(head) {
+            // Vérifier s'il y a une collision avec le corps du serpent
+            return snake.slice(1).some(part => part.x === head.x && part.y === head.y);
+        }
+
+        function resetGame() {
+            snake = [{ x: 400, y: 400 }];
+            direction = { x: 0, y: -gridSize }; // Réinitialiser la direction vers le haut
+            food = { x: Math.floor(Math.random() * 40) * gridSize, y: Math.floor(Math.random() * 40) * gridSize };
+            score = 0;
+            level = 1;
+            speed = 100;
+            isPaused = false;
+            document.getElementById('game-over').style.display = 'none';
+        }
+
+        function restartGame() {
+            resetGame();
+            gameInterval = setInterval(gameLoop, speed);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (!mouseMode) {
+                switch (e.key) {
+                    case 'ArrowUp':
+                        direction = { x: 0, y: -gridSize };
+                        break;
+                    case 'ArrowDown':
+                        direction = { x: 0, y: gridSize };
+                        break;
+                    case 'ArrowLeft':
+                        direction = { x: -gridSize, y: 0 };
+                        break;
+                    case 'ArrowRight':
+                        direction = { x: gridSize, y: 0 };
+                        break;
+                    case ' ':
+                        isPaused = !isPaused;
+                        break;
+                    case 'm':
+                        mouseMode = !mouseMode;
+                        break;
+                }
+            } else if (e.key === 'm') {
+                mouseMode = !mouseMode;
+            }
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if (mouseMode) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                const head = snake[0];
+
+                // Calculer la direction vers le curseur de la souris
+                const diffX = mouseX - head.x;
+                const diffY = mouseY - head.y;
+
+                // Définir la direction en fonction de la différence de position
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    direction.x = diffX > 0 ? gridSize : diffX < 0 ? -gridSize : 0;
+                    direction.y = 0;
+                } else {
+                    direction.x = 0;
+                    direction.y = diffY > 0 ? gridSize : diffY < 0 ? -gridSize : 0;
+                }
+            }
+        });
+
+        function gameLoop() {
+            update();
+            draw();
+        }
+
+        gameInterval = setInterval(gameLoop, speed);
+    </script>
+</body>
+</html>

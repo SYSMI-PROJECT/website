@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/Import/icons/Logo.png" type="image/png">
+    <title>Ping Pong</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(circle, #021265, #003105);
+            font-family: Arial, sans-serif;
+            color: #ecf0f1;
+        }
+
+        canvas {
+            border: 2px solid #ecf0f1;
+            background-color: #34495e;
+            width: 800px;
+            height: 400px;
+        }
+
+        #scoreboard {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: #ffffff;
+        }
+
+        #notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px 40px;
+            border-radius: 10px;
+            display: none;
+            color: #ffffff;
+            text-align: center;
+            font-size: 30px;
+        }
+
+        #nextRoundButton {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #27ae60;
+            padding: 20px 40px;
+            border-radius: 10px;
+            display: none;
+            cursor: pointer;
+            color: #ffffff;
+            font-size: 24px;
+        }
+
+        .power-up {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            display: none;
+            animation: pulse 1s infinite alternate;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        .power-up::after {
+            content: attr(data-name);
+            display: block;
+            font-size: 10px;
+            text-align: center;
+            color: #ffffff;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .pause-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #ffffff;
+        }
+
+        .power-up-effect {
+            display: none;
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            animation: power-up-animation 1s infinite;
+        }
+
+        @keyframes power-up-animation {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #shieldElement {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(231, 76, 60, 0.5);
+        }
+
+        #cloneElement {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(142, 68, 173, 0.5);
+        }
+
+        #vortexElement {
+            display: none;
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            animation: vortex-animation 1s infinite;
+            background-color: #3498db; /* Changez la couleur de fond selon vos préférences */
+        }
+
+        @keyframes vortex-animation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="scoreboard">Manche: <span id="roundNumber">1</span> - Joueur: <span id="playerScore">0</span> - Adversaire: <span id="opponentScore">0</span></div>
+    <div id="notification"></div>
+    <button id="nextRoundButton" onclick="startNextRound()">Commencer la prochaine manche</button>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <div id="pauseOverlay" class="pause-overlay"></div>
+    <div id="powerups-container"></div>
+
+    <div id="shieldElement"></div>
+    <div id="cloneElement"></div>
+    <div id="vortexElement" class="power-up-effect"></div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const powerUpsContainer = document.getElementById('powerups-container');
+        let playerPosition = canvas.height / 2;
+        let botPosition = canvas.height / 2;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballSpeedX = 10;
+        let ballSpeedY = 10;
+        let playerScore = 0;
+        let opponentScore = 0;
+        let roundNumber = 1;
+        let gameOver = false;
+        let powerUps = [];
+
+        const playerScoreDisplay = document.getElementById('playerScore');
+        const opponentScoreDisplay = document.getElementById('opponentScore');
+        const roundNumberDisplay = document.getElementById('roundNumber');
+        const notification = document.getElementById('notification');
+        const nextRoundButton = document.getElementById('nextRoundButton');
+        const pauseOverlay = document.getElementById('pauseOverlay');
+        const vortexElement = document.getElementById('vortexElement');
+
+        let botSpeed = 5;
+        let difficulty = 'medium';
+
+        function setDifficulty(level) {
+            switch (level) {
+                case 'easy':
+                    botSpeed = 3;
+                    break;
+                case 'medium':
+                    botSpeed = 5;
+                    break;
+                case 'hard':
+                    botSpeed = 8;
+                    break;
+                default:
+                    botSpeed = 5;
+            }
+        }
+
+        function startNextRound() {
+    gameOver = false;
+    ballSpeedX = -ballSpeedX;
+    ballX = canvas.width / 2;
+    ballY = canvas.height / 2;
+    roundNumber++;
+    roundNumberDisplay.textContent = roundNumber;
+    if (roundNumber <= 10) {
+        nextRoundButton.style.display = 'none';
+    } else {
+        nextRoundButton.style.display = 'none';
+        if (playerScore > opponentScore) {
+            showNotification('<span style="color: #27ae60;">Vous avez gagné !</span>');
+            // Redirection vers le script PHP lorsque le joueur a gagné les 10 manches
+            window.location.href = 'Super étoile.php';
+        } else if (opponentScore > playerScore) {
+            showNotification('<span style="color: #c0392b;">Vous avez perdu !</span>');
+            gameOver = true;
+            nextRoundButton.style.display = 'block'; // Afficher le bouton "Rejouer"
+        } else {
+            showNotification('<span style="color: #3498db;">Match nul !</span>');
+            gameOver = true;
+            nextRoundButton.style.display = 'block'; // Afficher le bouton "Rejouer"
+        }
+        gameOver = true;
+    }
+    setDifficulty(getNextDifficulty());
+    draw();
+}
+
+
+
+        function getNextDifficulty() {
+            switch (roundNumber) {
+                case 1:
+                    return 'medium';
+                case 2:
+                    return 'hard';
+                case 3:
+                    return 'hard';
+                case 4:
+                    return 'hard';
+                case 5:
+                    return 'hard';
+                default:
+                    return 'hard';
+            }
+        }
+
+        setDifficulty(difficulty);
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ecf0f1';
+            ctx.fillRect(10, playerPosition - 50, 10, 100);
+            ctx.fillRect(canvas.width - 20, botPosition - 50, 10, 100);
+            ctx.fillRect(canvas.width / 2 - 5, 0, 10, canvas.height);
+
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            powerUps.forEach(powerUp => {
+                ctx.fillStyle = powerUp.color;
+                ctx.beginPath();
+                ctx.arc(powerUp.x, powerUp.y, 10, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            powerUps.forEach((powerUp, index) => {
+                if (ballX > powerUp.x - 10 && ballX < powerUp.x + 10 && ballY > powerUp.y - 10 && ballY < powerUp.y + 10) {
+                    pauseGame(powerUp.type);
+                    applyPowerUpEffect(powerUp.type);
+                    powerUps.splice(index, 1);
+                }
+            });
+
+            if (ballY < 10 || ballY > canvas.height - 10) {
+                ballSpeedY = -ballSpeedY;
+            }
+
+            if ((ballX < 20 && ballY > playerPosition - 50 && ballY < playerPosition + 50) ||
+                (ballX > canvas.width - 20 && ballY > botPosition - 50 && ballY < botPosition + 50)) {
+                ballSpeedX = -ballSpeedX;
+            }
+
+            if (ballX < 0) {
+                opponentScore++;
+                updateScore();
+                checkWin();
+                gameOver = true;
+                showNotification('<span style="color: #c0392b;">Vous avez perdu !</span>');
+                nextRoundButton.style.display = 'block';
+            } else if (ballX > canvas.width) {
+                playerScore++;
+                updateScore();
+                checkWin();
+                if (roundNumber <= 10) {
+                    gameOver = true;
+                    showNotification('<span style="color: #27ae60;">Vous avez gagné !</span>');
+                    nextRoundButton.style.display = 'block';
+                } else {
+                    showNotification('<span style="color: #3498db;">Game Over</span>');
+                    gameOver = true;
+                }
+            }
+
+            if (gameOver === false) {
+                moveBot();
+                requestAnimationFrame(draw);
+            }
+        }
+
+        function resetBall() {
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballSpeedX = -ballSpeedX;
+        }
+
+        canvas.addEventListener('mousemove', function(event) {
+            if (!gameOver) {
+                playerPosition = event.clientY - canvas.getBoundingClientRect().top;
+            }
+        });
+
+        function moveBot() {
+            if (ballX < canvas.width - 20) {
+                let deltaY = ballY - (botPosition + 25);
+                if (deltaY < 0) {
+                    botPosition -= Math.min(botSpeed, Math.abs(deltaY));
+                } else if (deltaY > 0) {
+                    botPosition += Math.min(botSpeed, deltaY);
+                }
+            }
+        }
+
+        function showNotification(message) {
+            notification.innerHTML = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function updateScore() {
+            playerScoreDisplay.textContent = playerScore;
+            opponentScoreDisplay.textContent = opponentScore;
+        }
+
+        function checkWin() {
+            if (playerScore === 10 || opponentScore === 10) {
+                if (playerScore === 10) {
+                    // Redirection vers le script PHP lorsque le joueur a gagné les 10 manches
+                    window.location.href = 'Super étoile.php';
+                }
+                gameOver = true;
+                nextRoundButton.style.display = 'block';
+            }
+        }
+
+        function pauseGame(powerUpName) {
+            gameOver = true;
+            pauseOverlay.textContent = powerUpName;
+            pauseOverlay.style.display = 'flex';
+            setTimeout(() => {
+                pauseOverlay.style.display = 'none';
+                gameOver = false;
+                draw();
+            }, 2000);
+        }
+
+        function generatePowerUps() {
+            setInterval(() => {
+                if (powerUps.length < 10) {
+                    const x = Math.random() * (canvas.width - 40) + 20;
+                    const y = Math.random() * (canvas.height - 40) + 20;
+                    const type = getRandomPowerUpType();
+                    const color = getPowerUpColor(type);
+                    powerUps.push({ x, y, type, color });
+                }
+            }, 5000);
+        }
+
+        function getRandomPowerUpType() {
+            const types = ['speedBoost', 'slowMotion', 'shield', 'magnet', 'clone', 'vortex', 'invertControls', 'gravityFlip', 'speedReduction', 'speedIncrease', 'randomDirection', 'scoreDouble', 'scoreReset', 'ballFreeze', 'playerInvisibility', 'botInvisibility', 'extraLife', 'randomTeleport', 'playerSlow', 'botSlow', 'ballSpeedReset', 'playerSpeedBoost', 'botSpeedBoost'];
+            return types[Math.floor(Math.random() * types.length)];
+        }
+
+        function getPowerUpColor(type) {
+            switch (type) {
+                case 'speedBoost':
+                    return '#f39c12';
+                case 'slowMotion':
+                    return '#2980b9';
+                case 'shield':
+                    return '#e74c3c';
+                case 'magnet':
+                    return '#9b59b6';
+                case 'clone':
+                    return '#8e44ad';
+                case 'vortex':
+                    return '#3498db';
+                case 'invertControls':
+                    return '#16a085';
+                case 'gravityFlip':
+                    return '#f1c40f';
+                case 'speedReduction':
+                    return '#27ae60';
+                case 'speedIncrease':
+                    return '#c0392b';
+                case 'randomDirection':
+                    return '#0000ff';
+                case 'scoreDouble':
+                    return '#800080';
+                case 'scoreReset':
+                    return '#008000';
+                case 'ballFreeze':
+                    return '#FF5733';
+                case 'playerInvisibility':
+                    return '#808080';
+                case 'botInvisibility':
+                    return '#FFD700';
+                case 'extraLife':
+                    return '#ff7f0e';
+                case 'randomTeleport':
+                    return '#1abc9c';
+                case 'playerSlow':
+                    return '#2c3e50';
+                case 'botSlow':
+                    return '#e67e22';
+                case 'ballSpeedReset':
+                    return '#bdc3c7';
+                case 'playerSpeedBoost':
+                    return '#7f8c8d';
+                case 'botSpeedBoost':
+                    return '#34495e';
+                default:
+                    return '#ffffff';
+            }
+        }
+
+        function applyPowerUpEffect(type) {
+            switch (type) {
+                case 'speedBoost':
+                    let originalBallSpeedX = ballSpeedX;
+                    let originalBallSpeedY = ballSpeedY;
+                    ballSpeedX *= 1.5;
+                    ballSpeedY *= 1.5;
+                    setTimeout(() => {
+                        ballSpeedX = originalBallSpeedX;
+                        ballSpeedY = originalBallSpeedY;
+                    }, 5000);
+                    break;
+                case 'slowMotion':
+                    let originalBallSpeedX2 = ballSpeedX;
+                    let originalBallSpeedY2 = ballSpeedY;
+                    ballSpeedX *= 0.5;
+                    ballSpeedY *= 0.5;
+                    setTimeout(() => {
+                        ballSpeedX = originalBallSpeedX2;
+                        ballSpeedY = originalBallSpeedY2;
+                    }, 5000);
+                    break;
+                case 'shield':
+                    document.getElementById('shieldElement').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('shieldElement').style.display = 'none';
+                    }, 5000);
+                    break;
+                case 'magnet':
+                    // implement magnet logic
+                    break;
+                case 'clone':
+                    document.getElementById('cloneElement').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('cloneElement').style.display = 'none';
+                    }, 5000);
+                    break;
+                case 'vortex':
+                    vortexElement.style.display = 'block';
+                    setTimeout(() => {
+                        vortexElement.style.display = 'none';
+                    }, 5000);
+                    break;
+                case 'invertControls':
+                    canvas.addEventListener('mousemove', function(event) {
+                        if (!gameOver) {
+                            playerPosition = canvas.getBoundingClientRect().bottom - event.clientY;
+                        }
+                    });
+                    setTimeout(() => {
+                        canvas.addEventListener('mousemove', function(event) {
+                            if (!gameOver) {
+                                playerPosition = event.clientY - canvas.getBoundingClientRect().top;
+                            }
+                        });
+                    }, 5000);
+                    break;
+                case 'gravityFlip':
+                    ballSpeedY = -ballSpeedY;
+                    break;
+                case 'speedReduction':
+                    ballSpeedX *= 0.5;
+                    ballSpeedY *= 0.5;
+                    break;
+                case 'speedIncrease':
+                    ballSpeedX *= 2;
+                    ballSpeedY *= 2;
+                    break;
+                case 'randomDirection':
+                    ballSpeedX = Math.random() < 0.5 ? -ballSpeedX : ballSpeedX;
+                    ballSpeedY = Math.random() < 0.5 ? -ballSpeedY : ballSpeedY;
+                    break;
+                case 'scoreDouble':
+                    playerScore *= 2;
+                    opponentScore *= 2;
+                    break;
+                case 'scoreReset':
+                    playerScore = 0;
+                    opponentScore = 0;
+                    break;
+                case 'ballFreeze':
+                    ballSpeedX = 0;
+                    ballSpeedY = 0;
+                    break;
+                case 'playerInvisibility':
+                    // implement player invisibility logic
+                    break;
+                case 'botInvisibility':
+                    // implement bot invisibility logic
+                    break;
+                case 'extraLife':
+                    // implement extra life logic
+                    break;
+                case 'randomTeleport':
+                    ballX = Math.random() * canvas.width;
+                    ballY = Math.random() * canvas.height;
+                    break;
+                case 'playerSlow':
+                    botSpeed *= 0.5;
+                    break;
+                case 'botSlow':
+                    botSpeed *= 0.5;
+                    break;
+                case 'ballSpeedReset':
+                    ballSpeedX = 10;
+                    ballSpeedY = 10;
+                    break;
+                case 'playerSpeedBoost':
+                    botSpeed *= 2;
+                    break;
+                case 'botSpeedBoost':
+                    botSpeed *= 2;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        generatePowerUps();
+        draw();
+    </script>
+</body>
+</html>

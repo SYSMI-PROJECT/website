@@ -1,0 +1,60 @@
+@import url('/src/css/index.css');
+
+body {
+    background: linear-gradient(135deg, rgb(158 158 158) 0%, rgb(207 207 207));
+}
+
+.profile-card img {
+    box-shadow: 0px 0px 9px 3px rgb(0 0 0 / 85%);
+}
+
+.image-container .image-name {
+    color: #000000;
+}
+
+.friend-info {
+    color: #000000;
+}
+
+.container {
+    background: #ededed;
+}
+
+.profile-card h1 {
+    color: black;
+}
+
+.user-list .user {
+	box-shadow: 0 4px 10px rgb(0 0 0);
+}
+
+.badge {
+    background-color: #ffffff;
+	border: solid 1px #000000;
+}
+
+.image-container .image-name {
+    color: white;
+}
+
+.links-logo {
+    color: black;
+}
+
+.thought-bubble {
+    box-shadow: 5px 2px 8px rgb(0 0 0);
+    background: #ffffff;
+}
+
+.status, .quote, .challenge {
+    color: black;
+}
+
+.feedback-form input, .feedback-form textarea, .feedback-form select {
+    background-color: #ffffff;
+    color: black;
+}
+
+.infos-user, .widget-item p, .stats-list, .widget-item h3, .widget-item h4, .arrow-btn {
+     color: black;
+}
