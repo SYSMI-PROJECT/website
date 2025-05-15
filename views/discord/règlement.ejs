@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Règlement Général</title>
+    <link rel="icon" type="image/png" href="../../Logo.png">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #444;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            border: solid 5px black;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #ff00d4;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-align: center;
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        h2 {
+            color: #e6b800;
+            font-size: 24px;
+            margin-top: 30px;
+            transition: color 0.3s ease;
+            animation: slideInRight 1s forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        h2:hover {
+            color: #ffcc00;
+        }
+
+        p {
+            color: #ccc;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            animation: fadeIn 1s forwards;
+            border-left: 4px solid #ffcc00;
+            padding-left: 10px;
+            box-sizing: border-box;
+        }
+
+        .general-regulation {
+            color: #00ff2b;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        hr {
+            border: none;
+            border-bottom: 1px solid #666;
+            margin: 30px 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #888;
+            animation: slideInUp 1s forwards;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>Règlement Global de la SYSMI Club</h1>
+
+    <p style="color: white;" class="general-regulation">Veillez à tout prix, respecter ce règlement afin d'éviter de vous manger un banissement. 
+        <br><br>
+    Veillez noter que chaque serveur aurons leurs propre règlement. Mais si l'un de nos règlements n'est pas respecté, merci de le signaler au staff du serveur ou de contacter un membre du staff de la (SYSMI Club).</p>
+
+    <h2>1. Respect de la communauté</h2>
+    <p>Nous vous demandons d'avoir un minimum de respect au sein  de la SYSMI Club. Toute forme de cyberharcèlement, de menaces ou d'usurpation d'identité sera sévèrement sanctionnée.</p>
+
+    <h2>2. Confidentialité et sécurité</h2>
+    <p>Il est formellement interdit de divulguer les informations privées d'un utilisateur dans notre communauté.</p>
+
+    <h2>3. DM et Publicité </h2>
+    <p>Toute forme de publicité ou de spam en MP (sans l'autorisation de la personne) est strictement interdit.
+        <br>Vous êtes libre de ne pas respscter ceci</p>
+
+    <h2>4. Serveurs non autorisées</h2>
+    <p>Les serveurs publicitaires / partenariats ne serons pas accepter dans la (SYSMI CLUB).</p>
+    <p class="general-regulation">Les parenariats serons autorisé uniquement dans les salons (partenariats)</p>
+
+    <hr>
+
+    <footer>Pour toute question ou problèmes en cas de violation de ces règles, veuillez contacter un membre du personnel.</footer>
+</div>
+
+</body>
+</html>

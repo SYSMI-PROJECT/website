@@ -10,11 +10,8 @@
   <link rel="stylesheet" href="<%= cssFile %>">
 </head>
 <body>
-  <style>
-
-  </style>
 <nav>
-    <div class="logo">
+  <div class="logo">
       <img src="/src/img/Logo.png" alt="Logo de Mon Réseau" class="logo-img">
       <span class="logo-text">the SYSMI</span>
     </div>
@@ -22,7 +19,7 @@
       <i class="fas fa-home"></i>
       <span>VOS POST</span>
     </a>
-    <a href="/public/pages/miscellaneous/new_post" class="menu-item" id="home-link" onclick="refreshPosts();">
+    <a href="/camera" class="menu-item" id="home-link" onclick="refreshPosts();">
       <i class="fas fa-plus-circle"></i>
       <span>NEW POST</span>
     </a>
@@ -42,7 +39,6 @@
     </a>
     <% } %>
 </nav>
-
 
 <div class="main">
     <div class="container section <%= !isUserLoggedIn ? 'not-logged' : '' %>" id="friends">
@@ -87,41 +83,55 @@
       
 <div class="container" id="profil">
     <div class="profile-card">
-      <a href="/profil?id=<%= user_id %>&prenom=<%= encodeURIComponent(prenom) %>" class="profil-link">
+    <div class="profil-link">
+      <a href="/profil?id=<%= user_id %>&prenom=<%= encodeURIComponent(prenom) %>">
         <div class="avatar-container">
           <img src="<%= userData.photo_profil ? userData.photo_profil : 'https://p7.hiclipart.com/preview/782/114/405/5bbc3519d674c.jpg' %>" alt="Image de profil" />
         </div>
-        <div class="bubble-text">      
-                    <% if (isUserLoggedIn) { %>
-                    <h1><%= prenom %></h1>
-                <div class="thought-bubble">
-                    <div class="status">🎭 Humeur : En mode chill 😎</div>
+      </a>
+          <div class="bubble-text">      
+            <% if (isUserLoggedIn) { %>
+              <h1><%= prenom %></h1>
+                <div class="thought-bubble" onclick="showForm()">
+                  <div class="status">🎭 Humeur : En mode chill 😎</div>
                     <div class="quote">📝 Citation du jour : "Chaque petite action compte."</div>
-                </div>
-                    <p>Appuyez ici pour modifier votre profil</p>
-                <div class="badge">
-                <i class="fas fa-crown" style="color: goldenrod;" title="premium"></i>
-                <i class="fas fa-bolt"style="color: #c7c700;" title="Actif"></i>
+                      <div class="edit-overlay">✏️</div>
+                    </div>
+
+                    <div id="edit-form-container">
+                      <form onsubmit="saveForm(event)">
+                        <label>Nouvelle humeur :</label>
+                        <input type="text" id="newMood" placeholder="Ex : En mode focus 🔥"><br>
+                        <label>Nouvelle citation :</label>
+                        <input type="text" id="newQuote" placeholder="Ex : L'effort paie toujours"><br>
+                        <button type="submit">💾 Sauvegarder</button>
+                      </form>
+                    </div>
+
+                  <p>Appuyez ici pour modifier votre profil</p>
+                    <div class="badge">
+                      <i class="fas fa-crown" style="color: goldenrod;" title="premium"></i>
+                      <i class="fas fa-bolt"style="color: #c7c700;" title="Actif"></i>
+                    </div>
+                <% } else { %>
+                  <h1>Bienvenue,</h1>
+                  <p>Veuillez vous connecter.</p>
+                <% } %>
+              </div>
             </div>
-            <% } else { %>
-              <h1>Bienvenue,</h1>
-              <p>Veuillez vous connecter.</p>
-            <% } %>
-          </div>
-        </a>
         <div class="links-buttons">
           <% if (isUserLoggedIn) { %>
-            <a target="_blank" href="https://discord.gg/83pzTuJ5wv" class="links-logo">
-              <span>Nous rejoindre</span> <i class="fab fa-discord"></i>
+            <a href="/store" class="links-logo">
+              <span>boutique</span> <i class="fas fa-shop"></i>
             </a>
-            <a href="/settings" class="links-logo">
-              <span>paramètres</span> <i class="fas fa-cog"></i>
+            <a href="/minigames" class="links-logo">
+              <span>mini jeux</span> <i class="fas fa-gamepad"></i>
             </a>
             <a href="/users" class="links-logo">
               <span>liste utilisateurs</span> <i class="fas fa-user-plus"></i>
             </a>
-            <a target="_blank" href="https://github.com/zacaventure/SYSMI_PROJECT/releases/tag/1.0.0" class="links-logo">
-              <span>installer</span> <i class="fab fa-github"></i>
+            <a href="/settings" class="links-logo">
+              <span>paramètres</span> <i class="fas fa-cog"></i>
             </a>
             <a href="#feedback" class="links-logo">
               <span>noter le site</span> <i class="fas fa-star"></i>
@@ -153,15 +163,11 @@
       
           <!-- Container du widget -->
           <div class="widget" id="widget">
-            
-            <!-- Flèche gauche -->
             <div class="arrow-container left">
               <button class="arrow-btn" onclick="moveLeft()">
                 <i class="fas fa-chevron-left"></i>
               </button>
             </div>
-        
-            <!-- Widgets à afficher -->
             <div class="widget-items" id="widget-items">
               <div class="widget-item">
                 <p>📊 Statistiques</p>
@@ -172,17 +178,15 @@
                 <button onclick="showWidgetContent('cadeau')">Voir</button>
               </div>
             </div>
-        
-            <!-- Flèche droite -->
             <div class="arrow-container right">
               <button class="arrow-btn" onclick="moveRight()">
                 <i class="fas fa-chevron-right"></i>
               </button>
             </div>
-      
           </div>
         </div>
       <% } %>  
+
       <!-- Le menu est toujours visible, connecté ou pas -->
       <div class="penel">
         <div class="menu-toggle" onclick="toggleMenu()">☰</div>
@@ -231,29 +235,46 @@
     </div> -->        
 </div>
 
-<div class="container" id="objects">
-    <div class="card"></div>
-    <div class="card"></div>
-    <div class="card"></div>
+<div class="container" id="music">
+  <!-- 🎶 Titre chanson avec <marquee> -->
+  <div class="titre-chanson overflow-hidden whitespace-nowrap mb-4">
+    <marquee behavior="scroll" direction="left" scrollamount="4" style="color: #0f0; font-weight: bold;">
+      <div id="titre-morceau">🎶 En lecture : ... 🎶</div>
+    </marquee>
+  </div>
+
+  <!-- 🎧 Audio -->
+  <audio id="lecteur" src="/uploads/audios/téléchargement.mp3" preload="metadata"></audio>
+
+  <!-- 🎛️ Contrôles -->
+  <div class="controls flex items-center justify-between mb-3">
+    <button onclick="toggleLecture()" class="bg-fuchsia-600 text-white px-4 py-2 rounded-xl shadow-md hover:bg-fuchsia-400 transition">
+      ▶ | ⏸
+    </button>
+    <div id="temps-actuel" style="color: white;">00:00</div>
+  </div>
+
+  <!-- 📈 Barre de progression -->
+    <div class="progress-bar">
+      <div id="barre-progression" class="progress"></div>
+  </div>
 </div>
 
     <div class="container" id="utilisateurs">
-      <div class="user-list">
-        <a href="/minigames" class="user"
-           style="background-size:cover;background-repeat:no-repeat;background-position:center;">
-          <img src="https://getdrawings.com/free-icon/snake-game-icon-66.png" alt="User Avatar">
-          <p>Mini jeux</p>
-        </a>
-        <a href="/boutique" class="user"
-           style="background-size:cover;background-repeat:no-repeat;background-position:center;">
-          <img src="https://static.vecteezy.com/system/resources/previews/014/494/586/original/shopping-bags-colorful-paper-bags-for-shopping-mall-products-png.png" alt="User Avatar">
-          <p>Boutique</p>
-        </a>
-        <a href="services" class="user"
-           style="background-size:cover;background-repeat:no-repeat;background-position:center;">
-          <img src="/src/img/service.png" alt="User Avatar">
+      <h2>Vos accès débloqué</h2>
+        <div class="accès-list">
+          <a href="/" style="background-image: url('/src/walpaper/shop.png');" class="accès">
+            <img src="/src/img/store.png" alt="User Avatar">
+            <p>Boutique</p>
+          </a>
+          <a href="/" style="background-image: url('/src/walpaper/aide.png');" class="accès">
+            <img src="/src/img/service.png" alt="User Avatar">
           <p>Aide / Services</p>
-        </a>
+          </a>
+          <a href="/discord/SYSMI-ZONE" style="background-image: url('/src/walpaper/SYSMI ZONE 23.png');" class="accès">
+            <img src="/src/img/discord.png" alt="User Avatar">
+            <p>DISCORD COMMUNITYS</p>
+          </a>
       </div>
     </div>
 
@@ -285,33 +306,60 @@
         </form>
       </section>
     </div>
-
-  </div> <!-- /main -->
+  </div>
 
   <footer>
-    &copy; 2025 La SYSMI PROJECT. <a href="#contact">Politique de confidentialité</a>.
+    &copy; 2025 La SYSMI PROJECT. <a href="/privacy">Politique de confidentialité</a>.
   </footer>
 
-  <script>
-    const prenom = "<%= prenom %>";
+    <script>
+      const prenom = "<%= prenom %>";
+    </script>
 
-    function toggleMenu() {
-      const menu = document.getElementById("menu");
-      if (menu.classList.contains("active")) {
-        menu.classList.remove("active");
-        setTimeout(() => menu.style.display = "none", 300);
-      } else {
-        menu.style.display = "flex";
-        setTimeout(() => menu.classList.add("active"), 10);
-      }
+  <script src="/src/js/view/index/toggle.js"></script>
+    <script src="/src/js/view/index/SYSMI-Widget.js"></script>
+    <script src="/src/js/view/index/clock.js"></script>
+    <script src="/src/js/view/index/friends.js"></script>
+  <script src="/src/js/view/index/humeur.js"></script>
+
+<script>
+  const lecteur = document.getElementById('lecteur');
+  const barre = document.getElementById('barre-progression');
+  const temps = document.getElementById('temps-actuel');
+  const titreMorceau = document.getElementById('titre-morceau');
+  let enLecture = false;
+
+  function toggleLecture() {
+    if (lecteur.paused) {
+      lecteur.volume = 1.0;
+      lecteur.play();
+      enLecture = true;
+    } else {
+      lecteur.pause();
+      enLecture = false;
     }
-  </script>
+  }
 
-  
+  lecteur.addEventListener('timeupdate', () => {
+    const pourcentage = (lecteur.currentTime / lecteur.duration) * 100;
+    barre.style.width = pourcentage + '%';
 
-<script src="/src/js/view/SYSMI-Widget.js"></script>
-<script src="/src/js/view/clock.js"></script>
-<script src="/src/js/view/friends.js"></script>
+    const minutes = Math.floor(lecteur.currentTime / 60);
+    const secondes = Math.floor(lecteur.currentTime % 60).toString().padStart(2, '0');
+    temps.textContent = `${minutes}:${secondes}`;
+  });
 
-</body>
+  // 🎶 Mettre à jour le titre dans le <marquee>
+  lecteur.addEventListener('loadedmetadata', () => {
+    const src = lecteur.src;
+    const nomFichier = decodeURIComponent(src.split('/').pop());
+    const titre = nomFichier.replace(/\.[^/.]+$/, '');
+    titreMorceau.textContent = `🎶 En lecture : ${titre} 🎶`;
+  });
+</script>
+
+
+
+
+  </body>
 </html>

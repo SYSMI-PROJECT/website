@@ -1,15 +1,7 @@
-const profil = require('./profil');
 const db = require('../database');
 
 module.exports = async (req, res, next) => {
-    console.log('🧩 Middleware UsersData - Session :', {
-        userId: req.session?.userId,
-        username: req.session?.username,
-        prenom: req.session?.prenom
-    });
-
     if (!req.session || !req.session.userId) {
-        console.log('⚠️ Aucune session active ou ID manquant');
         req.userData = null;
         return next();
     }
@@ -17,13 +9,10 @@ module.exports = async (req, res, next) => {
     const id = req.session.userId;
 
     if (req.userData && req.userData.id === id) {
-        console.log('✅ Données utilisateur déjà présentes en mémoire');
         return next();
     }
 
     try {
-        console.log('🔍 Chargement depuis la DB pour l’ID :', id);
-
         const [rows] = await db.execute(`
             SELECT 
                 u.id, u.etoile, u.role, u.statut, u.prenom, u.nom, u.theme, 
@@ -38,7 +27,6 @@ module.exports = async (req, res, next) => {
         );
 
         if (rows.length === 0) {
-            console.log('❌ Aucun utilisateur trouvé');
             req.userData = null;
             return next();
         }
@@ -54,6 +42,15 @@ module.exports = async (req, res, next) => {
         const visibilityStatus = user.visibility === 'private'
             ? 'private-status text-red-500'
             : 'public-status text-green-500';
+
+        // 🔢 Nombre d'amis
+        const [amisRows] = await db.execute(`
+            SELECT 
+              (SELECT COUNT(*) FROM relation WHERE demandeur = ? AND statut = 1) + 
+              (SELECT COUNT(*) FROM relation WHERE receveur = ? AND statut = 1) AS nombre_amis
+        `, [id, id]);
+
+        const nombreAmis = amisRows[0]?.nombre_amis || 0;
 
         req.userData = {
             id: user.id,
@@ -76,26 +73,19 @@ module.exports = async (req, res, next) => {
             instagram: user.lien_instagram,
             discord: user.lien_discord,
             twitch: user.lien_twitch,
-            photo_profil: user.photo_profil
+            photo_profil: user.photo_profil,
+            nombreAmis: nombreAmis
         };
 
-        console.log('✅ Données utilisateur chargées');
-
         if (user.statut === 'banni') {
-            console.log('🚫 Utilisateur banni - redirection');
             return res.redirect('/Import/Error/Account_banned');
         }
 
-        const [produits] = await db.execute(`
-            SELECT id, nom, description, prix, image 
-            FROM produits
-        `);
-
+        const [produits] = await db.execute(`SELECT id, nom, description, prix, image FROM produits`);
         req.produitsData = produits;
-        console.log(`🛍️ Produits chargés : ${produits.length}`);
     } catch (error) {
-        console.error('💥 Erreur dans le middleware UsersData :', error);
-        return res.status(500).send('Erreur serveur interne');
+        console.error('Erreur dans UsersData :', error);
+        return res.status(500).send('Erreur serveur');
     }
 
     next();

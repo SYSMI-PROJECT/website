@@ -4,6 +4,7 @@
 
 	body {
 		font-family: 'Arial', sans-serif;
+		/* font-family: 'Orbitron', sans-serif; */
 		margin: 0;
 		padding: 0;
 		background: linear-gradient(135deg, rgb(0 0 0) 0%, rgb(17 17 17));
@@ -141,7 +142,8 @@
 
 	.container h2 {
 		margin-top: 0;
-		color: #ffffff;
+		color: #00c700;
+		text-align: center;
 	}
 	/* --------------- head containers (#) --------------- */
 
@@ -211,6 +213,7 @@
 		border: 2px solid #007fff;
 		border-color: #ffffff #0079ff #ffffff;
 		transition: transform 0.3s ease-in-out;
+		cursor: pointer;
 	}
 	
 	.profile-pic:hover {
@@ -295,6 +298,7 @@
 	}
 
 	.status, .quote, .challenge {
+		font-family: 'Arial', sans-serif;
 		font-size: 14px;
 		margin: 10px 0;
 		color: #f0f0f0;
@@ -386,6 +390,7 @@
 	}
 
 	.links-buttons a {
+		font-family: 'Arial', sans-serif;
 		display: inline-flex;
 		align-items: center;
 		font-weight: bold;
@@ -465,7 +470,7 @@
 		background: rgba(255, 255, 255, 0.15);
 	}
 
-	button {
+	.widget button {
 		border: none;
 		border-radius: 8px;
 		color: white;
@@ -476,7 +481,7 @@
 		transition: background 0.3s ease, transform 0.2s ease;
 	}
 
-	button:hover {
+	.widget button:hover {
 		transform: scale(1.05);
 	}
 
@@ -655,7 +660,7 @@
 		width: 80px;
 		height: 80px;
 		overflow: hidden;
-		border-radius: 20px;
+		border-radius: 15px;
 		box-shadow: 0px 0px 10px 4px rgb(145 145 145 / 85%);
 	}
 	
@@ -715,29 +720,34 @@
 
 	/* --------------- content (#cards-link) --------------- */
 
-	.user-list {
+	.accès-list {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 20px;
 	}
 
-	.user-list .user {
+
+	.accès-list .accès {
 		color: #ffffff;
 		border-radius: 10px;
 		padding: 20px;
 		width: calc(33.333% - 55px);
 		text-align: center;
-		box-shadow: 0 4px 10px rgb(0 0 0);
+    	box-shadow: 0 4px 10px rgb(255 255 255 / 6%);
 		transition: transform 0.3s, box-shadow 0.3s;
 		text-decoration: none;
+		background-size: cover; 
+  		background-repeat: no-repeat; 
+  		background-position: center;
 	}
 
-	.user-list .user:hover {
+	.accès-list .accès:hover {
 		transform: translateY(-10px);
 		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 	}
 
-	.user img {
+
+	.accès img {
 		width: 80px;
 		height: 80px;
 		border-radius: 50%;
@@ -746,11 +756,12 @@
 		box-shadow: 0px 0px 9px 3px rgb(0 0 0 / 85%);
 		border: 3px solid white;
 	}
-	.user p {
+	
+	.accès p {
 		font-size: 16px;
 		font-weight: bold;
-		background-color: #ff0000b0;
-		box-shadow: 0px 0px 9px 3px rgb(0 0 0 / 85%);
+		background-color: #000000;
+		box-shadow: 0px 0px 9px 3px rgb(255 255 255 / 85%);
 		border-radius: 20px;
 	}
 
@@ -808,7 +819,7 @@
 	}
 
 	.feedback-form button:hover {
-		background-color: #e0a800;
+		background-color: #00ff0042;
 	}
 
 	.feedback-form button:active {
@@ -823,9 +834,8 @@
 
 		/* --------------- content (footer) --------------- */
 
-
 	footer {
-		background: linear-gradient(180deg, #212121, #00030b);
+		background: black;
 		color: white;
 		text-align: center;
 		padding: 20px 0;
@@ -834,7 +844,7 @@
 	}
 
 	footer a {
-		color: #bc1a1a;
+		color: #00c700;
 		text-decoration: none;
 		font-weight: bold;
 		font-size: 17px;
@@ -847,7 +857,7 @@
 	/* --------------- Responsivité --------------- */
 
 	@media (max-width: 1024px) {
-		.user-list .user {
+		.accès-list .accès {
 			width: calc(33.333% - -225px);
 		}       
 	}
@@ -875,7 +885,7 @@
 			font-size: 16px;
 		}
 
-		.user-list .user {
+		.accès-list .accès {
 			width: calc(50% - 59px);
 		}
 
@@ -913,7 +923,6 @@
 			overflow-x: auto;
 			scroll-snap-type: x mandatory;
 			-webkit-overflow-scrolling: touch;
-			white-space: nowrap;
 			gap: 20px;
 			padding: 14px;
 			scroll-behavior: smooth;
@@ -931,7 +940,7 @@
 		.widget-container {
 			margin-left: 60px;
 		}
-		.user-list .user {
+		.accès-list .accès {
 			width: calc(100% - 20px);
 		}
 
@@ -1165,4 +1174,137 @@
 				visibility: visible;
 				transform: translateX(-50%) translateY(0);
 			}
-			
+
+
+
+
+
+
+.edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.thought-bubble:hover .edit-overlay {
+  opacity: 1;
+}
+
+#edit-form-container {
+    position: absolute;
+    margin-top: 1rem;
+    background: #111;
+    padding: 1rem;
+    border: 1px solid #555;
+    border-radius: 1rem;
+    display: none;
+    margin-left: -20px;
+    margin-top: -30px;
+}
+
+#edit-form-container input[type="text"] {
+  width: 93%;
+  padding: 0.5rem;
+  background: #111;
+  color: white;
+  border: 1px solid #ff007f;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#edit-form-container button {
+  background: #ff00ff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+}
+
+#edit-form-container label {
+    color: white;
+    font-weight: 600;
+}
+	
+
+.music-container {
+      background: #111;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 20px #f0f;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .titre-chanson {
+      overflow: hidden;
+      border: 2px solid #0f0;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      background: #000;
+      box-shadow: 0 0 10px #0f0;
+    }
+
+    .titre-chanson marquee {
+	  font-family: 'Arial', sans-serif;
+      color: #0f0;
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 5px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .controls button {
+      background-color: #f0f;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px #f0f;
+      transition: all 0.3s ease;
+    }
+
+    .controls button:hover {
+      background-color: #ff77ff;
+    }
+
+    .progress-bar {
+      background: #333;
+      border-radius: 10px;
+      height: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 5px #0f0;
+    }
+
+    .progress-bar .progress {
+      height: 100%;
+      background: #0f0;
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    .audio-icon {
+      font-size: 1.2rem;
+      margin-right: 8px;
+    }

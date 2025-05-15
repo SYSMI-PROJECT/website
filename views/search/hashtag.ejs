@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title><%= titre %></title>
+  <link rel="icon" href="/src/img/Logo.png" type="image/png">
+  <link rel="stylesheet" href="/src/css/views/hashtag.css">
+</head>
+<body>
+  <div class="container">
+    <div class="tag-container">
+      <h1><%= hashtag %></h1>
+      <div class="tag">#</div>
+    </div>
+
+    <div class="publication-container">
+      <% if (publications.length === 0) { %>
+        <p>Aucune publication trouvée pour ce hashtag.</p>
+      <% } else { %>
+        <% publications.forEach(publication => { 
+          const mediaPathRaw = publication.media_path || '';
+          const ext = mediaPathRaw.split('.').pop().toLowerCase();
+          const isVideo = ['mp4', 'webm', 'ogg'].includes(ext);
+          const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(ext);
+          const filename = mediaPathRaw.split('/').pop();
+          const folder = isVideo ? 'videos' : isImage ? 'images' : '';
+          const mediaPath = folder ? `/uploads/${folder}/${filename}` : null;
+        %>
+          <div class="publication">
+            <a href="/publication/<%= publication.id %>">
+              <% if (mediaPath && isImage) { %>
+                <img src="<%= mediaPath %>" alt="Image" loading="lazy">
+              <% } else if (mediaPath && isVideo) { %>
+                <video autoplay loop muted playsinline>
+                  <source src="<%= mediaPath %>" type="video/<%= ext %>">
+                </video>
+              <% } else { %>
+                <div class="media-placeholder">Aucun média</div>
+              <% } %>
+            </a>
+
+            <div class="author-info">
+              <img src="<%= publication.photo_profil || '/public/import/img/default-avatar.png' %>" alt="Avatar">
+              <span class="pseudo"><%= publication.prenom %> <%= publication.nom %></span>
+            </div>
+
+            <div class="hashtags">
+              <%- convertHashtagsToLinks(publication.hashtags || '') %>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

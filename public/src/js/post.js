@@ -277,34 +277,53 @@ function attachInteractions() {
   });
   
   // --- Autoplay/Pause via IntersectionObserver ---
-  const videoObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      const video = entry.target;
-      const publicationId = video.id.split('-')[1];
-      const playButton = document.getElementById('play-pause-' + publicationId);
-      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-        document.querySelectorAll('video').forEach(v => {
-          if (v !== video) { v.pause(); }
-        });
-        video.muted = false;
-        video.play().then(() => {
-          if (playButton) playButton.style.display = 'none';
-        }).catch(error => console.error('Erreur en lecture automatique:', error));
-      } else {
-        video.pause();
-        if (playButton) playButton.style.display = 'block';
+const videoObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const video = entry.target;
+    const publicationId = video.id.split('-')[1];  // Assure-toi que l'ID de la vidéo suit ce format
+    const playButton = document.getElementById('play-pause-' + publicationId);
+    
+    if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+      // Pause les autres vidéos si la vidéo courante est visible
+      document.querySelectorAll('video').forEach(v => {
+        if (v !== video) { 
+          v.pause();  // Pauser les autres vidéos
+          const otherPlayButton = document.getElementById('play-pause-' + v.id.split('-')[1]);
+          if (otherPlayButton) otherPlayButton.style.display = 'block';  // Afficher les autres boutons
+        }
+      });
+
+      // Démute et joue la vidéo
+      video.muted = false;
+      video.play().then(() => {
+        if (playButton) {
+          playButton.style.display = 'none'; // Cacher le bouton play/pause si la vidéo joue
+        }
+      }).catch(error => {
+        console.error('Erreur en lecture automatique:', error);
+      });
+    } else {
+      // Pause la vidéo si elle n'est plus dans la vue
+      video.pause();
+      if (playButton) {
+        playButton.style.display = 'block'; // Afficher le bouton play/pause
       }
-    });
-  }, { threshold: 0.5 });
-  document.querySelectorAll('video').forEach(video => {
-    videoObserver.observe(video);
-  });
-  
-  document.addEventListener("visibilitychange", function() {
-    if (document.hidden) {
-      document.querySelectorAll('video').forEach(video => video.pause());
     }
   });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('video').forEach(video => {
+  videoObserver.observe(video); // Observer toutes les vidéos présentes
+});
+
+document.addEventListener("visibilitychange", function() {
+  if (document.hidden) {
+    // Met en pause toutes les vidéos si l'onglet devient invisible
+    document.querySelectorAll('video').forEach(video => video.pause());
+  }
+});
+
+
   
   // --- Afficher plus / Afficher moins ---
   document.querySelectorAll('.show-more').forEach(button => {

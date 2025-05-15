@@ -2,49 +2,68 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const UsersData = require('../middleware/UsersData');
+const nbDemandes = require('../middleware/counter/friend');
 
 // Page de profil
 router.get('/profil/:id?', UsersData, async (req, res) => {
   if (!req.userData) {
-    console.log('⚠️ L\'utilisateur n\'est pas connecté, redirection vers la page d\'erreur');
+    console.log("⚠️ L'utilisateur n'est pas connecté, redirection vers la page d'erreur");
     return res.render('error', { message: 'Vous devez être connecté pour voir cette page.' });
   }
 
   const userId = req.params.id || req.userData.id;
-  console.log('Récupération du profil de l\'utilisateur avec ID:', userId);
+  console.log("Récupération du profil de l'utilisateur avec ID:", userId);
 
   try {
+    // 🔎 Récupération des infos utilisateur
     const [userRes] = await db.execute(`SELECT * FROM utilisateur WHERE id = ?`, [userId]);
-
-    if (userRes.length === 0) {
-      return res.status(404).send('Utilisateur non trouvé');
-    }
-
+    if (userRes.length === 0) return res.status(404).send('Utilisateur non trouvé');
+    
     const user = userRes[0];
-    const bio = user.bio || "Bio non définie";
+    const bio = user.bio || 'Bio non définie';
 
-    const [amisRes] = await db.execute(`SELECT u.id, u.prenom, p.image_content
-                                       FROM utilisateur u
-                                       JOIN relation r ON (r.demandeur = u.id OR r.receveur = u.id)
-                                       LEFT JOIN photos_de_profil p ON u.id = p.user_id
-                                       WHERE (r.demandeur = ? OR r.receveur = ?)
-                                         AND r.statut = 1
-                                         AND u.id != ?`,
+    // 👥 Récupération des amis confirmés (pour cet utilisateur)
+    const [amisRes] = await db.execute(`
+      SELECT u.id, u.prenom, u.photo_profil
+      FROM utilisateur u
+      JOIN relation r ON (r.demandeur = u.id OR r.receveur = u.id)
+      WHERE (r.demandeur = ? OR r.receveur = ?)
+        AND r.statut = 1
+        AND u.id != ?`,
       [user.id, user.id, user.id]
     );
 
-    const [imgRes] = await db.execute(`SELECT image_content FROM photos_de_profil WHERE user_id = ?`, [user.id]);
+    const nombreAmis = amisRes.length;
+
+    // 🔔 Récupération des demandes en attente (seulement si c’est mon profil)
+    let nbDemandes = 0;
+    if (user.id === req.userData.id) {
+      const [resDemandes] = await db.execute(`
+        SELECT COUNT(*) AS nbDemandes
+        FROM relation
+        WHERE receveur = ? AND statut = 0`,
+        [req.userData.id]
+      );
+      nbDemandes = resDemandes[0]?.nbDemandes || 0;
+    }
+
+    // 🧠 Construction des données pour la vue
+    const isMyProfile = user.id === req.userData.id;
 
     res.render('miscellaneous/profil', {
-      titre: user.id === req.userData.id ? 'Mon profil' : 'Profil public',
+      titre: isMyProfile ? 'Mon profil' : 'Profil public',
       prenom: user.prenom,
       nom: user.nom,
-      bio: user.bio,
-      userData: req.userData,
+      bio,
       role: user.role,
       amis: amisRes,
-      userData: user,
-      image_content: imgRes[0] ? Buffer.from(imgRes[0].image_content).toString('base64') : null
+      user,
+      nombreAmis,       // 🔹 Affiché dans tous les cas
+      nbDemandes: isMyProfile ? nbDemandes : null, // uniquement si moi
+      userData: {
+        ...req.userData,
+        photo_profil: user.photo_profil
+      }
     });
   } catch (err) {
     console.error('Erreur dans /profil/:id :', err);
@@ -99,7 +118,7 @@ router.get('/settings/securite', UsersData, async (req, res) => {
 
     const userSettings = settingsRes.length ? settingsRes[0] : {}; 
 
-    res.render('miscellaneous/user/settings/securite', {
+    res.render('miscellaneous/settings/securite', {
       user_settings: userSettings, 
       cssFile: '/src/css/theme.css',
       titre: 'Sécurité'
@@ -147,6 +166,13 @@ router.get('/settings/theme', UsersData, (req, res) => {
   });
 });
 
+router.get('/langue', (req, res) => {
+  res.render('miscellaneous/settings/langue', {
+    cssFile: '/src/css/contact.css',
+    titre: 'Contact'
+  });
+});
+
 // Page des mini-jeux
 router.get('/minigames', async (req, res) => {
   try {
@@ -161,6 +187,7 @@ router.get('/minigames', async (req, res) => {
       titre: 'Mini-jeux',
       games: gamesRes
     });
+
   } catch (err) {
     console.error('Erreur dans /minigames :', err);
     res.status(500).send('Erreur serveur');
@@ -192,13 +219,13 @@ router.get('/settings', (req, res) => {
 });
 
 // Page de la boutique
-router.get('/boutique', UsersData, async (req, res) => {
+router.get('/store', UsersData, async (req, res) => {
   if (!req.userData) {
     return res.render('error', { message: 'Vous devez être connecté pour accéder à la boutique.' });
   }
 
   try {
-    res.render('miscellaneous/boutique', {
+    res.render('miscellaneous/store', {
       user: req.userData,
       produits: req.produitsData
     });
@@ -239,7 +266,11 @@ router.get('/post', UsersData, async (req, res) => {
       [publications] = await db.execute(`
         SELECT 
           p.*, 
-          u.prenom, u.nom, p.avatar, u.statut 
+          u.id AS user_id, 
+          u.prenom, 
+          u.nom, 
+          u.photo_profil,  -- Photo de profil de l'utilisateur
+          u.statut  -- Statut de l'utilisateur
         FROM publications p
         JOIN utilisateur u ON p.user_id = u.id
         ORDER BY p.date_creation DESC
@@ -249,7 +280,11 @@ router.get('/post', UsersData, async (req, res) => {
       [publications] = await db.execute(`
         SELECT 
           p.*, 
-          u.prenom, u.nom, u.avatar, u.statut 
+          u.id AS user_id, 
+          u.prenom, 
+          u.nom, 
+          u.photo_profil,  -- Photo de profil de l'utilisateur
+          u.statut  -- Statut de l'utilisateur
         FROM publications p
         JOIN utilisateur u ON p.user_id = u.id
         WHERE p.user_id = ?
@@ -257,9 +292,17 @@ router.get('/post', UsersData, async (req, res) => {
       `, [filterUserId]);
     }
 
+    // Ajouter le lien vers le profil dans chaque publication
+    publications = publications.map(pub => ({
+      ...pub,
+      profileLink: `/profil/${pub.user_id}`,  // Lien vers le profil de l'utilisateur
+    }));
+
+    // Rendre la vue avec les publications
     res.render('miscellaneous/post', {
       publications,
       user_id,
+      filterUserId,
       userData: req.userData
     });
   } catch (err) {
@@ -281,5 +324,7 @@ router.get('/pdp_editor', (req, res) => {
     titre: 'Contact'
   });
 });
+
+router.use('/camera', require('./camera'));
 
 module.exports = router;

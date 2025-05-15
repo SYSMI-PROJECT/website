@@ -59,10 +59,14 @@
       <main id="globalContainer" role="main">
         <!-- Statistiques -->
         <section class="stats">
-            <div class="stat">
-                <h2><?= htmlspecialchars((string)$nombreAmis); ?></h2>
-                <p>Amis</p>
-            </div>
+          <div class="stat">
+            <% if (typeof nombreAmis !== 'undefined') { %>
+              <h2><%= nombreAmis %> <%= nombreAmis > 1 ? '' : '' %></h2>
+              <p>Amis</p>
+            <% } else { %>
+              <p>Amis : Données non disponibles</p>
+            <% } %>                    
+          </div>          
             <div class="stat">
                 <h2>42</h2>
                 <p>Projets</p>
@@ -89,8 +93,24 @@
                   <div class="badge"><i class="fas fa-user-shield" style="color: #ff4900;"></i> Staff</div>
               <?php endif; ?>
               <?php if ($role === 'premium') : ?>
-                  <div class="badge" style="background-color: goldenrod;"><i class="fas fa-crown" style="color: #654200;"></i> Premium</div>
+                  <div class="badge"><i class="fas fa-crown" style="color: #654200;"></i> Premium</div>
               <?php endif; ?>
+          </div>
+      </section>
+
+      <section class="profile-section">
+          <h2>Liste d'amis</h2>
+        <div class="amis-list">
+          <% if (amis.length > 0) { %>
+            <% amis.forEach(ami => { %>
+              <li style="display: flex; align-items: center; padding: 5px; gap: 10px;">
+                <img class="friends-list" src="<%= ami.photo_profil ? ami.photo_profil : 'https://p7.hiclipart.com/preview/782/114/405/5bbc3519d674c.jpg' %>" alt="Ami">
+                <span><%= ami.prenom %></span>
+              </li>
+            <% }) %>
+          <% } else { %>
+            <li>Aucun ami pour le moment.</li>
+          <% } %>
           </div>
       </section>
 
@@ -107,6 +127,7 @@
         <?php if (!empty($userEmail)) : ?>
             <p>Email : <?= htmlspecialchars((string)$userEmail); ?></p>
         <?php endif; ?>
+      </div>
       </section>
 
       <section class="profile-section social-media">
@@ -188,24 +209,6 @@
               </div>
             </div>
           </section>
-        </div>
-    
-        </div>
-          <div class="profil-body">
-            <h2>Amis</h2>
-            <ul class="amis-list">
-              <% if (amis.length > 0) { %>
-                <% amis.forEach(ami => { %>
-                  <li>
-                    <img src="<%= ami.image_content ? 'data:image/png;base64,' + ami.image_content : '/src/images/default_avatar.png' %>" alt="Ami">
-                    <span><%= ami.prenom %></span>
-                  </li>
-                <% }) %>
-              <% } else { %>
-                <li>Aucun ami pour le moment.</li>
-              <% } %>
-            </ul>
-          </div>
         </div>
 
       <script>

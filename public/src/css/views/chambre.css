@@ -1,0 +1,42 @@
+body {
+  background: #000;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+}
+
+#chambre-container {
+  padding: 20px;
+  text-align: center;
+}
+
+#chambre {
+  width: 800px;
+  height: 400px;
+  margin: auto;
+  background: #111;
+  border: 2px solid #0ff;
+  position: relative;
+}
+
+.objet {
+  position: absolute;
+  width: 80px;
+  cursor: move;
+  transition: transform 0.2s;
+}
+
+.objet:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 6px #f0f);
+}
+
+#editToggle {
+  background: #f0f;
+  border: none;
+  padding: 10px 20px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #f0f;
+}

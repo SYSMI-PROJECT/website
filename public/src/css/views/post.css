@@ -78,6 +78,7 @@ nav a.menu-item, nav button.menu-item {
   height: 50px;
   border-radius: 50%;
   border: 2px solid #fff;
+    object-fit: cover;
 }
 
 .share-button, .like-button, .comment-button, .speed-button, .mute-button {
@@ -166,9 +167,8 @@ button.like-button.liked {
 }
 .play-pause-button {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 47%;
+  left: 47%;
   background-color: transparent;
   color: inherit;
   border: none;

@@ -40,6 +40,7 @@
       <% if (!publications || publications.length === 0) { %>
         <div id="posts-container" class="publication-container" style="margin:19rem auto; background-color:aliceblue;">
           <% if (filterUserId && filterUserId !== user_id) { %>
+            
             <p style="background-color:aliceblue;color:black;font-weight:600;text-align:center;padding:20px;">
               <span style="display:inline-block;width:60px;height:60px;background:#000;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:2rem;">
                 <i class="fas fa-lock"></i>
@@ -61,26 +62,48 @@
       <% } else { %>
         <div id="posts-container" class="publication-container">
           <% publications.forEach(publication => {
-               const ext = publication.media_path?.split('.').pop().toLowerCase() || '';
-          %>
+               const ext = publication.media_path?.split('.').pop().toLowerCase() || ''; %>
             <div class="publication-wrapper">
               <article class="publication" id="publication-<%= publication.id %>">
                 <% if (publication.media_path) { %>
                   <div class="media">
                     <div class="media-wrapper" id="media-wrapper-<%= publication.id %>">
                       <% if (['jpg','jpeg','png','gif'].includes(ext)) { %>
-                        <img src="<%= publication.media_path %>" alt="Image" loading="lazy"
-                             style="<%= publication.viaWebcam ? 'object-fit:cover;' : '' %>">
+                        <img src="<%= publication.media_path %>" alt="Image" loading="lazy" style="<%= publication.viaWebcam ? 'object-fit:cover;' : '' %>">
                       <% } else if (['mp4','webm','ogg'].includes(ext)) { %>
                         <div class="video-container" onclick="togglePlayPause(<%= publication.id %>)">
                           <video id="video-<%= publication.id %>" class="media" preload="metadata"
-                                 playsinline loop muted style="<%= publication.viaWebcam ? 'object-fit:cover;' : '' %>">
+                                playsinline loop muted style="<%= publication.viaWebcam ? 'object-fit:cover;' : '' %>">
                             <source src="<%= publication.media_path %>" type="video/<%= ext %>">
                           </video>
-                          <button class="play-pause-button" onclick="togglePlayPause(<%= publication.id %>); event.stopPropagation();">
+                          <button id="play-pause-<%= publication.id %>" class="play-pause-button" onclick="togglePlayPause(<%= publication.id %>); event.stopPropagation();">
                             <i class="fas fa-play"></i>
                           </button>
-                        </div>
+                          <div class="video-overlay" onclick="event.stopPropagation();">
+                            <div class="follow-container" onclick="event.stopPropagation();">
+                              <h3><%= publication.auteur %></h3>
+                              <a href="#" class="follow-btn" onclick="toggleFollow(<%= publication.user_id %>, event)">Suivre</a>
+                            </div>
+                            <div class="desc" onclick="event.stopPropagation();">
+                              <p class="contenu truncated">
+                                <%- nl2br(convertHashtagsToLinks(publication.contenu)) %>
+                                <% if (publication.hashtags && publication.hashtags.trim() !== '') { %>
+                                  <span class="hashtags-links">
+                                    <%- nl2br(convertHashtagsToLinks(publication.hashtags)) %>
+                                  </span>
+                                <% } %>
+                              </p>
+                              <button type="button" class="show-more">Afficher plus</button>
+                            </div>
+                            <small class="timestamp">Publié le : <%= new Date(publication.date_creation).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></small>
+                          </div>
+                          <div class="progress-container" data-publication-id="<%= publication.id %>">
+                            <div class="buffered-progress" id="buffered-<%= publication.id %>"></div>
+                            <div class="progress" id="progress-<%= publication.id %>"></div>
+                            <div class="progress-handle" id="handle-<%= publication.id %>"></div>
+                            <div class="progress-tooltip" id="tooltip-<%= publication.id %>">00:00 / 00:00</div>
+                          </div>
+
                       <% } else if (['mp3','wav','ogg'].includes(ext)) { %>
                         <audio controls>
                           <source src="<%= publication.media_path %>" type="audio/<%= ext %>">
@@ -111,8 +134,8 @@
               <div class="interactions" data-publication-id="<%= publication.id %>">
                 <div class="avatar-container">
                   <% if (user_id) { %>
-                    <a href="/PAGES/user/home?id=<%= publication.user_id %>">
-                      <img src="<%= publication.avatar || 'https://via.placeholder.com/40' %>" alt="Avatar" loading="lazy">
+                    <a href="<%= publication.profileLink %>">
+                      <img src="<%= publication.photo_profil %>" alt="Avatar" loading="lazy">
                     </a>
                   <% } else { %>
                     <a href="/public/forms/login" style="display:flex;align-items:center;justify-content:center;width:50px;height:50px;background:#f00;border-radius:50%;">

@@ -366,3 +366,14 @@ header.profile-header {
     #publicationContainer { padding: 5px; }
     .profile-section p { font-size: 12px; }
 }
+
+.friends-list {
+    width: 25px; 
+    border-radius: 20px;
+    transition: transform 0.3s ease;
+  }
+
+  .friends-list:hover {
+    transform: scale(1.2);
+}
+
