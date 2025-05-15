@@ -7,8 +7,6 @@ const editPdp = require('./edit_pdp');
 const visibility = require('./visibility');
 const theme = require('./theme');
 
-
-// Utilisation de chemins différents pour chaque route
 router.use('/delete', deletePdp);
 router.use('/upload', uploadPdp);
 router.use('/editor', editPdp);

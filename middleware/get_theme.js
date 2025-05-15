@@ -18,7 +18,7 @@ module.exports = async (req, res, next) => {
       }
     }
   } catch (error) {
-    console.error('Erreur lors de la récupération du thème :', error);
+    console.error('Error retrieving theme:', error);
   } finally {
     if (conn) conn.release();
   }

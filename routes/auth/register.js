@@ -19,27 +19,27 @@ router.post('/', async (req, res) => {
   const { nom, prenom, email, motDePasse, pays, date_naissance } = req.body;
 
   if (!nom || !prenom || !email || !motDePasse || !pays || !date_naissance) {
-    return res.status(400).send('Tous les champs sont requis.');
+    return res.status(400).send('All fields are required.');
   }
 
   if (containsEmail(nom) || containsEmail(prenom)) {
-    return res.status(400).send('Le prénom et le nom ne doivent pas contenir d’email.');
+    return res.status(400).send('Name and surname cannot contain an email address.');
   }
 
   if (motDePasse.length < 8) {
-    return res.status(400).send('Le mot de passe doit contenir au moins 8 caractères.');
+    return res.status(400).send('Password must be at least 8 characters long.');
   }
 
   const allowedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'protonmail.com'];
   if (!isValidEmailDomain(email, allowedDomains)) {
-    return res.status(400).send("Email invalide.");
+    return res.status(400).send("Invalid Email.");
   }
 
   const [day, month, year] = date_naissance.split('/');
   const birthDate = new Date(`${year}-${month}-${day}`);
   const age = new Date().getFullYear() - birthDate.getFullYear();
   if (age < 13) {
-    return res.status(400).send("Vous devez avoir au moins 13 ans.");
+    return res.status(400).send("You must be at least 13 years old to register.");
   }
 
   try {
@@ -89,8 +89,8 @@ router.post('/', async (req, res) => {
 
     return res.redirect('/public/import/Error/Mail/Mail_sended');
   } catch (err) {
-    console.error('Erreur d\'inscription :', err);
-    res.status(500).send('Erreur serveur lors de l’inscription.');
+    console.error('Register error :', err);
+    res.status(500).send('Server error during registration.');
   }
 });
 

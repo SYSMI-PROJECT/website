@@ -1,25 +1,18 @@
-/* script.js */
-
-// Fonction pour défiler à gauche
 function moveLeft() {
   const widgetItems = document.getElementById('widget-items');
   widgetItems.scrollBy({ left: -200, behavior: 'smooth' });
 }
 
-// Fonction pour défiler à droite
 function moveRight() {
   const widgetItems = document.getElementById('widget-items');
   widgetItems.scrollBy({ left: 200, behavior: 'smooth' });
 }
 
-// Fonction pour afficher le contenu du widget
 function showWidgetContent(type) {
   const widgetItems = document.getElementById('widget-items');
 
-  // Réinitialiser le contenu
   widgetItems.innerHTML = "";
 
-  // Créer un nouveau widget à afficher en fonction du type
   const wrapper = document.createElement('div');
   wrapper.className = "widget-content fade-in";
 
@@ -51,11 +44,9 @@ function showWidgetContent(type) {
     `;
   }
 
-  // Ajouter le nouveau widget au conteneur
   widgetItems.appendChild(wrapper);
 }
 
-// Fonction pour réinitialiser le widget
 function resetWidget() {
   const widgetItems = document.getElementById('widget-items');
   widgetItems.innerHTML = "";
@@ -63,7 +54,6 @@ function resetWidget() {
   const wrapper = document.createElement('div');
   wrapper.className = "widget-content fade-in";
 
-  // Ajouter les boutons de base (Statistiques, Cadeau, etc.)
   wrapper.innerHTML = `
     <div class="widget-item">
       <p>📊 Statistiques</p>
@@ -78,7 +68,6 @@ function resetWidget() {
   widgetItems.appendChild(wrapper);
 }
 
-// Fonction pour réclamer le cadeau
 function claimGift() {
   alert("🎉 Cadeau bien réclamé !");
 }

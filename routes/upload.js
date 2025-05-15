@@ -3,24 +3,21 @@ const path = require('path');
 const fs = require('fs');
 const router = express.Router();
 
-// Fonction pour vérifier si le fichier existe
 function fileExists(filePath) {
   return fs.existsSync(filePath);
 }
 
-// Route pour accéder aux vidéos
 router.get('/videos/:filename', (req, res) => {
   const { filename } = req.params;
-  const filePath = path.join(__dirname, '..', 'public', 'uploads', 'vidéos', filename);
+  const filePath = path.join(__dirname, '..', 'public', 'uploads', 'videos', filename);
 
   if (fileExists(filePath)) {
     res.sendFile(filePath);
   } else {
-    res.status(404).send('Vidéo non trouvée.');
+    res.status(404).send('Video not found.');
   }
 });
 
-// Route pour accéder aux images
 router.get('/images/:filename', (req, res) => {
   const { filename } = req.params;
   const filePath = path.join(__dirname, '..', 'public', 'uploads', 'images', filename);
@@ -28,11 +25,10 @@ router.get('/images/:filename', (req, res) => {
   if (fileExists(filePath)) {
     res.sendFile(filePath);
   } else {
-    res.status(404).send('Image non trouvée.');
+    res.status(404).send('Image not found.');
   }
 });
 
-// Route pour accéder aux audios
 router.get('/audios/:filename', (req, res) => {
   const { filename } = req.params;
   const filePath = path.join(__dirname, '..', 'public', 'uploads', 'audios', filename);
@@ -40,7 +36,7 @@ router.get('/audios/:filename', (req, res) => {
   if (fileExists(filePath)) {
     res.sendFile(filePath);
   } else {
-    res.status(404).send('Audio non trouvé.');
+    res.status(404).send('Audio not found.');
   }
 });
 

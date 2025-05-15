@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
 
     if (rows[0].photo_profil) {
       const filePath = path.join(__dirname, '../../public', rows[0].photo_profil);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath); // Supprime le fichier
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
 
     await connection.query('UPDATE utilisateur SET photo_profil = NULL WHERE id = ?', [req.session.userId]);
@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
 
     res.redirect(`/profil/${req.session.userId}`);
   } catch (error) {
-    console.error('Erreur suppression photo :', error);
+    console.error('Photo deletion error :', error);
     res.redirect('/error?type=delete_pdp_exception');
   }
 });

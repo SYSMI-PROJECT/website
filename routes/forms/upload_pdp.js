@@ -6,15 +6,12 @@ const pool = require('../../database');
 
 const router = express.Router();
 
-// Dossier de destination
 const uploadFolder = path.join(__dirname, '../../public/uploads/avatar');
 
-// Créer le dossier s'il n'existe pas
 if (!fs.existsSync(uploadFolder)) {
   fs.mkdirSync(uploadFolder, { recursive: true });
 }
 
-// Configuration de multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadFolder);
@@ -27,7 +24,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Route POST pour l'upload
 router.post('/', upload.single('photo'), async (req, res) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
   const maxSize = 5 * 1024 * 1024;
@@ -49,10 +45,10 @@ router.post('/', upload.single('photo'), async (req, res) => {
     );
     connection.release();
 
-    console.log("Photo enregistrée :", filePath);
+    console.log("Photo saved :", filePath);
     res.redirect(`/profil/${req.session.userId}`);
   } catch (error) {
-    console.error("Erreur upload photo :", error);
+    console.error("Photo upload error :", error);
     res.redirect('/error?type=upload_exception');
   }
 });

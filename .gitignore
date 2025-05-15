@@ -6,9 +6,5 @@
 node_modules/
 npm-debug.log*
 
-# PHP
-/vendor/
-*.log
-
 # Mac/Linux
 .DS_Store

@@ -1,4 +1,3 @@
-// middleware/checkStayConnected.js
 const db = require('../database');
 
 module.exports = async (req, res, next) => {

@@ -2,23 +2,20 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../database');
 
-// Middleware pour vérifier si l'utilisateur est connecté
 const requireLogin = (req, res, next) => {
   if (!req.session.userId) {
-    return res.status(401).send("Vous devez être connecté pour accéder à cette page.");
+    return res.status(401).send("You must be logged in to access this page.");
   }
   next();
 };
 
 router.post('/visibility', requireLogin, (req, res) => {
-  // Utilisation correcte du nom de la variable de session
   const user_id = req.session.userId;
 
-  // Validation des entrées
   const visibility = req.body.visibility || 'private';
   const visibility_posts = Array.isArray(req.body.visibility_posts) 
     ? req.body.visibility_posts.join(',') 
-    : ''; // S'assurer que visibility_posts est une chaîne correcte
+    : '';
   const notifications = req.body.notifications === 'enabled' ? 1 : 0;
   const two_factor_auth = req.body.two_factor_auth === 'enabled' ? 1 : 0;
   const dark_mode = req.body.dark_mode === 'enabled' ? 1 : 0;
@@ -39,11 +36,10 @@ router.post('/visibility', requireLogin, (req, res) => {
 
   db.query(query, values, (err, result) => {
     if (err) {
-      console.error('Erreur lors de la mise à jour des paramètres utilisateur :', err);
-      return res.status(500).send("Erreur lors de la mise à jour des paramètres.");
+      console.error('Error updating user settings :', err);
+      return res.status(500).send("Error updating settings.");
     }
 
-    // Rediriger vers le profil utilisateur après la mise à jour
     res.redirect('/');
   });
 });

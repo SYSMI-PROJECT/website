@@ -2,12 +2,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('loginForm');
     
     form.addEventListener('submit', function(event) {
-      event.preventDefault(); // Empêche l'envoi classique du formulaire
+      event.preventDefault();
   
       const email = form.querySelector('input[name="email"]').value;
       const password = form.querySelector('input[name="password"]').value;
   
-      // Envoi des données au serveur via Fetch
       fetch('/login', {
         method: 'POST',
         headers: {
@@ -17,13 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .then(response => {
         if (response.ok) {
-          window.location.href = '/';  // Redirige après une connexion réussie
+          window.location.href = '/';
         } else {
           alert('Identifiants incorrects');
         }
       })
       .catch(error => {
-        console.error('Erreur lors de la connexion', error);
+        console.error('Error while connecting', error);
       });
     });
   });

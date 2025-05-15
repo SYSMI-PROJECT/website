@@ -4,6 +4,7 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 require('dotenv').config();
 const cookieParser = require('cookie-parser');
+const logger = require('./logger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -57,8 +58,6 @@ app.get('/register', (req, res) => {
 app.get('/', async (req, res) => {
   const conn = await db.getConnection();
 
-  console.log("Connexion à la base de données réussie.");
-
   let amis = [], nbDemandes = 0, image_content = null, prenom = '', role = '', etoile = '';
   const user = req.userData;
 
@@ -66,7 +65,7 @@ app.get('/', async (req, res) => {
     const userId = user.id;
 
     try {
-      console.log("Exécution de la requête des amis...");
+      logger.database("Executing the friends' request..");
 
       const [rows] = await conn.execute(
         `SELECT u.id, u.prenom, u.photo_profil
@@ -88,13 +87,13 @@ app.get('/', async (req, res) => {
       role = user.role;
       etoile = user.etoile ?? 0;
 
-      console.log("Requête des amis terminée.");
+      logger.success("Friend request completed!");
 
-      console.log("Récupération de l'image de profil...");
+      logger.database("Recovering profile picture..");
 
       image_content = user.photo_profil || null;
 
-      console.log("Récupération des notifications (demandes)...");
+      logger.database("Retrieving notifications (requests).");
 
       const [notifRes] = await conn.execute(
         'SELECT COUNT(*) as count FROM relation WHERE receveur = ? AND statut = 0',
@@ -103,9 +102,9 @@ app.get('/', async (req, res) => {
 
       nbDemandes = notifRes[0].count;
 
-      console.log("Toutes les requêtes SQL sont terminées.");
+      logger.success("All SQL queries are completed!");
     } catch (error) {
-      console.error("Erreur lors de l'exécution des requêtes SQL :", error);
+      console.error("Error while executing SQL queries:", error);
     }
   }
 
@@ -136,5 +135,5 @@ app.get('/logout', (req, res) => {
 app.use('/', miscRoutes);
 
 app.listen(PORT, () => {
-  console.log(`✅ Serveur lancé : http://localhost:${PORT}`);
+  logger.success(`✅ Serveur started : http://localhost:${PORT}`);
 });

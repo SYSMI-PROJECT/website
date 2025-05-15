@@ -11,7 +11,6 @@ if (!fs.existsSync(uploadFolder)) {
   fs.mkdirSync(uploadFolder, { recursive: true });
 }
 
-// Configuration Multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadFolder);
@@ -21,7 +20,6 @@ const storage = multer.diskStorage({
     const ext = path.extname(file.originalname);
     const baseName = `pdp_${userId}`;
 
-    // Supprimer ancien fichier si présent (jpeg, png, gif)
     const possibleExts = ['.png', '.jpg', '.jpeg', '.gif'];
     possibleExts.forEach(ext => {
       const fullPath = path.join(uploadFolder, `${baseName}${ext}`);
@@ -35,7 +33,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Route de remplacement
 router.post('/', upload.single('photo'), async (req, res) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
   const maxSize = 5 * 1024 * 1024;
@@ -57,10 +54,10 @@ router.post('/', upload.single('photo'), async (req, res) => {
     );
     connection.release();
 
-    console.log("PDP remplacée :", filePath);
+    console.log("PFP replaced :", filePath);
     res.redirect(`/profil/${req.session.userId}`);
   } catch (error) {
-    console.error("Erreur remplacement PDP :", error);
+    console.error("PFP replacement error :", error);
     res.redirect('/error?type=upload_exception');
   }
 });
