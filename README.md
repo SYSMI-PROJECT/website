@@ -41,5 +41,15 @@ Bienvenue dans le projet **SYSMI PROJECT**, l'objectif est de réaliser une gran
 
 ---
 
-## 🏗 Structure du projet
+## 🌿 Configuration environment
 
+| Name                                          | Description                                                                                       | Optional |
+|-----------------------------------------------|--------------------------------------------------------------------------------------------------|----------|
+| `DB_HOST`                                     | Database Host                                   | No       |
+| `DB_PORT`                                     | Database Port                                   | No       |
+| `DB_USER`                                     | Database User                                   | No       |
+| `DB_PASSWORD`                                 | Database Password                               | No       |
+| `DB_NAME`                                     | Database Name                                   | No       |
+| `SESSION_SECRET`                              | Session Key                                     | Yes      |
+| `SMTP_USERNAME`                               | Mailer SMTP Username                            | Yes      |
+| `SMTP_PASSWORD`                               | Mailer SMTP Password                            | Yes      |
