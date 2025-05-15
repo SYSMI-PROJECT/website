@@ -9,7 +9,6 @@ router.get('/', (req, res) => {
   res.redirect('/staff/dashboard');
 });
 
-// Route pour le dashboard
 router.get('/dashboard', (req, res) => {
   if (!req.userData || req.userData.role !== 'staff') {
     return res.redirect('/');
@@ -21,9 +20,25 @@ router.get('/dashboard', (req, res) => {
   });
 });
 
-router.use('/users', require('./users')); 
-router.use('/posts', require('./posts')); 
-router.use('/tasks', require('./tasks'));
-router.use('/produits', require('./produits'));
+router.get('/tasks', (req, res) => {
+  res.render('staff/tasks', {
+    cssFile: '/src/css/contact.css',
+    titre: 'Contact'
+  });
+});
+
+router.get('/settings', (req, res) => {
+  if (!req.userData || req.userData.role !== 'staff') {
+    return res.redirect('/');
+  }
+
+  res.render('miscellaneous/staff/settings', {
+    user: req.userData,
+    cssFile: '/src/css/settings.css'
+  });
+});
+
+router.use('/users', require('./users'));  // /staff/users
+router.use('/posts', require('./posts'));  // /staff/posts
 
 module.exports = router;

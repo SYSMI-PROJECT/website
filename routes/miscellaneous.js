@@ -2,82 +2,61 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const UsersData = require('../middleware/UsersData');
-const nbDemandes = require('../middleware/counter/friend');
 
-// Page de profil
-router.get('/profil/:id?', UsersData, async (req, res) => {
+router.get('/profil/:id', UsersData, async (req, res) => {
   if (!req.userData) {
-    console.log("⚠️ L'utilisateur n'est pas connecté, redirection vers la page d'erreur");
+    console.log('⚠️ L\'utilisateur n\'est pas connecté, redirection vers la page d\'erreur');
     return res.render('error', { message: 'Vous devez être connecté pour voir cette page.' });
   }
 
   const userId = req.params.id || req.userData.id;
-  console.log("Récupération du profil de l'utilisateur avec ID:", userId);
+  console.log('Récupération du profil de l\'utilisateur avec ID:', userId);
 
   try {
-    // 🔎 Récupération des infos utilisateur
     const [userRes] = await db.execute(`SELECT * FROM utilisateur WHERE id = ?`, [userId]);
-    if (userRes.length === 0) return res.status(404).send('Utilisateur non trouvé');
-    
-    const user = userRes[0];
-    const bio = user.bio || 'Bio non définie';
 
-    // 👥 Récupération des amis confirmés (pour cet utilisateur)
-    const [amisRes] = await db.execute(`
-      SELECT u.id, u.prenom, u.photo_profil
-      FROM utilisateur u
-      JOIN relation r ON (r.demandeur = u.id OR r.receveur = u.id)
-      WHERE (r.demandeur = ? OR r.receveur = ?)
-        AND r.statut = 1
-        AND u.id != ?`,
+    if (userRes.length === 0) {
+      return res.status(404).send('User not found.');
+    }
+
+    const user = userRes[0];
+    const bio = user.bio || "Bio is empty";
+
+    const [amisRes] = await db.execute(`SELECT u.id, u.prenom, p.image_content
+                                       FROM utilisateur u
+                                       JOIN relation r ON (r.demandeur = u.id OR r.receveur = u.id)
+                                       LEFT JOIN photos_de_profil p ON u.id = p.user_id
+                                       WHERE (r.demandeur = ? OR r.receveur = ?)
+                                         AND r.statut = 1
+                                         AND u.id != ?`,
       [user.id, user.id, user.id]
     );
 
-    const nombreAmis = amisRes.length;
-
-    // 🔔 Récupération des demandes en attente (seulement si c’est mon profil)
-    let nbDemandes = 0;
-    if (user.id === req.userData.id) {
-      const [resDemandes] = await db.execute(`
-        SELECT COUNT(*) AS nbDemandes
-        FROM relation
-        WHERE receveur = ? AND statut = 0`,
-        [req.userData.id]
-      );
-      nbDemandes = resDemandes[0]?.nbDemandes || 0;
-    }
-
-    // 🧠 Construction des données pour la vue
-    const isMyProfile = user.id === req.userData.id;
+    const [imgRes] = await db.execute(`SELECT image_content FROM photos_de_profil WHERE user_id = ?`, [user.id]);
 
     res.render('miscellaneous/profil', {
-      titre: isMyProfile ? 'Mon profil' : 'Profil public',
+      titre: user.id === req.userData.id ? 'Mon profil' : 'Profil public',
       prenom: user.prenom,
       nom: user.nom,
-      bio,
+      bio: user.bio,
+      userData: req.userData,
       role: user.role,
       amis: amisRes,
-      user,
-      nombreAmis,       // 🔹 Affiché dans tous les cas
-      nbDemandes: isMyProfile ? nbDemandes : null, // uniquement si moi
-      userData: {
-        ...req.userData,
-        photo_profil: user.photo_profil
-      }
+      userData: user,
+      image_content: imgRes[0] ? Buffer.from(imgRes[0].image_content).toString('base64') : null
     });
   } catch (err) {
-    console.error('Erreur dans /profil/:id :', err);
-    res.status(500).send('Erreur serveur');
+    console.error('Error in /profil/:id :', err);
+    res.status(500).send('Server error.');
   }
 });
 
-// Page des utilisateurs
 router.get('/users', UsersData, async (req, res) => {
   const searchKeyword = req.query.search || '';
   const like = `%${searchKeyword}%`;
 
   if (!req.userData) {
-    console.log('⚠️ req.userData est vide sur /users');
+    console.log('⚠️ req.userData is empty on /users');
     return res.render('error', { message: 'Vous devez être connecté pour voir cette page.' });
   }
 
@@ -98,12 +77,11 @@ router.get('/users', UsersData, async (req, res) => {
       searchKeyword
     });
   } catch (err) {
-    console.error('Erreur dans /users :', err);
-    res.status(500).send('Erreur serveur');
+    console.error('Error in /users :', err);
+    res.status(500).send('Server error.');
   }
 });
 
-// Paramètres de sécurité
 router.get('/settings/securite', UsersData, async (req, res) => {
   if (!req.userData) {
     return res.render('error', { message: 'Vous devez être connecté pour voir cette page.' });
@@ -118,18 +96,17 @@ router.get('/settings/securite', UsersData, async (req, res) => {
 
     const userSettings = settingsRes.length ? settingsRes[0] : {}; 
 
-    res.render('miscellaneous/settings/securite', {
+    res.render('miscellaneous/user/settings/securite', {
       user_settings: userSettings, 
       cssFile: '/src/css/theme.css',
       titre: 'Sécurité'
     });
   } catch (err) {
     console.error('Erreur dans /settings/securite :', err);
-    res.status(500).send('Erreur serveur');
+    res.status(500).send('Server error.');
   }
 });
 
-// Mise à jour des paramètres de sécurité
 router.post('/settings/securite', UsersData, async (req, res) => {
   if (!req.userData) {
     return res.render('error', { message: 'Vous devez être connecté pour voir cette page.' });
@@ -150,13 +127,13 @@ router.post('/settings/securite', UsersData, async (req, res) => {
     res.redirect('/settings/securite');
   } catch (err) {
     console.error('Erreur lors de la mise à jour des paramètres de sécurité :', err);
-    res.status(500).send('Erreur serveur');
+    res.status(500).send('Server error.');
   }
 });
 
 router.get('/settings/theme', UsersData, (req, res) => {
   if (!req.userData) {
-    console.log('⚠️ req.userData est vide sur /theme');
+    console.log('⚠️ req.userData is empty on /theme');
     return res.redirect('/login');
   }
 
@@ -166,14 +143,6 @@ router.get('/settings/theme', UsersData, (req, res) => {
   });
 });
 
-router.get('/langue', (req, res) => {
-  res.render('miscellaneous/settings/langue', {
-    cssFile: '/src/css/contact.css',
-    titre: 'Contact'
-  });
-});
-
-// Page des mini-jeux
 router.get('/minigames', async (req, res) => {
   try {
     const gamesRes = [
@@ -187,14 +156,12 @@ router.get('/minigames', async (req, res) => {
       titre: 'Mini-jeux',
       games: gamesRes
     });
-
   } catch (err) {
-    console.error('Erreur dans /minigames :', err);
-    res.status(500).send('Erreur serveur');
+    console.error('Error in /minigames :', err);
+    res.status(500).send('Server error.');
   }
 });
 
-// Page de jeu spécifique
 router.get('/games/:category/:game', UsersData, (req, res) => {
   if (!req.userData) {
     return res.render('error', { message: 'Vous devez être connecté pour jouer à ce jeu.' });
@@ -210,7 +177,6 @@ router.get('/games/:category/:game', UsersData, (req, res) => {
   });
 });
 
-// Page des paramètres
 router.get('/settings', (req, res) => {
   res.render('miscellaneous/settings', {
     cssFile: '/src/css/contact.css',
@@ -218,24 +184,22 @@ router.get('/settings', (req, res) => {
   });
 });
 
-// Page de la boutique
-router.get('/store', UsersData, async (req, res) => {
+router.get('/boutique', UsersData, async (req, res) => {
   if (!req.userData) {
     return res.render('error', { message: 'Vous devez être connecté pour accéder à la boutique.' });
   }
 
   try {
-    res.render('miscellaneous/store', {
+    res.render('miscellaneous/boutique', {
       user: req.userData,
       produits: req.produitsData
     });
   } catch (error) {
     console.error("Erreur lors de l'affichage de la boutique:", error);
-    res.status(500).send("Erreur serveur");
+    res.status(500).send("Server error.");
   }
 });
 
-// Dashboard du staff
 router.get('/dashboard', UsersData, (req, res) => {
   if (!req.userData) {
     return res.render('error', { message: 'Vous devez être connecté pour accéder au tableau de bord.' });
@@ -248,7 +212,6 @@ router.get('/dashboard', UsersData, (req, res) => {
   });
 });
 
-// Route pour les publications
 router.get('/post', UsersData, async (req, res) => {
   if (!req.userData) {
     return res.render('error', { message: 'Vous devez être connecté pour voir cette page.' });
@@ -262,29 +225,19 @@ router.get('/post', UsersData, async (req, res) => {
     let publications = [];
 
     if (!filterUserId) {
-      // Sélectionner toutes les publications avec infos utilisateur
       [publications] = await db.execute(`
         SELECT 
           p.*, 
-          u.id AS user_id, 
-          u.prenom, 
-          u.nom, 
-          u.photo_profil,  -- Photo de profil de l'utilisateur
-          u.statut  -- Statut de l'utilisateur
+          u.prenom, u.nom, p.avatar, u.statut 
         FROM publications p
         JOIN utilisateur u ON p.user_id = u.id
         ORDER BY p.date_creation DESC
       `);
     } else {
-      // Publications d'un seul utilisateur
       [publications] = await db.execute(`
         SELECT 
           p.*, 
-          u.id AS user_id, 
-          u.prenom, 
-          u.nom, 
-          u.photo_profil,  -- Photo de profil de l'utilisateur
-          u.statut  -- Statut de l'utilisateur
+          u.prenom, u.nom, u.avatar, u.statut 
         FROM publications p
         JOIN utilisateur u ON p.user_id = u.id
         WHERE p.user_id = ?
@@ -292,22 +245,14 @@ router.get('/post', UsersData, async (req, res) => {
       `, [filterUserId]);
     }
 
-    // Ajouter le lien vers le profil dans chaque publication
-    publications = publications.map(pub => ({
-      ...pub,
-      profileLink: `/profil/${pub.user_id}`,  // Lien vers le profil de l'utilisateur
-    }));
-
-    // Rendre la vue avec les publications
     res.render('miscellaneous/post', {
       publications,
       user_id,
-      filterUserId,
       userData: req.userData
     });
   } catch (err) {
-    console.error('Erreur dans /post :', err);
-    res.status(500).send('Erreur serveur');
+    console.error('Error in /post :', err);
+    res.status(500).send('Server error');
   }
 });
 
@@ -324,7 +269,5 @@ router.get('/pdp_editor', (req, res) => {
     titre: 'Contact'
   });
 });
-
-router.use('/camera', require('./camera'));
 
 module.exports = router;

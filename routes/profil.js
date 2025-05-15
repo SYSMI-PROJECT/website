@@ -1,18 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const UserData = require('../middleware/UsersData'); // <- renommé ici
+const UserData = require('../middleware/UsersData');
 const db = require('../database');
 
-// Route du profil (public ou personnel)
-router.get('/:id?', UserData, async (req, res) => {
+router.get('/:id', UserData, async (req, res) => {
   const sessionUserId = req.session.userId;
   const paramUserId = req.params.id;
 
-  // Soit l’ID passé en paramètre, soit l’ID de session (profil personnel)
   const userID = paramUserId || sessionUserId;
 
   if (!userID) {
-    return res.status(401).send("Non autorisé : utilisateur non connecté.");
+    return res.status(401).send("Unauthorized: User not logged in.");
   }
 
   try {
@@ -27,7 +25,7 @@ router.get('/:id?', UserData, async (req, res) => {
     `, [userID]);
 
     if (userRows.length === 0) {
-      return res.status(404).send("Utilisateur non trouvé.");
+      return res.status(404).send("User not found.");
     }
 
     const user = userRows[0];
@@ -42,12 +40,12 @@ router.get('/:id?', UserData, async (req, res) => {
       cssFile: '/src/css/profil.css',
       titre: `Profil de ${user.prenom}`,
       isUserLoggedIn: !!req.session.userId,
-      userData: req.userData // tu peux utiliser ça dans la vue si besoin
+      userData: req.userData
     });
 
   } catch (err) {
     console.error(err);
-    res.status(500).send("Erreur serveur.");
+    res.status(500).send("Server error.");
   }
 });
 
