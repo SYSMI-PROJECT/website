@@ -1,0 +1,9 @@
+   @import url('/src/css/index.css');
+   
+   .container { 
+        background-color: #292929;
+    }
+
+    .thought-bubble {
+        background: #111;
+    }

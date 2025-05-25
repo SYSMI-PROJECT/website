@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>à propos</title>
+  <link rel="stylesheet" href="/src/css/navbar.css">
+  <link rel="icon" href="/src/img/icn/Logo.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a, #1a001a);
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .explain-wrapper {
+      padding: 3rem 1rem;
+      min-height: 100vh;
+      animation: backgroundMove 20s infinite linear;
+      margin: 50px auto;
+    }
+
+    @keyframes backgroundMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .explain-container {
+      margin: 0 auto;
+    }
+
+    .title-main {
+      font-size: 3rem;
+      color: #f0f;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      letter-spacing: 2px;
+    }
+
+    .section {
+      background: rgba(10, 10, 10, 0.9);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 25px rgba(255, 0, 255, 0.3);
+      border: 1px solid #333;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .section:hover {
+    transform: scale(1.01);
+    box-shadow: 0 0 30px #39ff14;
+    }
+
+    .section h2 {
+      color: #39ff14;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      text-shadow: 0 0 10px #39ff14;
+    }
+
+    .section p, .section ul {
+      font-size: 1.2rem;
+      line-height: 1.8;
+    }
+
+    .section ul {
+      margin-top: 0.5rem;
+      margin-left: 1.5rem;
+      color: #abff9b;
+    }
+
+    .highlight {
+      color: #39ff14;
+      font-weight: bold;
+    }
+
+    .cta {
+      background: linear-gradient(135deg, #f0f, #ff8cd6);
+      color: #000;
+      text-align: center;
+      padding: 2.5rem;
+      border-radius: 2rem;
+      box-shadow: 0 0 25px #f0f;
+      margin-bottom: 3rem;
+      animation: pulse 3s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 15px #f0f;
+      }
+      50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 35px #f0f;
+      }
+    }
+
+    .cta h3 {
+      font-size: 1.7rem;
+      margin-bottom: 1rem;
+    }
+
+    .cta p {
+      margin-bottom: 1.2rem;
+    }
+
+    .cta button {
+      padding: 1rem 2rem;
+      background-color: #39ff14;
+      border: none;
+      border-radius: 1rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 15px #39ff14;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .cta button:hover {
+      background-color: #2ecc71;
+      transform: scale(1.05);
+    }
+
+    .quote {
+      text-align: center;
+      font-style: italic;
+      color: #ccc;
+      margin-top: 2rem;
+      font-size: 1.1rem;
+    }
+
+    .inner-voice {
+      font-style: italic;
+      color: #aaa;
+      text-align: center;
+      font-size: 1.1rem;
+      margin: 1rem 0;
+    }
+
+    .revealable .content-hidden {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    .revealable.open .content-hidden {
+      display: block;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+    <div class="navbar">
+      <div class="navbar-logo">
+        <a href="/" target="_self">
+          <img src="/src/img/icn/Logo.png" alt="Logo La SYSMI PROJECT" class="logo">
+        </a>
+      </div>
+  </div>
+
+  <audio autoplay loop id="ambiance" style="display:none">
+    <source src="/uploads/audios/téléchargement.mp3" type="audio/mpeg">
+  </audio>
+
+  <section class="explain-wrapper">
+    <div class="explain-container">
+      <h1 class="title-main glow">🧠 La SYSMI PROJET, c'est quoi ?</h1>
+
+      <div class="section">
+        <p><strong>Ce n’est pas juste un site.</strong><br>
+        C’est une révolte. Une énergie. Un endroit où <span class="highlight">tu peux être VRAI.</span></p>
+        <p class="inner-voice">Tu sens que c’est pas juste un site. Pas vrai ?</p>
+      </div>
+
+      <div class="section revealable">
+        <h2>🚨 Pourquoi créer ça ?</h2>
+        <i class="fas fa-chevron-down" style="display: flex; font-size: 30px; justify-content: center;"></i>
+        <div class="content-hidden">
+          <p>Parce que t’allumes ton téléphone et… bam.<br>
+          Encore un fait divers. Un harcèlement. Une haine gratuite. Un silence.<br><br>
+          Les gens souffrent. Et au lieu d’écouter, on leur dit de fermer leur gueule.<br>
+          <strong>Eh ben NON.</strong><br><br>
+          SYSMI, c’est un endroit où on dit :<br>
+          <em>"T’as le droit d’avoir mal. Le droit d’en parler. Le droit d’exister."</em></p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🧨 On nous a appris à avoir honte</h2>
+        <p>Depuis tout petit on t’a appris à cacher :</p>
+        <ul>
+          <li>👉 Tes larmes</li>
+          <li>👉 Tes traumas</li>
+          <li>👉 Tes envies</li>
+          <li>👉 Ton toi réel</li>
+        </ul>
+        <p>Et maintenant t’es là, à exploser à l’intérieur, mais avec un sourire en façade.<br><br>
+        <strong>SYSMI veut péter ce masque.</strong><br>
+        Ici, on te dit pas "sois fort", on te dit : <span class="highlight">"sois libre."</span></p>
+      </div>
+
+      <div class="section">
+        <h2>🪞 Et toi, c’est quoi que tu caches ?</h2>
+        <p>Une peur ? Une douleur ? Une part de toi que t’oses pas montrer ?<br>
+        Ici, tu peux enfin la libérer. Sans jugement. Sans masque.</p>
+      </div>
+
+      <div class="section">
+        <h2>🌱 C’est quoi SYSMI ?</h2>
+        <ul>
+          <li>Partager ton humeur, tes posts, ton style</li>
+          <li>Jouer à des mini-jeux stylés</li>
+          <li>Créer ton avatar, ta chambre, ton monde</li>
+          <li>T’exprimer sur ce que les autres plateformes effacent</li>
+        </ul>
+        <p><strong>Ici, ta voix a un écho. Et elle compte.</strong></p>
+      </div>
+
+      <div class="section">
+        <h2>🛡️ Ce qu’on veut changer</h2>
+        <p>
+          🧠 L’indifférence<br>
+          💔 Le rejet<br>
+          😶 Le silence<br><br>
+          SYSMI, c’est un espace où :<br>
+          - On t’écoute<br>
+          - On apprend ensemble<br>
+          - On expose les vrais sujets (harcèlement, pression sociale, etc.)<br><br>
+          Ce n’est pas un réseau. <strong>C’est un bouclier numérique avec une âme.</strong>
+        </p>
+      </div>
+
+      <div class="cta">
+        <h3>🎯 Es-tu prêt à briser le silence ?</h3>
+        <form method="POST" action="/rejoindre-la-mission" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+          <button name="choix" value="oui">💥 OUI, je veux faire partie du changement</button>
+          <button name="choix" value="non">🤔 Pas encore prêt... mais je reviendrai</button>
+        </form>
+      </div>
+
+      <p class="quote">"Un jour, on dira que t’as fait partie des premiers. Et ce jour-là, tu seras fier."</p>
+    </div>
+  </section>
+
+  <script>
+    document.querySelectorAll('.revealable').forEach(section => {
+      section.addEventListener('click', () => {
+        section.classList.toggle('open');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/src/img/icn/Logo.png" type="image/png">
+    <link rel="stylesheet" href="/src/css/views/message.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <title>Messages Privés</title>
+</head>
+<body>
+<div class="chat-container">
+    <div class="chat-header">
+        <a href="/" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2><%= receiver.prenom %> <%= receiver.nom %></h2>
+    </div>
+    <div class="chat-messages">
+        <% if (messages.length > 0) { %>
+        <% messages.forEach(message => { 
+            const isSender = message.expediteur_id === loggedInUserID;
+        %>
+        <div class="message <%= isSender ? 'sent' : 'received' %>">
+            <% if (message.expediteur_avatar) { %>
+                <div class="avatar" style="background-image: url('<%= message.expediteur_avatar %>');"></div>
+            <% } else { %>
+                <div class="avatar no-avatar">
+                    <%= message.expediteur_prenom.charAt(0).toUpperCase() %>
+                </div>
+            <% } %>
+        <div class="message-content">
+            <div class="message-author">
+                <%= message.expediteur_prenom %>
+                <% if (isSender) { %>
+                    <form action="/message/<%= receiverID %>/delete/<%= message.id %>?_method=DELETE" method="POST" class="delete-form" onsubmit="return confirm('Supprimer ce message ?')">
+                        <button type="submit" class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                    </form>
+                <% } %>
+                </div>
+                <div><%= message.contenu %></div>
+                    <small class="message-date"><%= message.date_envoi %></small>
+                </div>
+            </div>
+            <% }) %>
+        <% } else { %>
+            <p class="empty-chat">Aucun message pour le moment. Commencez la conversation !</p>
+        <% } %>
+    </div>
+
+    <form id="messageForm" class="chat-input" action="/message/<%= receiverID %>" method="POST">
+        <textarea id="messageTextarea" name="contenu" rows="1" placeholder="Envoyez un message..." required></textarea>
+        <button type="submit" class="send-button"><i class="fas fa-paper-plane"></i></button>
+    </form>
+</div>
+
+        <script>
+            const chatContainer = document.querySelector('.chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        </script>
+        <script src="/src/js/messages/send.js"></script>
+    </body>
+</html>

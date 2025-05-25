@@ -9,19 +9,20 @@
     --color-border: #ddd;
     --color-white: #fff;
     --color-black: #000;
-    --overlay-text-color: #ffcc00; /* Couleur de texte pour l'overlay */
+    --overlay-text-color: #ffcc00;
 }
+
+.hidden {display: none;}
+
+
+
 .container {
     animation: fadeIn 1s ease-out;
     margin: 0 auto !important;
     padding: 0px !important;
     max-width: none !important;
 }
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.hidden { display: none; }
+
 header.profile-header {
     display: flex;
     flex-wrap: wrap;
@@ -30,6 +31,7 @@ header.profile-header {
     color: var(--color-white);
     padding: 30px 20px;
 }
+
 .avatar-container {
     display: flex;
     flex-direction: column;
@@ -46,20 +48,24 @@ header.profile-header {
     margin-bottom: 20px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 .avatar:hover {
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
+
 .avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
 .avatar-buttons {
     display: flex;
     gap: 10px;
     justify-content: center;
 }
+
 .edit-btn {
     background: rgba(255, 0, 0, 0.8);
     color: var(--color-white);
@@ -70,26 +76,32 @@ header.profile-header {
     font-size: 0.8rem;
     transition: background 0.3s ease;
 }
+
 .edit-btn:hover {
     background: rgba(0, 0, 0, 0.8);
 }
+
 .user-info {
     flex: 1;
     margin-left: 20px;
 }
+
 .bio {
     font-size: 1rem;
     margin: 10px 0;
     color: rgba(255, 255, 255, 0.8);
 }
+
 .account-status {
     font-size: 1rem;
     margin-top: 5px;
 }
+
 .account-status.private-status {
     color: #FF0000;
     font-weight: 600;
 }
+
 .account-status.public-status {
     color: #00AA00;
     font-weight: 600;
@@ -344,6 +356,17 @@ header.profile-header {
     transition: opacity 0.3s ease;
 }
 .video-card:hover .overlay { opacity: 1; }
+
+.friends-list {
+    width: 25px; 
+    border-radius: 20px;
+    transition: transform 0.3s ease;
+  }
+
+  .friends-list:hover {
+    transform: scale(1.2);
+}
+
 @media (max-width: 768px) {
     header.profile-header {
         flex-direction: column;
@@ -367,13 +390,8 @@ header.profile-header {
     .profile-section p { font-size: 12px; }
 }
 
-.friends-list {
-    width: 25px; 
-    border-radius: 20px;
-    transition: transform 0.3s ease;
-  }
-
-  .friends-list:hover {
-    transform: scale(1.2);
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 

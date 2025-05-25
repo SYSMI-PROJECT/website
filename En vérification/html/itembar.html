@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Prévisualisation ItemBar</title>
+  <style>
+    body {
+      background-color: #000;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+
+    .preview-container {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .itembar {
+      width: 300px;
+      height: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .itembar.green {
+      background: #00ff00;
+      color: #000;
+    }
+
+    .itembar.fuchsia {
+      background: linear-gradient(90deg, fuchsia, deeppink);
+      color: #fff;
+      animation: pulse 2s infinite;
+    }
+
+    .itembar.pixel {
+      background: #333;
+      border: 3px dashed #ff0;
+      color: #ff0;
+      font-family: 'Courier New', monospace;
+    }
+
+    @keyframes pulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.5); }
+    }
+
+    .label {
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Prévisualisation des styles d'ItemBar</h1>
+  <div class="preview-container">
+    <div>
+      <div class="label">Neo Green</div>
+      <div class="itembar green">S-Coin : 10k</div>
+    </div>
+
+    <div>
+      <div class="label">Fuchsia Pulse</div>
+      <div class="itembar fuchsia">S-Coin : 10k</div>
+    </div>
+
+    <div>
+      <div class="label">Pixel Warzone</div>
+      <div class="itembar pixel">S-Coin : 10k</div>
+    </div>
+  </div>
+</body>
+</html>

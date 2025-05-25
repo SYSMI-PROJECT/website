@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/src/img/icn/Logo.png" type="image/png">
+    <link rel="stylesheet" href="/src/css/errors/feedback.css">
+    <title>Merci pour votre avis</title>
+</head>
+<body>
+    <div class="success-container">
+        <div class="emoji">😊</div>
+        <h1>Merci pour votre avis !</h1>
+        <p>Votre avis est précieux et nous aide à rendre La SYSMI PROJECT encore meilleure.</p>
+        <div class="stars">
+            <?php 
+            $rating = 5;
+            echo str_repeat("⭐", $rating); 
+            ?>
+        </div>
+        <button class="redirect-button" onclick="window.location.href='/'">Continuer</button>
+    </div>
+</body>
+</html>

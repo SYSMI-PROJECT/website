@@ -1,24 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const isStaffMiddleware = require('../../middleware/isStaffMiddleware');
 
-router.get('/', (req, res) => {
-  if (!req.userData || req.userData.role !== 'staff') {
-    return res.redirect('/');
-  }
-  
-  res.redirect('/staff/dashboard');
-});
-
-router.get('/dashboard', (req, res) => {
-  if (!req.userData || req.userData.role !== 'staff') {
-    return res.redirect('/');
-  }
-
-  res.render('miscellaneous/dashboard', {
-    user: req.userData,
-    cssFile: '/src/css/dashboard.css'
-  });
-});
 
 router.get('/tasks', (req, res) => {
   res.render('staff/tasks', {
@@ -27,16 +10,15 @@ router.get('/tasks', (req, res) => {
   });
 });
 
-router.get('/settings', (req, res) => {
-  if (!req.userData || req.userData.role !== 'staff') {
-    return res.redirect('/');
-  }
 
-  res.render('miscellaneous/staff/settings', {
-    user: req.userData,
-    cssFile: '/src/css/settings.css'
-  });
+router.get('/reset-password/:userId', isStaffMiddleware, async (req, res) => {
+  const { userId } = req.params;
+  const user = await getUserById(userId);
+  if (!user) return res.status(404).send('Utilisateur introuvable');
+  res.render('staff/reset-password', { user });
 });
+
+
 
 router.use('/users', require('./users'));  // /staff/users
 router.use('/posts', require('./posts'));  // /staff/posts

@@ -63,3 +63,8 @@ body {
     box-shadow: 0 4px 10px rgb(0 0 0);
 }
 
+.testimonial {
+        box-shadow: 0 0 10px 0px #000000;
+        color: black;
+}
+

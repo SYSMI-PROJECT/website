@@ -1,42 +1,55 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <link rel="icon" type="image/png" href="/src/img/Logo.png">
-    <link rel="stylesheet" href="/src/css/forms/login.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion</title>
+    <link rel="icon" type="image/png" href="/src/img/icn/Logo.png">
+    <link rel="stylesheet" href="/src/css/forms/account.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMG9UuPlu0SU+2nv5qK2V3Nz56azkn5xjsaN8R" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
 </head>
 <body>
-    <div class="login-box">
+    <div class="wrapper">
+        <header>
+        <div style="display: flex; flex-direction: column; justify-content: space-evenly;">
+            <a class="add-account" href="/register">
+                <i class="fas fa-user-plus"></i>
+            </a>
+        <h1>connexion</h1>
+        </div>
+        <div class="login-box">
         <p class="message">Vous serez bloqué après 3 tentatives infructueuses.</p>
+        </header>
 
-        <form id="loginForm" action="/auth/login" method="post">
+
+        <form class="account register" id="loginForm" action="/auth/login" method="post">
             <div class="user-box">
-                <input type="email" name="email" id="email" required>
                 <label>Adresse mail</label>
+                <input type="email" name="email" id="email" required>
                 <div class="error-message" id="emailError">Veuillez entrer une adresse email valide.</div>
             </div>
             <div class="user-box">
-                <input type="password" name="password" id="password" required>
                 <label>Mot de passe</label>
+                <input type="password" name="password" id="password" required>
                 <div class="error-message" id="passwordError">Veuillez entrer votre mot de passe.</div>
             </div>
-            
-            <!-- Nouvelle case à cocher -->
+
             <div class="stay-connected">
-                <input type="checkbox" id="stayConnected" name="stayConnected">
                 <label for="stayConnected">Rester connecté</label>
+                <input type="checkbox" id="stayConnected" name="stayConnected">
             </div>
 
-            <div>
-                <button type="submit">Se Connecter</button>
+            <div class="full-width">
+                <button type="submit" id="submitBtn">Login</button>
             </div>
-        </form>
 
         <div class="forgot-password">
             <a href="forgot.html">Mot de passe oublié ?</a>
         </div>
+        </form>
     </div>
-  </body>
+</body>
 </html>

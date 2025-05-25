@@ -24,7 +24,7 @@ body {
     box-shadow: 0 4px 8px rgb(0 0 0 / 73%);
     transition: background 0.3s ease, transform 0.3s ease;
     flex-direction: column;
-    background: linear-gradient(180deg, #0e0e0e, #00030a);
+    background: black;
 }
 
 
@@ -74,7 +74,7 @@ body {
 
 
 .navbar:hover {
-    background-color: #FFC107;
+    background-color: #00132b;
 }
 
 .navbar img {

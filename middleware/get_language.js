@@ -2,8 +2,11 @@ const db = require('../database');
 
 module.exports = async function(req, res, next) {
     if (req.userData && req.userData.id) {
+        let connection;
         try {
-            const [rows] = await db.execute(
+            connection = await db.getConnection();
+
+            const [rows] = await connection.execute(
                 'SELECT langue FROM utilisateur WHERE id = ?',
                 [req.userData.id]
             );
@@ -19,6 +22,8 @@ module.exports = async function(req, res, next) {
             console.error('Erreur lors de la récupération de la langue:', error);
             res.locals.userLanguage = 'fr';
             req.userData.langue = 'fr';
+        } finally {
+            if (connection) connection.release()
         }
     } else {
         res.locals.userLanguage = 'fr';

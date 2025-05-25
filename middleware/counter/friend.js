@@ -4,12 +4,14 @@ const db = require('../../database');
 async function getNbDemandes(userId) {
   let nbDemandes = 0;
 
-  if (!userId) {
-    return 0; // Utilisateur non connecté
-  }
+  if (!userId) return 0;
+
+  let connection;
 
   try {
-    const [rows] = await db.execute(`
+    connection = await db.getConnection();
+
+    const [rows] = await connection.execute(`
       SELECT COUNT(*) AS nb_demandes
       FROM relation r
       INNER JOIN utilisateur u ON r.demandeur = u.id
@@ -23,6 +25,8 @@ async function getNbDemandes(userId) {
   } catch (err) {
     console.error("Erreur lors du comptage des demandes d'amis :", err);
     return 0;
+  } finally {
+    if (connection) connection.release(); // ✅ Libération propre
   }
 
   return nbDemandes;
@@ -30,11 +34,10 @@ async function getNbDemandes(userId) {
 
 module.exports = async function(req, res, next) {
   if (req.userData && req.userData.id) {
-    const nbDemandes = await getNbDemandes(req.userData.id);
-    req.nbDemandes = nbDemandes;
+    req.nbDemandes = await getNbDemandes(req.userData.id);
   } else {
     req.nbDemandes = 0;
   }
-  
+
   next();
 };

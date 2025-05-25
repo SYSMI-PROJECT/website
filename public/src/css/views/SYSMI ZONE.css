@@ -1,195 +1,195 @@
-        body {
-            background: linear-gradient(-45deg, #7900ff, #4e003e, #001169);
-            background-attachment: fixed;
-        }
+body {
+    background: linear-gradient(-45deg, #7900ff, #4e003e, #001169);
+    background-attachment: fixed;
+}
 
-        .content {
-            padding: 20px;
-        }
+.content {
+    padding: 20px;
+}
 
-        .filter-menu label {
-            font-size: 14px;
-            font-weight: bold;
-            margin-right: 10px;
-        }
+.filter-menu label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 10px;
+}
 
-        .filter-menu select {
-            padding: 3px;
-            font-size: 14px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            width: 120px;
-        }
+.filter-menu select {
+    padding: 3px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 120px;
+}
 
-        .search-bar label {
-            font-size: 14px;
-            font-weight: bold;
-            margin-right: 10px;
-        }
+.search-bar label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 10px;
+}
 
-        .search-bar input {
-            padding: 4px;
-            font-size: 14px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            width: 160px;
-        }
+.search-bar input {
+    padding: 4px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 160px;
+}
 
-        .container {
-            max-width: 600px;
-            padding: 5px;
-            background-color: #414141;
-            box-shadow: 7px 8px 10px rgb(0 0 0);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 30px;
-        }
+.container {
+    max-width: 600px;
+    padding: 5px;
+    background-color: #414141;
+    box-shadow: 7px 8px 10px rgb(0 0 0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
 
-        .cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
 
-        .card {
-            border-radius: 20px;
-            padding: 20px;
-            width: calc(33.333% - 20px);
-            box-shadow: 10px 10px 10px rgb(0 0 0 / 54%);
-            box-sizing: border-box;
-            margin-bottom: 30px;
-            background-color: rgba(255, 255, 255, 0.08);
-            transition: transform 0.3s ease;
-            background-color: #0000008c;
-            border: solid 1px #00aaff;
-            height: -webkit-fill-available;
-        }
+.card {
+    border-radius: 20px;
+    padding: 20px;
+    width: calc(33.333% - 20px);
+    box-shadow: 10px 10px 10px rgb(0 0 0 / 54%);
+    box-sizing: border-box;
+    margin-bottom: 30px;
+    background-color: rgba(255, 255, 255, 0.08);
+    transition: transform 0.3s ease;
+    background-color: #0000008c;
+    border: solid 1px #00aaff;
+    height: -webkit-fill-available;
+}
 
-        .card .description {
-            overflow: hidden;
-        }
+.card .description {
+    overflow: hidden;
+}
 
-        .card .description.expand {
-            max-height: none;
-        }
+.card .description.expand {
+    max-height: none;
+}
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 4px 7px 10px rgb(4 255 0 / 54%);
-        }
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 4px 7px 10px rgb(4 255 0 / 54%);
+}
 
-        .card h3 {
-            margin-top: 0;
-            color: white;
-            text-align: center;
-        }
+.card h3 {
+    margin-top: 0;
+    color: white;
+    text-align: center;
+}
 
-        p {
-            color: aliceblue;
-        }
+p {
+    color: aliceblue;
+}
 
-        .form-container {
-            margin-bottom: 20px;
-            display: none;
-        }
+.form-container {
+    margin-bottom: 20px;
+    display: none;
+}
 
-        .form-container.show {
-            display: block;
-        }
+.form-container.show {
+    display: block;
+}
 
-        .card-details {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 10px;
-            margin-top: 12px;
-        }
+.card-details {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 12px;
+}
 
-        .server-tag {
-            width: 60px;
-            height: 60px;
-            border-radius: 5px;
-            background-position: center;
-            background-size: cover;
-        }
+.server-tag {
+    width: 60px;
+    height: 60px;
+    border-radius: 5px;
+    background-position: center;
+    background-size: cover;
+}
 
-        .card-details-text {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+.card-details-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
-        .card-details-text p {
-            margin: 5px;
-            text-align: left;
-            font-size: 12px;
-            font-weight: 800;
-        }
+.card-details-text p {
+    margin: 5px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 800;
+}
 
-        .description {
-            box-sizing: border-box;
-            position: relative;
-            text-align: center;
-        }
+.description {
+    box-sizing: border-box;
+    position: relative;
+    text-align: center;
+}
 
-        .description h1 {
-            font-size: 14px;
-            color: #ffffff;
-            text-align: left;
-            margin: 20px 0;
-            line-height: 1.6;
-            font-weight: 400;
-            word-break: break-word;
-            white-space: normal;
-            letter-spacing: 0.5px;
-            font-family: "Roboto", BlinkMacSystemFont, -apple-system, 
-                "Helvetica Neue", "Helvetica", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Arial", sans-serif;
-        }
+.description h1 {
+    font-size: 14px;
+    color: #ffffff;
+    text-align: left;
+    margin: 20px 0;
+    line-height: 1.6;
+    font-weight: 400;
+    word-break: break-word;
+    white-space: normal;
+    letter-spacing: 0.5px;
+    font-family: "Roboto", BlinkMacSystemFont, -apple-system, 
+        "Helvetica Neue", "Helvetica", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Arial", sans-serif;
+}
 
-        .join-button {
-            display: block;
-            background-color: #b54100b0;
-            color: #ffffff;
-            text-decoration: none;
-            text-align: center;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            border-radius: 10px;
-            padding: 5px;
-            font-weight: bold;
-        }
+.join-button {
+    display: block;
+    background-color: #b54100b0;
+    color: #ffffff;
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 10px;
+    padding: 5px;
+    font-weight: bold;
+}
 
-        .join-button:hover {
-            background-color: #00670b;
-        }
+.join-button:hover {
+    background-color: #00670b;
+}
 
-        .read-more {
-            display: none;
-            margin-top: 10px;
-            color: #FF3400;
-            text-decoration: underline;
-            cursor: pointer;
-        }
+.read-more {
+    display: none;
+    margin-top: 10px;
+    color: #FF3400;
+    text-decoration: underline;
+    cursor: pointer;
+}
 
-        .description.expand .read-more {
-            display: block;
-        }
+.description.expand .read-more {
+    display: block;
+}
 
-        .server-tag img {
-            width: 40px;
-            height: auto;
-        }
+.server-tag img {
+    width: 40px;
+    height: auto;
+}
 
-        @media screen and (max-width: 768px) {
-            .card {
-                width: calc(50% - 20px);
-            }
-        }
+@media screen and (max-width: 768px) {
+    .card {
+        width: calc(50% - 20px);
+    }
+}
 
-        @media screen and (max-width: 480px) {
-            .card {
-                width: calc(100% - 0px);
-            }
-        }
+@media screen and (max-width: 480px) {
+    .card {
+        width: calc(100% - 0px);
+    }
+}

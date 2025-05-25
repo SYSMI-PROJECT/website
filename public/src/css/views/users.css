@@ -1,257 +1,257 @@
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(-45deg, #a30000, #7500ff);
-            background-attachment: fixed;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(-45deg, #a30000, #7500ff);
+        background-attachment: fixed;
+    }
 
-        .search-container {
-            margin: 20px;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .search-container {
+        margin: 20px;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        .search-container input {
-            width: 80%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            box-shadow: -1px 5px 8px rgb(26 26 26);
-        }
+    .search-container input {
+        width: 80%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-shadow: -1px 5px 8px rgb(26 26 26);
+    }
 
-        .search-container .btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 10px;
-            margin-left: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            font-size: 1em;
-            cursor: pointer;
-            text-decoration: none;
-            border-radius: 5px;
-            box-shadow: -1px 5px 8px rgb(26 26 26);
-        }
+    .search-container .btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px;
+        margin-left: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        font-size: 1em;
+        cursor: pointer;
+        text-decoration: none;
+        border-radius: 5px;
+        box-shadow: -1px 5px 8px rgb(26 26 26);
+    }
 
-        .search-container .btn:hover {
-            background-color: #0056b3;
-        }
+    .search-container .btn:hover {
+        background-color: #0056b3;
+    }
 
 
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-            margin: auto;
-            border-radius: 5px;
-        }
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        margin: auto;
+        border-radius: 5px;
+    }
 
-        .user-card {
-            display: flex;
-            flex-direction: column;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: -1px 5px 8px rgb(26 26 26);
-            overflow: hidden;
-            transition: transform 0.2s;
-            margin: 10px;
-            border: solid 1px;
-            width: 600px;
-            position: relative;
-        }
+    .user-card {
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: -1px 5px 8px rgb(26 26 26);
+        overflow: hidden;
+        transition: transform 0.2s;
+        margin: 10px;
+        border: solid 1px;
+        width: 600px;
+        position: relative;
+    }
 
-        .user-card.hidden {
-            display: none;
-        }
+    .user-card.hidden {
+        display: none;
+    }
 
-        .user-card:hover {
-            transform: scale(1.02);
-        }
+    .user-card:hover {
+        transform: scale(1.02);
+    }
 
-        .profile-pic {
-            display: flex;
-            align-items: center;
-            background: #eee;
-            padding: 20px;
-            position: relative;
-        }
+    .profile-pic {
+        display: flex;
+        align-items: center;
+        background: #eee;
+        padding: 20px;
+        position: relative;
+    }
 
-        .profile-pic a {
-            display: block;
-        }
+    .profile-pic a {
+        display: block;
+    }
+
+    .profile-pic img {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border: solid 2px dodgerblue;
+        padding: 2px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .profile-pic img:hover {
+        transform: scale(1.10);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .user-name {
+        margin-left: 20px;
+        position: relative;
+    }
+
+    .user-name h2 {
+        font-size: 1.2em;
+        color: #a0f;
+    }
+
+    .user-info {
+        padding: 20px;
+    }
+
+    .bio {
+        margin: 10px 0;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 10px;
+    }
+
+    .social-icon img {
+        width: 30px;
+        height: 30px;
+        transition: transform 0.3s ease;
+        border-radius: 6px;
+        background-color: #0007ff66;
+        border: solid 1px red;
+        transition: transform 0.3s ease;
+    }
+
+    .social-icon img:hover {
+        transform: scale(1.2);
+        box-shadow: 0 4px 8px rgb(0 0 0);
+    }
+
+    .view-profile {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #007bff;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        text-align: center;
+        font-size: 0.9em;
+        font-weight: bold;
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+    }
+
+    .view-profile:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    @media (max-width: 600px) {
 
         .profile-pic img {
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border: solid 2px dodgerblue;
-            padding: 2px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 80px;
+            height: 80px;
         }
+    }
 
-        .profile-pic img:hover {
-            transform: scale(1.10);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        }
+    .badges-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
 
-        .user-name {
-            margin-left: 20px;
-            position: relative;
-        }
+    .badge {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 5px 10px;
+        font-size: 13px;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: -1px 5px 8px rgb(26 26 26);
+    }
 
-        .user-name h2 {
-            font-size: 1.2em;
-            color: #a0f;
-        }
-
-        .user-info {
-            padding: 20px;
-        }
-
-        .bio {
-            margin: 10px 0;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 10px;
-        }
-
-        .social-icon img {
-            width: 30px;
-            height: 30px;
-            transition: transform 0.3s ease;
-            border-radius: 6px;
-            background-color: #0007ff66;
-            border: solid 1px red;
-            transition: transform 0.3s ease;
-        }
-
-        .social-icon img:hover {
-            transform: scale(1.2);
-            box-shadow: 0 4px 8px rgb(0 0 0);
-        }
-
-        .view-profile {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #007bff;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-            text-align: center;
-            font-size: 0.9em;
-            font-weight: bold;
-            position: absolute;
-            right: 20px;
-            bottom: 20px;
-        }
-
-        .view-profile:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-
-        @media (max-width: 600px) {
-
-            .profile-pic img {
-                width: 80px;
-                height: 80px;
-            }
-        }
-
-        .badges-container {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .badge {
-            background-color: #ffffff;
-            border-radius: 12px;
-            padding: 5px 10px;
-            font-size: 13px;
-            border: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: -1px 5px 8px rgb(26 26 26);
-        }
-
-        .badge i {
-            color: #0041ff;
-        }
+    .badge i {
+        color: #0041ff;
+    }
 
 /* Conteneur des boutons d'action */
 .action-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: flex-end;
-    align-items: center;
+display: flex;
+gap: 15px;
+justify-content: flex-end;
+align-items: center;
 }
 
 /* Styles généraux pour les boutons */
 .icon {
-    color: #007bff;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2em;
-    transition: transform 0.3s ease, color 0.3s ease;
+color: #007bff;
+background: none;
+border: none;
+cursor: pointer;
+font-size: 1.2em;
+transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .icon:hover {
-    transform: translateY(-3px);
+transform: translateY(-3px);
 }
 
 /* Classes de variante */
 .icon.success {
-    color: green;
+color: green;
 }
 
 .icon.success:hover {
-    color: #0a6616;
+color: #0a6616;
 }
 
 .icon.danger {
-    color: red;
+color: red;
 }
 
 .icon.danger:hover {
-    color: #a80000;
+color: #a80000;
 }
 
 .icon.info {
-    color: blue;
+color: blue;
 }
 
 .icon.info:hover {
-    color: #0056b3;
+color: #0056b3;
 }
 
 .icon.warning {
-    color: gray;
+color: gray;
 }
 
 .icon.warning:hover {
-    color: #505050;
+color: #505050;
 }
 
 .icon.pending {
-    color: orange;
+color: orange;
 }
 
 .icon.blocked {
-    color: gray;
-    font-style: italic;
+color: gray;
+font-style: italic;
 }

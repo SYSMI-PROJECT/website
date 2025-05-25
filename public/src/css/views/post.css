@@ -1,5 +1,6 @@
 /* ==================== Styles généraux ==================== */
-body { background: #020202; color: #fff; }
+body { 	/* font-family: 'Arial', sans-serif; */ font-family: 'Orbitron', 
+                      sans-serif; background: #020202; color: #fff; }
 body.light-mode { background: #fff; color: #000; }
 body.light-mode nav { background: #f5f5f5; }
 .main { padding: 0; margin: 0; }

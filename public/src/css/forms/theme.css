@@ -70,7 +70,8 @@ h2 {
 
 /* Styles individuels des thèmes */
 .theme-blanc { background: #ffffff; color: #333; }
-.theme-noir { background: #222; color: #fff; }
+.theme-sombre { background: #292929; color: #fff; }
+.theme-noir { background: #000000; color: #fff; }
 .theme-bleu { background: #007bff; color: #fff; }
 .theme-rouge { background: #dc3545; color: #fff; }
 .theme-vert { background: #28a745; color: #fff; }

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>THE SYSMI - Connexion</title>
+  <style>
+    body {
+      background: black;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      padding: 2rem;
+      font-size: 1.2rem;
+      overflow: hidden;
+    }
+    #terminal {
+      white-space: pre-line;
+      line-height: 1.6;
+      min-height: 70vh;
+    }
+    #enterBtn {
+      display: none;
+      background: fuchsia;
+      color: white;
+      font-weight: bold;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 1rem;
+      margin-top: 2rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px fuchsia;
+      font-size: 1rem;
+    }
+    #enterBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px fuchsia;
+    }
+  </style>
+</head>
+<body>
+
+<div id="terminal"></div>
+<button id="enterBtn" onclick="location.href='/'">🎮 Entrer dans le QG</button>
+
+<script>
+  const lines = [
+    "> Initialisation du système...",
+    "> Connexion à l'utilisateur zac_Xgamer...",
+    "> Vérification biométrique... ✅",
+    "> Accès autorisé. Chargement de l'univers THE SYSMI..."
+  ];
+
+  const terminal = document.getElementById('terminal');
+  const enterBtn = document.getElementById('enterBtn');
+
+  let i = 0;
+
+  function typeLine() {
+    if (i < lines.length) {
+      const line = document.createElement('div');
+      terminal.appendChild(line);
+      let j = 0;
+      const interval = setInterval(() => {
+        if (j < lines[i].length) {
+          line.textContent += lines[i][j++];
+        } else {
+          clearInterval(interval);
+          i++;
+          setTimeout(typeLine, 800);
+        }
+      }, 35);
+    } else {
+      enterBtn.style.display = 'inline-block';
+    }
+  }
+
+  typeLine();
+</script>
+
+</body>
+</html>

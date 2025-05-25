@@ -12,8 +12,12 @@ module.exports = async (req, res, next) => {
         return next();
     }
 
+    let connection;
+
     try {
-        const [rows] = await db.execute(`
+        connection = await db.getConnection();
+
+        const [rows] = await connection.execute(`
             SELECT 
                 u.id, u.etoile, u.role, u.statut, u.prenom, u.nom, u.theme, 
                 u.email, u.consol, u.bio, u.secret_code, u.xp, u.photo_profil,
@@ -35,7 +39,7 @@ module.exports = async (req, res, next) => {
 
         if (!user.secret_code) {
             const newSecretCode = Date.now().toString(36) + Math.random().toString(36).substring(2);
-            await db.execute(`UPDATE utilisateur SET secret_code = ? WHERE id = ?`, [newSecretCode, id]);
+            await connection.execute(`UPDATE utilisateur SET secret_code = ? WHERE id = ?`, [newSecretCode, id]);
             user.secret_code = newSecretCode;
         }
 
@@ -43,8 +47,7 @@ module.exports = async (req, res, next) => {
             ? 'private-status text-red-500'
             : 'public-status text-green-500';
 
-        // 🔢 Nombre d'amis
-        const [amisRows] = await db.execute(`
+        const [amisRows] = await connection.execute(`
             SELECT 
               (SELECT COUNT(*) FROM relation WHERE demandeur = ? AND statut = 1) + 
               (SELECT COUNT(*) FROM relation WHERE receveur = ? AND statut = 1) AS nombre_amis
@@ -81,11 +84,14 @@ module.exports = async (req, res, next) => {
             return res.redirect('/Import/Error/Account_banned');
         }
 
-        const [produits] = await db.execute(`SELECT id, nom, description, prix, image FROM produits`);
+        const [produits] = await connection.execute(`SELECT id, nom, description, prix, image FROM produits`);
         req.produitsData = produits;
+
     } catch (error) {
         console.error('Erreur dans UsersData :', error);
         return res.status(500).send('Erreur serveur');
+    } finally {
+        if (connection) connection.release();
     }
 
     next();

@@ -1,9 +1,19 @@
 const db = require('../database');
 
 module.exports = async (req, res, next) => {
-  const defaultTheme = 'blanc';
+  const defaultTheme = 'noir';
   let theme = defaultTheme;
   let conn;
+
+  // Mapping thème → chemin du fichier CSS
+  const themeToCssFile = {
+    noir: '/src/css/index.css',
+    blanc: '/src/css/Theme/white.css',
+    sombre: '/src/css/Theme/dark.css',
+    galaxie: '/src/css/Theme/galaxy.css',
+    fuchsia: '/src/css/Theme/fuchsia.css'
+    // Ajoute d'autres thèmes ici si nécessaire
+  };
 
   try {
     if (req.session.userId) {
@@ -23,10 +33,9 @@ module.exports = async (req, res, next) => {
     if (conn) conn.release();
   }
 
-  res.locals.cssFile = theme === 'noir'
-    ? '/src/css/index.css'
-    : '/src/css/Theme/white.css';
-
+  // Si le thème n'existe pas dans le mapping, utilise celui par défaut
+  res.locals.cssFile = themeToCssFile[theme] || themeToCssFile[defaultTheme];
   res.locals.theme = theme;
+
   next();
 };

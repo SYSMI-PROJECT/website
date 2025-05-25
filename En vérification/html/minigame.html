@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ Mini-jeu Sécurité</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    body {
+      background: radial-gradient(circle at top left, #141414, #000000);
+      font-family: 'Orbitron', sans-serif;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .game-container {
+      background: linear-gradient(145deg, #1c1c1c, #0d0d0d);
+      border: 2px solid #ff00ff;
+      border-radius: 25px;
+      padding: 2.5rem;
+      max-width: 700px;
+      width: 90%;
+      box-shadow: 0 0 25px #ff00ff99, inset 0 0 15px #00ff9977;
+      text-align: center;
+      animation: fadeIn 1s ease-out;
+      backdrop-filter: blur(4px);
+    }
+
+    .question {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      color: #ffffff;
+      text-shadow: 0 0 8px #00ffccaa;
+      border-bottom: 2px dashed #ffffff22;
+      padding-bottom: 1rem;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 0.7rem 0;
+      padding: 1rem;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #00ffcc, #00cc99);
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 0 12px #00ffcc99, inset 0 0 8px #ffffff33;
+      transition: all 0.25s ease;
+    }
+
+    .btn::before {
+      content: '🎮';
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      animation: glowIcon 2s infinite alternate;
+    }
+
+    .btn:hover {
+      background: linear-gradient(145deg, #00cc99, #009977);
+      transform: scale(1.03);
+      box-shadow: 0 0 16px #00ffcc, 0 0 10px #ffffff55 inset;
+    }
+
+    .result {
+      margin-top: 1.7rem;
+      font-weight: bold;
+      padding: 1.2rem;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ff00ff33, #00ff9933);
+      box-shadow: 0 0 14px #00ff99aa, 0 0 10px #ff00ffaa;
+      color: #ffffff;
+      font-size: 1.2rem;
+      text-shadow: 0 0 5px #ffffff99;
+      animation: pulse 0.9s ease-in-out;
+    }
+
+    .next-btn {
+      background: linear-gradient(145deg, #ff00ff, #cc00cc);
+      color: #fff;
+      margin-top: 2rem;
+      border-radius: 16px;
+      padding: 0.9rem 1.2rem;
+      box-shadow: 0 0 14px #ff00ffcc;
+      transition: 0.3s;
+    }
+
+    .next-btn:hover {
+      background: linear-gradient(145deg, #cc00cc, #aa0099);
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes glowIcon {
+      from { text-shadow: 0 0 3px #00ffcc, 0 0 6px #00ffccaa; }
+      to { text-shadow: 0 0 10px #00ffcc, 0 0 12px #00ffcc99; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="question" id="question"></div>
+    <div id="answers"></div>
+    <div class="result" id="result"></div>
+    <button class="btn next-btn" onclick="nextQuestion()" style="display:none">▶️ Suivant</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        text: "Tu reçois un message : 'Tu me plais trop, envoie-moi une photo intime... 🥺'",
+        answers: [
+          { text: "❌ Je refuse", feedback: "✅ Bien joué, tu poses tes limites." },
+          { text: "📤 J’accepte sous pression", feedback: "⚠️ Céder n’est jamais ta faute. Mais méfie-toi des pressions." },
+          { text: "🚨 Je signale immédiatement", feedback: "👏 Tu as eu le bon réflexe !" }
+        ]
+      },
+      {
+        text: "Tu vois quelqu’un harceler un autre en commentaire : insultes, moqueries...",
+        answers: [
+          { text: "😐 Je regarde sans rien dire", feedback: "⚠️ Rester passif, c’est laisser faire." },
+          { text: "🗯 Je soutiens la victime publiquement", feedback: "💪 Courageux ! Tu envoies un signal fort." },
+          { text: "🚩 Je signale le harceleur", feedback: "✔️ Excellente initiative !" }
+        ]
+      },
+      {
+        text: "On te demande ton adresse en message privé après 2 jours de discussion...",
+        answers: [
+          { text: "📬 Je la donne, je fais confiance", feedback: "❌ Trop tôt ! Protège ta vie perso." },
+          { text: "🙅‍♂️ Je dis non et je coupe le contact", feedback: "✅ Super réflexe de prudence." },
+          { text: "📌 Je demande pourquoi", feedback: "🤔 Mieux vaut rester prudent quand il s'agit d'infos perso." }
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById("question").innerText = q.text;
+      const answersDiv = document.getElementById("answers");
+      const resultDiv = document.getElementById("result");
+      answersDiv.innerHTML = "";
+      resultDiv.innerHTML = "";
+      document.querySelector(".next-btn").style.display = "none";
+
+      q.answers.forEach((a) => {
+        const btn = document.createElement("button");
+        btn.classList.add("btn");
+        btn.innerText = a.text;
+        btn.onclick = () => {
+          resultDiv.innerText = a.feedback;
+          document.querySelector(".next-btn").style.display = "inline-block";
+        };
+        answersDiv.appendChild(btn);
+      });
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        document.querySelector(".game-container").innerHTML = `
+          <h2 style="text-shadow: 0 0 10px #00ffcc;">🎉 Bien joué !</h2>
+          <p style="font-size: 1.1rem;">Tu as complété ce mini-jeu de sensibilisation 💡</p>
+          <button class="btn next-btn" onclick="restartGame()">🔁 Rejouer</button>
+        `;
+      }
+    }
+
+    function restartGame() {
+      currentQuestion = 0;
+      showQuestion();
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>

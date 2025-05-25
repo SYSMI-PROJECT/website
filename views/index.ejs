@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <link rel="icon" type="image/png" href="/src/img/Logo.png">
+  <link rel="icon" type="image/png" href="/src/img/icn/Logo.png">
   <title>SYSMI PROJECT</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -12,36 +12,34 @@
 <body>
 <nav>
   <div class="logo">
-      <img src="/src/img/Logo.png" alt="Logo de Mon Réseau" class="logo-img">
-      <span class="logo-text">the SYSMI</span>
-    </div>
-    <a href="/post" class="menu-item">
-      <i class="fas fa-home"></i>
-      <span>VOS POST</span>
-    </a>
-    <a href="/camera" class="menu-item" id="home-link" onclick="refreshPosts();">
-      <i class="fas fa-plus-circle"></i>
-      <span>NEW POST</span>
-    </a>
-    <a href="/miscellaneous/FriendList" class="menu-item">
-      <i class="fas fa-bell"></i>
-      <span>S - NOTIFY</span>
+    <img src="/src/img/icn/Logo.png" alt="Logo de Mon Réseau" class="logo-img">
+    <span class="logo-text">the SYSMI</span>
+  </div>
+  <a href="/post" class="menu-item">
+    <i class="fas fa-home"></i>
+    <span>VOS POST</span>
+  </a>
+  <a href="/camera" class="menu-item" id="home-link" onclick="refreshPosts();">
+    <i class="fas fa-plus-circle"></i>
+    <span>NEW POST</span>
+  </a>
+  <a href="/miscellaneous/FriendList" class="menu-item">
+    <i class="fas fa-bell"></i>
+    <span>S - NOTIFY</span>
 <% if (nbDemandes > 0) { %>
-        <div class="badge"><%= nbDemandes %></div>
+    <div class="badge"><%= nbDemandes %></div>
     <% } %>
-    </a>
-
+  </a>
     <% if (role && (role === 'premium' || role === 'staff')) { %>
-
-    <a href="/dashboard" class="menu-item" style="background: darkgoldenrod;">
-        <i class="fas fa-users"></i>
-        <span>dashboard</span>
-    </a>
+  <a href="/dashboard" class="menu-item" style="background: darkgoldenrod;">
+    <i class="fas fa-users"></i>
+    <span>dashboard</span>
+  </a>
     <% } %>
 </nav>
 
-<div class="main">
-    <div class="container section <%= !isUserLoggedIn ? 'not-logged' : '' %>" id="friends">
+  <div class="main">
+    <div class="container <%= !isUserLoggedIn ? 'not-logged' : '' %>" id="friends">
         <% if (isUserLoggedIn) { %>
           <% if (amis && amis.length > 0) { %>
             <% amis.forEach(function(ami) { %>
@@ -56,310 +54,377 @@
                 </div>   
                 <div class="friend-menu" id="friend-menu-<%= ami.id %>">
                 <a href="/profil/<%= ami.id %>">
-                    <i class="fas fa-user"></i>
+                  <i class="fas fa-user"></i>
                 </a>
-                <a href="/public/pages/miscellaneous/message?id=<%= ami.id %>" title="Envoyer un message">
-                    <i class="fas fa-comment-dots"></i>
+                <a href="/message/<%= ami.id %>" title="Envoyer un message">
+                  <i class="fas fa-comment-dots"></i>
                 </a>
                 <a href="/public/pages/miscellaneous/message?id=<%= ami.id %>" title="Appeler">
-                    <i class="fas fa-phone"></i>
+                  <i class="fas fa-phone"></i>
                 </a>
+              </div>
             </div>
-        </div>
-        <% }) %>
+          <% }) %>
             <% } else { %>
-                <p style="color:red; font-weight:700;">
-                    Aucun ami pour le moment... et si tu envoyais une invitation ? 😊
-                </p>
+              <p style="color:red; font-weight:700;">
+                Aucun ami pour le moment... et si tu envoyais une invitation ? 😊
+              </p>
                 <% } %>
-            <% } else { %>
-        <div class="not-logged-message">
+              <% } else { %>
+            <div class="not-logged-message">
             <h2>Liste d'amis</h2>
             <p>Connecte-toi pour voir tes amis ici !</p>
-        </div>
-    <% } %>
-</div>
-      
-      
-<div class="container" id="profil">
-    <div class="profile-card">
-    <div class="profil-link">
-      <a href="/profil?id=<%= user_id %>&prenom=<%= encodeURIComponent(prenom) %>">
+          </div>
+        <% } %>
+      </div> 
+
+    <div class="container" id="profil">
+      <div class="profile-card">
+        <div class="profil-link">
+          <a href="<%= isUserLoggedIn || isInvite ? `/profil?id=${user_id}&prenom=${encodeURIComponent(prenom)}` : '#' %>">
         <div class="avatar-container">
-          <img src="<%= userData.photo_profil ? userData.photo_profil : 'https://p7.hiclipart.com/preview/782/114/405/5bbc3519d674c.jpg' %>" alt="Image de profil" />
+          <img src="<%= userData && userData.photo_profil ? userData.photo_profil : 'https://p7.hiclipart.com/preview/782/114/405/5bbc3519d674c.jpg' %>" alt="Image de profil" />
         </div>
-      </a>
-          <div class="bubble-text">      
-            <% if (isUserLoggedIn) { %>
-              <h1><%= prenom %></h1>
-                <div class="thought-bubble" onclick="showForm()">
-                  <div class="status">🎭 Humeur : En mode chill 😎</div>
-                    <div class="quote">📝 Citation du jour : "Chaque petite action compte."</div>
-                      <div class="edit-overlay">✏️</div>
-                    </div>
-
-                    <div id="edit-form-container">
-                      <form onsubmit="saveForm(event)">
-                        <label>Nouvelle humeur :</label>
-                        <input type="text" id="newMood" placeholder="Ex : En mode focus 🔥"><br>
-                        <label>Nouvelle citation :</label>
-                        <input type="text" id="newQuote" placeholder="Ex : L'effort paie toujours"><br>
-                        <button type="submit">💾 Sauvegarder</button>
-                      </form>
-                    </div>
-
-                  <p>Appuyez ici pour modifier votre profil</p>
-                    <div class="badge">
-                      <i class="fas fa-crown" style="color: goldenrod;" title="premium"></i>
-                      <i class="fas fa-bolt"style="color: #c7c700;" title="Actif"></i>
-                    </div>
-                <% } else { %>
-                  <h1>Bienvenue,</h1>
-                  <p>Veuillez vous connecter.</p>
-                <% } %>
-              </div>
-            </div>
-        <div class="links-buttons">
-          <% if (isUserLoggedIn) { %>
-            <a href="/store" class="links-logo">
-              <span>boutique</span> <i class="fas fa-shop"></i>
-            </a>
-            <a href="/minigames" class="links-logo">
-              <span>mini jeux</span> <i class="fas fa-gamepad"></i>
-            </a>
-            <a href="/users" class="links-logo">
-              <span>liste utilisateurs</span> <i class="fas fa-user-plus"></i>
-            </a>
-            <a href="/settings" class="links-logo">
-              <span>paramètres</span> <i class="fas fa-cog"></i>
-            </a>
-            <a href="#feedback" class="links-logo">
-              <span>noter le site</span> <i class="fas fa-star"></i>
-            </a>
-          <% } else { %>
-            <a href="/register" class="links-logo">
-              Signup <i class="fas fa-user-plus"></i>
-            </a>
-            <a href="/login" class="links-logo">
-              Login <i class="fa-solid fa-right-to-bracket"></i>
-            </a>
-          <% } %>
-        </div>
-      </div>
-
+        </a>
+        <div class="bubble-text">
       <% if (isUserLoggedIn) { %>
-        <div class="widget-container">
-          <div class="infos-user">
-            <div class="info-item">
-              <i class="fas fa-flag"></i>
-              <p>Pays : <strong style="color: #00c700;">France</strong></p>
+          <h1><%= prenom %></h1>
+          <div class="thought-bubble" onclick="showForm()">
+            <div class="status">🎭 Humeur : En mode chill 😎</div>
+              <div class="quote">📝 Citation du jour : "Chaque petite action compte."</div>
+              <div class="edit-overlay">✏️</div>
             </div>
-            <div class="divider">/</div>
-            <div class="info-item">
-              <i class="fas fa-clock"></i>
-              <p>Heure : <strong style="color: #00c700;" id="clock">--:--:--</strong></p>
-            </div>
+            <div id="edit-form-container">
+            <form onsubmit="saveForm(event)">
+              <label>Nouvelle humeur :</label>
+              <input type="text" id="newMood" placeholder="Ex : En mode focus 🔥"><br>
+              <label>Nouvelle citation :</label>
+              <input type="text" id="newQuote" placeholder="Ex : L'effort paie toujours"><br>
+              <button type="submit">💾 Sauvegarder</button>
+            </form>
           </div>
+            <p>Appuyez ici pour modifier votre profil</p>
+            <div class="badge">
+              <i class="fas fa-crown" style="color: goldenrod;" title="premium"></i>
+              <i class="fas fa-bolt" style="color: #c7c700;" title="Actif"></i>
+            </div>
+          <% } else if (isInvite) { %>
+            <h1>Bienvenue en mode invité 👤</h1>
+            <p>Certaines fonctionnalités sont limitées.</p>
+          <div class="badge">
+            <i class="fas fa-crown" style="color: goldenrod;" title="premium"></i>
+            <i class="fas fa-bolt" style="color: #c7c700;" title="Actif"></i>
+          </div>
+        <% } else { %>
+          <h1>Bienvenue,</h1>
+          <p>Veuillez vous connecter.</p>
+        <% } %>
+      </div>
+    </div>
+    <div class="links-buttons">
+      <% if (isInvite) { %>
+        <a href="/logout-invite" class="links-logo" style="gap: 10px; padding-left: 5px;">
+          <i class="fas fa-chevron-left"></i> <span>Quitter ce mode</span>
+        </a>
+        <a href="/about" class="links-logo">
+          <span>Notre objectif</span> <i class="fa-solid fa-circle-info"></i>
+        </a>
+        <a href="/games" class="links-logo">
+          <span>mini jeux</span> <i class="fas fa-gamepad"></i>
+        </a>
+      <% } else if (isUserLoggedIn) { %>
+        <a href="/about" class="links-logo">
+          <span>Notre objectif</span> <i class="fa-solid fa-circle-info"></i>
+        </a>
+        <a href="/games" class="links-logo">
+          <span>mini jeux</span> <i class="fas fa-gamepad"></i>
+        </a>
+        <a href="/users" class="links-logo">
+          <span>liste utilisateurs</span> <i class="fas fa-user-plus"></i>
+        </a>
+        <a href="/settings" class="links-logo">
+          <span>paramètres</span> <i class="fas fa-cog"></i>
+        </a>
+        <a href="#feedback" class="links-logo">
+          <span>noter le site</span> <i class="fas fa-star"></i>
+        </a>
+      <% } else { %>
+        <a href="/login" class="links-logo">
+          Connexion <i class="fas fa-user-plus" style=" display: block;"></i>
+        </a>
+        <a href="/invite" class="links-logo">
+          Mode invité <i class="fas fa-chevron-right" style=" display: block;"></i>
+        </a>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (isUserLoggedIn) { %>
+    <div class="widget-container">
+      <div class="infos-user">
+        <div class="info-item">
+          <i class="fas fa-flag"></i>
+          <p>Pays : <strong style="color: #00c700;">France</strong></p>
+        </div>
+        <div class="divider">/</div>
+          <div class="info-item">
+          <i class="fas fa-clock"></i>
+          <p>Heure : <strong style="color: #00c700;" id="clock">--:--:--</strong></p>
+        </div>
+      </div>
       
-          <!-- Container du widget -->
-          <div class="widget" id="widget">
-            <div class="arrow-container left">
-              <button class="arrow-btn" onclick="moveLeft()">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-            </div>
-            <div class="widget-items" id="widget-items">
-              <div class="widget-item">
-                <p>📊 Statistiques</p>
-                <button onclick="showWidgetContent('stats')">Voir</button>
-              </div>
-              <div class="widget-item">
-                <p>🎁 Cadeau du jour</p>
-                <button onclick="showWidgetContent('cadeau')">Voir</button>
-              </div>
-            </div>
-            <div class="arrow-container right">
-              <button class="arrow-btn" onclick="moveRight()">
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </div>
+      <div class="widget" id="widget">
+        <div class="arrow-container left">
+          <button class="arrow-btn" onclick="moveLeft()">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        </div>
+        <div class="widget-items" id="widget-items">
+          <div class="widget-item">
+            <p>📊 Statistiques</p>
+            <button onclick="showWidgetContent('stats')">Voir</button>
+          </div>
+          <div class="widget-item">
+            <p>🎁 Cadeau du jour</p>
+            <button onclick="showWidgetContent('cadeau')">Voir</button>
           </div>
         </div>
-      <% } %>  
+        <div class="arrow-container right">
+          <button class="arrow-btn" onclick="moveRight()">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  <% } %>  
 
-      <!-- Le menu est toujours visible, connecté ou pas -->
-      <div class="penel">
-        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-        <div class="menu" id="menu">
-          <a href="/logout">Se déconnecter</a>
-          <a href="https://discord.gg/83pzTuJ5wv">Notre discord</a>
-          <a href="#">Services</a>
-          <a href="#">Contact</a>
+  <div class="penel">
+    <% if (!isInvite) { %>
+      <!-- Utilisateur connecté -->
+      <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <% } else { %>
+      <!-- Mode invité : carré lumineux -->
+      <div id="inviteToggle" class="menu-toggle"
+          onclick="toggleMenu()"
+          style="border: solid 1px #393939; background: black; width: 26px; height: 40px; border-radius: 5px; box-shadow: 0 0 10px fuchsia; cursor: pointer; transition: background 0.3s ease, box-shadow 0.3s ease;">
+      </div>
+    <% } %>
+
+    <!-- Menu déroulant -->
+    <div class="menu<%= isInvite ? ' invite-mode' : '' %>" id="menu" style="display: none;">
+      <% if (!isInvite) { %>
+        <!-- Liens classiques -->
+        <a href="/logout">Se déconnecter</a>
+        <a href="https://discord.gg/83pzTuJ5wv">Notre discord</a>
+        <a href="#">Services</a>
+        <a href="#">Contact</a>
+      <% } else { %>
+        <div style="font-family: 'Arial', sans-serif; color: white;">
+          <p>Thème disponible</p>
+        </div>
+        <!-- Blocs colorés pour le mode invité -->
+          <div style="display: flex; gap: 10px;">
+            <div class="color-block" style="width: 40px; height: 40px; background: #ededed; border-radius: 6px;"></div>
+            <div class="color-block" style="width: 40px; height: 40px; background: #292929; border-radius: 6px;"></div>
+            <div class="color-block" style="width: 40px; height: 40px; background: black; border-radius: 6px;"></div>
+          </div>
+      <% } %>
         </div>
       </div>
     </div>
       
-<div class="container" id="itembar">
-    <div class="image-container">
-        <?php if ($showGift): ?>
-            <div class="image-name">🎁</div>
-                <div class="image-wrapper" id="gift">
-                    <img src="https://production-gameflipusercontent.fingershock.com/us-east-1:283d9bf8-ddfd-4a29-82be-3e03e84897dc/932f60c4-6f5b-433c-b5ca-9e1979faf095/041aedbd-70d5-4996-98f4-1e3ba9d4175a" alt="Discord Image 2">
-                    <div class="image-number" style="background-color: #da5920;">ouvrir</div>
-                </div>
-            </div>
-        <?php endif; ?>
-        <div class="image-container">
-            <div class="image-name">XP</div>
-                <div class="image-wrapper">
-                    <img src="https://production-gameflipusercontent.fingershock.com/us-east-1:283d9bf8-ddfd-4a29-82be-3e03e84897dc/932f60c4-6f5b-433c-b5ca-9e1979faf095/041aedbd-70d5-4996-98f4-1e3ba9d4175a" alt="Discord Image 2">
-                    <div class="image-number">
-                        <?php
-                        $bloc = 'level';
-                        include __DIR__ . '/../../../requiments/ItemsData.php';
-                        ?>
-                    </div>
-                </div>
-            </div>
-        <div class="image-container">
-            <div class="image-name">S-Coin</div>
-                <div class="image-wrapper">
-                    <img src="/src/img/coin.png" alt="Discord Image 3">
-                    <div class="image-number">
-                      <%= user && user.etoile ? user.etoile : 0 %>
-                    </div>
-                </div>
-            </div>
-            <!-- Ajoutez d'autres items 
+    <div class="container" id="itembar">
+      <div class="image-container">
+    <?php if ($showGift): ?>
+        <div class="image-name">🎁</div>
+          <div class="image-wrapper" id="gift">
+            <img src="https://production-gameflipusercontent.fingershock.com/us-east-1:283d9bf8-ddfd-4a29-82be-3e03e84897dc/932f60c4-6f5b-433c-b5ca-9e1979faf095/041aedbd-70d5-4996-98f4-1e3ba9d4175a" alt="Discord Image 2">
+          <div class="image-number" style="background-color: #da5920;">
+            <button class="get-coin" onclick="gainScoins(5)">ouvrir</button>
+          </div>
         </div>
-    </div> -->        
-</div>
-
-<div class="container" id="music">
-  <!-- 🎶 Titre chanson avec <marquee> -->
-  <div class="titre-chanson overflow-hidden whitespace-nowrap mb-4">
-    <marquee behavior="scroll" direction="left" scrollamount="4" style="color: #0f0; font-weight: bold;">
-      <div id="titre-morceau">🎶 En lecture : ... 🎶</div>
-    </marquee>
+      </div>
+    <?php endif; ?>
+      <div class="image-container">
+        <div class="image-name">XP</div>
+          <div class="image-wrapper">
+          <img src="https://production-gameflipusercontent.fingershock.com/us-east-1:283d9bf8-ddfd-4a29-82be-3e03e84897dc/932f60c4-6f5b-433c-b5ca-9e1979faf095/041aedbd-70d5-4996-98f4-1e3ba9d4175a" alt="Discord Image 2">
+            <div class="image-number">
+              <span id="XP-count">- - -</span>
+            </div>
+          </div>
+        </div>
+      <div class="image-container">
+        <div class="image-name">S-Coin</div>
+          <div class="image-wrapper">
+            <img src="/src/img/icn/coin.png" alt="Discord Image 3">
+              <div class="image-number" id="scoin-box">
+            <% if (isUserLoggedIn) { %>
+              <span id="scoin-count" style="display: block;" data-raw="<%= user.etoile %>"><%= user.etoile %></span>
+            <% } else { %>
+              <span id="scoin-count" style="display: block;">- - -</span>
+            <% } %>
+              <div id="scoin-message"></div>
+                <div id="scoin-anim" class="scoin-anim"></div>
+                
+                <audio id="scoin-sound-gain" src="/effects/sounds/+coin.mp3" preload="auto"></audio>
+                <audio id="scoin-sound-loss" src="/effects/sounds/-coin.mp3" preload="auto"></audio>
+              </div>
+            </div>
+          </div>
+          <!-- Ajoutez d'autres items 
+        </div>
+      </div> -->        
   </div>
 
-  <!-- 🎧 Audio -->
-  <audio id="lecteur" src="/uploads/audios/téléchargement.mp3" preload="metadata"></audio>
+  <!-- <div class="container" id="items">
+    <h2>Vos items débloqué</h2>
+    <div class="card"></div>
+  </div> -->   
 
-  <!-- 🎛️ Contrôles -->
-  <div class="controls flex items-center justify-between mb-3">
-    <button onclick="toggleLecture()" class="bg-fuchsia-600 text-white px-4 py-2 rounded-xl shadow-md hover:bg-fuchsia-400 transition">
-      ▶ | ⏸
-    </button>
-    <div id="temps-actuel" style="color: white;">00:00</div>
+  <div class="container" id="music">
+    <div class="titre-chanson">
+      <marquee behavior="scroll" direction="left" scrollamount="4" style="color: #0f0; font-weight: bold;">
+        <div id="titre-morceau">🎶 En lecture : ... 🎶</div>
+      </marquee>
+    </div>
+    <audio id="lecteur" src="/uploads/audios/téléchargement.mp3" preload="metadata"></audio>
+    <div class="controls">
+      <div style="display: flex; gap: 20px; align-items: center;">
+      <button class="play-pause" onclick="toggleLecture()">
+        ▶ | ⏸
+      </button>
+      <button class="unblock-music"></button>
+      </div>
+      <div id="temps-actuel" style="color: white;">00:00</div>
+    </div>
+      <div class="progress-bar">
+        <div id="barre-progression" class="progress"></div>
+    </div>
   </div>
 
-  <!-- 📈 Barre de progression -->
-    <div class="progress-bar">
-      <div id="barre-progression" class="progress"></div>
-  </div>
-</div>
-
-    <div class="container" id="utilisateurs">
-      <h2>Vos accès débloqué</h2>
-        <div class="accès-list">
-          <a href="/" style="background-image: url('/src/walpaper/shop.png');" class="accès">
-            <img src="/src/img/store.png" alt="User Avatar">
+  <div class="container" id="utilisateurs">
+    <h2>Vos accès débloqué</h2>
+      <div class="accès-list">
+        <div class="accès-wrapper">
+            <a href="/store" class="accès locked" id="card1" style="background-image: url('/src/img/walpaper/shop.png');">
+            <img src="/src/img/icn/store.png" alt="User Avatar">
             <p>Boutique</p>
-          </a>
-          <a href="/" style="background-image: url('/src/walpaper/aide.png');" class="accès">
-            <img src="/src/img/service.png" alt="User Avatar">
-          <p>Aide / Services</p>
-          </a>
-          <a href="/discord/SYSMI-ZONE" style="background-image: url('/src/walpaper/SYSMI ZONE 23.png');" class="accès">
-            <img src="/src/img/discord.png" alt="User Avatar">
-            <p>DISCORD COMMUNITYS</p>
-          </a>
-      </div>
-    </div>
+        </a>
+<!-- 🔒 Cadenas clickable -->
+<div class="lock-overlay" onclick="unlockCard(this, 'card1')">
+  <i class="fas fa-lock"></i>
+</div>
 
-    <div class="container" id="feedback">
-      <section class="section" id="testimonials">
-        <h2>
-          <a href="/public/pages/miscellaneous/feedback" style="margin-left:10px;font-size:16px;
-             text-decoration:none;color:#fff;padding:5px 10px;border-radius:5px;display:flex;
-             justify-content:center;gap:10px;">
-            Tout voir <i class="fas fa-arrow-right"></i>
-          </a>
-        </h2>
-        <form id="feedback-form" class="feedback-form" method="POST"
-              action="/public/import/php/script/forms/feedback.php">
-          <input type="hidden" id="user-id" name="user_id" value="<%= user_id %>">
-          <label for="feedback">Votre avis :</label>
-          <textarea id="feedback" name="feedback" placeholder="Partagez votre expérience ici..."
-                    rows="4" required></textarea>
-          <label for="rating">Votre note :</label>
-          <select id="rating" name="rating" required>
-            <option value="">-- Choisissez une note --</option>
-            <option value="5">⭐⭐⭐⭐⭐ - Excellent</option>
-            <option value="4">⭐⭐⭐⭐ - Très bien</option>
-            <option value="3">⭐⭐⭐ - Correct</option>
-            <option value="2">⭐⭐ - Médiocre</option>
-            <option value="1">⭐ - Mauvais</option>
-          </select>
-          <button type="submit">Envoyer mon avis</button>
-        </form>
-      </section>
+<!-- 🔊 Son erreur S-Coin (manque de monnaie) -->
+<audio id="scoin-denied-sound" src="/effects/sounds/denied.mp3" preload="auto"></audio>
+
+    </div>
+    <div class="accès-wrapper">
+      <a href="/" style="background-image: url('/src/img/walpaper/aide.png');" id="card2" class="accès locked">
+        <img src="/src/img/icn/service.png" alt="User Avatar">
+        <p>Aide / Services</p>
+      </a>
+      <div class="lock-overlay" onclick="unlockCard(this, 'card2')">
+        <i class="fas fa-lock"></i>
     </div>
   </div>
+  <div class="accès-wrapper">
+      <a href="/discord/SYSMI-ZONE" id="card3" style="background-image: url('/src/img/walpaper/SYSMI ZONE 23.png');" class="accès locked">
+        <img src="/src/img/icn/discord.png" alt="User Avatar">
+        <p>DISCORD COMMUNITYS</p>
+      </a>
+      <div class="lock-overlay" onclick="unlockCard(this, 'card3')">
+        <i class="fas fa-lock"></i>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <footer>
-    &copy; 2025 La SYSMI PROJECT. <a href="/privacy">Politique de confidentialité</a>.
-  </footer>
+
+  <div class="container" id="feedback">
+    <section class="section" id="testimonials">
+      <form id="feedback-form" class="feedback-form" method="POST" action="/settings/feedback">
+        <input type="hidden" id="user-id" name="user_id" value="<%= user_id %>">
+        <label for="feedback">Votre avis :</label>
+        <textarea id="feedback" name="feedback" placeholder="Partagez votre expérience ici..." rows="4" required></textarea>
+        <label for="rating">Votre note :</label>
+        <select id="rating" name="rating" required>
+          <option value="">-- Choisissez une note --</option>
+          <option value="5">⭐⭐⭐⭐⭐ - Excellent</option>
+          <option value="4">⭐⭐⭐⭐ - Très bien</option>
+          <option value="3">⭐⭐⭐ - Correct</option>
+          <option value="2">⭐⭐ - Médiocre</option>
+          <option value="1">⭐ - Mauvais</option>
+          </select>
+        <button type="submit">Envoyer mon avis</button>
+      </form>
+    </section>
+  </div>
+
+  <div class="container" id="feedback">
+    <% if (feedbacks && feedbacks.length > 0) { %>
+      <% feedbacks.forEach(feedback => { %>
+        <div class="testimonial">
+          <div class="testimonial-header">
+          <img class="feedback-profile" src="<%= feedback.photo_profil && feedback.photo_profil !== '' ? feedback.photo_profil : 'https://p7.hiclipart.com/preview/782/114/405/5bbc3519d674c.jpg' %>" alt="Profil">
+            <div class="user-info">
+              <strong><%= feedback.prenom %> <%= feedback.nom %></strong>
+              <span class="rating">⭐ <%= feedback.rating %>/5</span>
+            </div>
+          </div>
+            <p class="feedback-text"><%= feedback.feedback %></p>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>Aucun témoignage pour l’instant.</p>
+    <% } %>
+  </div>
+
+
+
+    <footer>
+      &copy; 2025 La SYSMI PROJECT. <a href="/privacy">Politique de confidentialité</a>.
+    </footer>
 
     <script>
       const prenom = "<%= prenom %>";
     </script>
 
-  <script src="/src/js/view/index/toggle.js"></script>
-    <script src="/src/js/view/index/SYSMI-Widget.js"></script>
-    <script src="/src/js/view/index/clock.js"></script>
-    <script src="/src/js/view/index/friends.js"></script>
-  <script src="/src/js/view/index/humeur.js"></script>
+    <script src="/src/js/index/toggle.js"></script>
+    <script src="/src/js/index/SYSMI-Widget.js"></script>
+    <script src="/src/js/index/clock.js"></script>
+    <script src="/src/js/index/friends.js"></script>
+    <script src="/src/js/index/humeur.js"></script>
+    <script src="/src/js/index/lecteur.js"></script>
 
-<script>
-  const lecteur = document.getElementById('lecteur');
-  const barre = document.getElementById('barre-progression');
-  const temps = document.getElementById('temps-actuel');
-  const titreMorceau = document.getElementById('titre-morceau');
-  let enLecture = false;
+<script src="/src/js/index/locked.js"></script>
 
-  function toggleLecture() {
-    if (lecteur.paused) {
-      lecteur.volume = 1.0;
-      lecteur.play();
-      enLecture = true;
-    } else {
-      lecteur.pause();
-      enLecture = false;
+  <script>
+    // Charger le compteur à l’ouverture
+    fetch('/api/scoin')
+      .then(res => res.json())
+      .then(data => {
+        if (data.etoile !== undefined) {
+          document.getElementById('scoin-count').textContent = data.etoile;
+        }
+      });
+
+    // Gagner des S-Coins
+    function gainScoins(amount) {
+      fetch('/api/coin/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            updateScoinCounter(data.newEtoile, amount);
+          }
+        });
     }
-  }
-
-  lecteur.addEventListener('timeupdate', () => {
-    const pourcentage = (lecteur.currentTime / lecteur.duration) * 100;
-    barre.style.width = pourcentage + '%';
-
-    const minutes = Math.floor(lecteur.currentTime / 60);
-    const secondes = Math.floor(lecteur.currentTime % 60).toString().padStart(2, '0');
-    temps.textContent = `${minutes}:${secondes}`;
-  });
-
-  // 🎶 Mettre à jour le titre dans le <marquee>
-  lecteur.addEventListener('loadedmetadata', () => {
-    const src = lecteur.src;
-    const nomFichier = decodeURIComponent(src.split('/').pop());
-    const titre = nomFichier.replace(/\.[^/.]+$/, '');
-    titreMorceau.textContent = `🎶 En lecture : ${titre} 🎶`;
-  });
-</script>
-
-
-
-
+  </script>
+  
   </body>
 </html>

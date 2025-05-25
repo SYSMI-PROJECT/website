@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadenas Cercle</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous"
+  />
+  <style>
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .lock-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid lime;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: border-color 0.4s, box-shadow 0.4s;
+      box-shadow: 0 0 12px lime;
+    }
+
+    .lock-circle.unlocked {
+      border-color: fuchsia;
+      box-shadow: 0 0 12px fuchsia;
+    }
+
+    .lock-circle i {
+      font-size: 48px;
+      color: lime;
+      transition: transform 0.4s, color 0.4s, filter 0.4s;
+      filter: drop-shadow(0 0 5px lime);
+    }
+
+    .lock-circle.unlocked i {
+      transform: rotate(-20deg);
+      color: fuchsia;
+      filter: drop-shadow(0 0 5px fuchsia);
+    }
+  </style>
+</head>
+<body>
+
+<div class="lock-circle" onclick="toggleLock(this)">
+  <i class="fas fa-lock"></i>
+</div>
+
+<script>
+  function toggleLock(el) {
+    const icon = el.querySelector('i');
+    icon.classList.toggle('fa-lock');
+    icon.classList.toggle('fa-lock-open');
+    el.classList.toggle('unlocked');
+  }
+</script>
+
+</body>
+</html>

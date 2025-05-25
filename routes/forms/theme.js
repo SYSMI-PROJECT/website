@@ -4,7 +4,7 @@ const pool = require('../../database');
 const UsersData = require('../../middleware/UsersData');
 
 // Liste des thèmes autorisés
-const themesAutorises = ['blanc', 'noir', 'bleu', 'rouge', 'vert'];
+const themesAutorises = ['blanc', 'noir', 'sombre', 'bleu', 'rouge', 'vert'];
 
 // Route POST pour modifier le thème
 router.post('/', UsersData, async (req, res) => {
